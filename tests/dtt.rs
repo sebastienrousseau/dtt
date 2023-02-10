@@ -367,6 +367,36 @@ mod tests {
         assert_eq!(previous_day.day, date_time.day - 1);
     }
     #[test]
+    fn test_from_str_impl() {
+        let date_str = "2022-01-01T12:00:00+01:00";
+
+        let expected = Ok(DateTime {
+            day: 1,
+            hour: 12,
+            iso_8601: date_str.to_owned(),
+            iso_week: 0,
+            microsecond: 0,
+            minute: 0,
+            month: "".to_owned(),
+            now: "".to_owned(),
+            offset: "".to_owned(),
+            ordinal: 0,
+            second: 0,
+            time: "".to_owned(),
+            tz: "".to_owned(),
+            weekday: "".to_owned(),
+            year: 2022,
+        });
+        let result = date_str.parse::<DateTime>();
+        assert_eq!(result, expected);
+
+        let date_str = "invalid";
+        let expected = Err(());
+        let result = date_str.parse::<DateTime>();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
     fn test_from_str() {
         let date_str = "2022-01-01T12:00:00+01:00";
 
@@ -504,5 +534,29 @@ mod tests {
         assert_eq!(result.tz, expected.tz);
         assert_eq!(result.offset, expected.offset);
         assert_eq!(result.now, expected.now);
+    }
+    #[test]
+    fn test_display() {
+        let date_time = DateTime::new();
+        let expected = format!(
+        "Year: {}\nMonth: {}\nDay: {}\nWeekday: {}\nHour: {}\nMinute: {}\nSecond: {}\nMicrosecond: {}\nOrdinal: {}\nIso 8601: {}\nIso Week: {}\nTime: {}\nTZ: {}\nOffset: {}\nNow: {}",
+        date_time.year,
+        date_time.month,
+        date_time.day,
+        date_time.weekday,
+        date_time.hour,
+        date_time.minute,
+        date_time.second,
+        date_time.microsecond,
+        date_time.ordinal,
+        date_time.iso_8601,
+        date_time.iso_week,
+        date_time.time,
+        date_time.tz,
+        date_time.offset,
+        date_time.now
+    );
+        let result = format!("{}", date_time);
+        assert_eq!(result, expected);
     }
 }
