@@ -150,7 +150,7 @@ lot of useful suggestions on how to improve this project.
 [11]: https://codecov.io/github/sebastienrousseau/dtt
 
 [banner]: https://raw.githubusercontent.com/sebastienrousseau/vault/main/assets/dtt/banners/banner-dtt-1597x377.svg "DTT Banner"
-[codecov-badge]: https://img.shields.io/codecov/c/github/sebastienrousseau/dtt?style=for-the-badge&token=0FZQGHLMOP 'Codecov'
+[codecov-badge]: https://img.shields.io/codecov/c/github/sebastienrousseau/dtt?style=for-the-badge&token=X3ZP0K1SGI 'Codecov'
 [crates-badge]: https://img.shields.io/crates/v/dtt.svg?style=for-the-badge 'Crates.io'
 [divider]: https://raw.githubusercontent.com/sebastienrousseau/vault/main/assets/elements/divider.svg "divider"
 [docs-badge]: https://img.shields.io/docsrs/dtt.svg?style=for-the-badge 'Docs.rs'

@@ -1,4 +1,4 @@
-name: ❯ CMN Release
+name: ❯ DTT Release
 
 on: [push]
 
@@ -215,7 +215,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ env.VERSION }}
-          release_name: Common (CMN) 🦀 v${{ env.VERSION }}
+          release_name: DateTime (DTT) 🦀 v${{ env.VERSION }}
           body_path: ${{ github.workspace }}/CHANGELOG.md
           draft: true
           prerelease: false
