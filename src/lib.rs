@@ -10,7 +10,7 @@
 //!
 //! [![Rust](https://img.shields.io/badge/rust-f04041?style=for-the-badge&labelColor=c0282d&logo=rust)](https://www.rust-lang.org)
 //! [![Crates.io](https://img.shields.io/crates/v/dtt.svg?style=for-the-badge&color=success&labelColor=27A006)](https://crates.io/crates/dtt)
-//! [![Lib.rs](https://img.shields.io/badge/lib.rs-v0.0.2-success.svg?style=for-the-badge&color=8A48FF&labelColor=6F36E4)](https://lib.rs/crates/dtt)
+//! [![Lib.rs](https://img.shields.io/badge/lib.rs-v0.0.3-success.svg?style=for-the-badge&color=8A48FF&labelColor=6F36E4)](https://lib.rs/crates/dtt)
 //! [![GitHub](https://img.shields.io/badge/github-555555?style=for-the-badge&labelColor=000000&logo=github)](https://github.com/sebastienrousseau/dtt)
 //! [![License](https://img.shields.io/crates/l/dtt.svg?style=for-the-badge&color=007EC6&labelColor=03589B)](http://opensource.org/licenses/MIT)
 //!
@@ -29,6 +29,15 @@
 //!
 //! ## Features
 //!
+//! The library `DateTime` provides date and time types and methods to
+//! make it easier to manipulate dates and times. It uses the serde
+//! library to derive the Deserialize and Serialize traits to convert
+//! the `DateTime` struct to and from various data formats. It also uses
+//! the time and regex crates to deal with time conversions and regular
+//! expressions respectively.
+//!
+//! The `DateTime` struct includes fields such as:
+//!
 //! | Feature | Description |
 //! | --- | --- |
 //! | `day` | Day of the month: (01-31) |
@@ -46,6 +55,8 @@
 //! | `tz` | Time zone object: (e.g. "UTC") |
 //! | `weekday` | Weekday object: (e.g. "Monday") |
 //! | `year` | Year object: (e.g. "2023") |
+//!
+//! Each of which represents different aspects of a date and time.
 //!
 //! ## Usage
 //!
@@ -135,6 +146,7 @@
 #![deny(dead_code)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_docs)]
+#![deny(rustc::existing_doc_keyword)]
 #![forbid(unsafe_code)]
 #![warn(unreachable_pub)]
 #![doc(
@@ -154,6 +166,9 @@ use time::{Duration, OffsetDateTime};
 
 extern crate regex;
 use regex::Regex;
+
+/// The `macros` module contains functions for generating macros.
+pub mod macros;
 
 ///
 /// DateTime struct to ease dates and times manipulation.
@@ -212,8 +227,10 @@ impl DateTime {
             OffsetDateTime::now_utc()
         } else {
             let (hours, minutes, _) = offset.as_hms();
-            let total_seconds = (hours as i16 * 3600) + (minutes as i16 * 60);
-            OffsetDateTime::now_utc() + Duration::seconds(total_seconds as i64)
+            let total_seconds =
+                (hours as i16 * 3600) + (minutes as i16 * 60);
+            OffsetDateTime::now_utc()
+                + Duration::seconds(total_seconds as i64)
         };
         let iso_8601 = now_utc.to_string();
 
@@ -251,7 +268,8 @@ impl DateTime {
     /// 23:59 is valid.
     /// 24:00 is not valid.
     pub fn is_valid_hour(input: &str) -> bool {
-        let re: Regex = Regex::new(r"^([0-1][0-9]|2[0-3])(:[0-5][0-9])?$").unwrap();
+        let re: Regex =
+            Regex::new(r"^([0-1][0-9]|2[0-3])(:[0-5][0-9])?$").unwrap();
         re.is_match(input)
     }
     /// Check if the input is a valid minute.
@@ -306,7 +324,9 @@ impl DateTime {
     /// 23:59:59 is valid.
     /// 24:00:00 is not valid.
     pub fn is_valid_time(input: &str) -> bool {
-        let re = Regex::new(r"^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").unwrap();
+        let re =
+            Regex::new(r"^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$")
+                .unwrap();
         re.is_match(input)
     }
     /// Check if the input is a valid ISO 8601 date and time.
@@ -341,7 +361,9 @@ impl DateTime {
             let captures = re.captures(&tz).unwrap();
             let tz_hour = captures[1].parse::<i32>().unwrap();
             let tz_minute = captures[2].parse::<i32>().unwrap();
-            if !(0..=23).contains(&tz_hour) || !(0..=59).contains(&tz_minute) {
+            if !(0..=23).contains(&tz_hour)
+                || !(0..=59).contains(&tz_minute)
+            {
                 return false;
             }
         }
@@ -385,8 +407,10 @@ impl DateTime {
             let hours = captures[2].parse::<i64>().unwrap();
             let minutes = captures[3].parse::<i64>().unwrap();
 
-            let total_seconds = (hours as i16 * 3600) + (minutes as i16 * 60);
-            OffsetDateTime::now_utc() + Duration::seconds(total_seconds as i64)
+            let total_seconds =
+                (hours as i16 * 3600) + (minutes as i16 * 60);
+            OffsetDateTime::now_utc()
+                + Duration::seconds(total_seconds as i64)
         };
 
         self.time = now_utc.to_string();
@@ -473,7 +497,8 @@ impl DateTime {
     /// Returns the `DateTime` structure that represents the resulting
     /// date and time.
     pub fn previous_day(&self) -> DateTime {
-        let previous_day = OffsetDateTime::now_utc() - Duration::days(1);
+        let previous_day =
+            OffsetDateTime::now_utc() - Duration::days(1);
         DateTime {
             day: previous_day.day(),
             hour: previous_day.hour(),
@@ -539,51 +564,4 @@ impl std::str::FromStr for DateTime {
             year,
         })
     }
-}
-
-/// Generates a function with the given name `$name` that checks whether
-/// a string `input` can be parsed into a value of type `$type`. The
-/// function returns `true` if the string can be parsed, and `false`
-/// otherwise.
-///
-/// The macro can be used to validate multiple types of DateTime
-/// methods such as:
-///
-/// | Macro | Description |
-/// |--------|------------|
-/// | `is_valid!(day, u32)` | Validates that a `day` is valid. |
-/// | `is_valid!(hour, u32)` | Validates that an `hour` is valid. |
-/// | `is_valid!(minute, u32)` | Validates that a `minute` is valid. |
-/// | `is_valid!(month, u32)` | Validates that a `month` is valid. |
-/// | `is_valid!(second, u32)` | Validates that a `second` is valid. |
-/// | `is_valid_time!(time, u32)` | Validates that a `time` is valid. |
-/// | `is_valid_iso_8601!(iso_8601, u32)` | Validates that a `iso_8601` is valid. |
-///
-/// # Example
-///
-/// ```rust
-///
-/// // Import the  `dtt` library.
-/// extern crate dtt;
-/// use dtt::is_valid;
-///
-/// // Use the `is_valid!` macro to validate that a `day` is valid.
-///
-/// is_valid!(day, u32);
-/// let input = "31";
-/// let result = day(input);
-/// assert!(result);
-///
-/// ```
-#[macro_export]
-macro_rules! is_valid {
-    ($name:ident, $type:ty) => {
-        fn $name(input: &str) -> bool {
-            let mut valid = false;
-            if let Ok(_input) = input.parse::<$type>() {
-                valid = true;
-            }
-            valid
-        }
-    };
 }
