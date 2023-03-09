@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 name = "dtt"
 repository = "https://github.com/sebastienrousseau/mini-functions/tree/main/dtt/"
 rust-version = "1.67"
-version = "0.0.2"
+version = "0.0.3"
 include = [
     "../../LICENSE-APACHE",
     "../../LICENSE-MIT",
@@ -29,8 +29,8 @@ path = "benches/dtt.rs"
 
 [dependencies]
 regex = "1.7.1"
-serde = { version = "1.0.152", features = ["derive"] }
-time = "0.3.17"
+serde = { version = "1.0.154", features = ["derive"] }
+time = "0.3.20"
 
 [dev-dependencies]
 criterion = "0.4.0"
@@ -42,6 +42,9 @@ path = "src/lib.rs"
 
 [features]
 default = []
+
+[workspace]
+members = ["xtask"]
 
 [package.metadata.docs.rs]
 all-features = true

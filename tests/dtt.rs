@@ -3,12 +3,12 @@
 mod tests {
 
     extern crate dtt;
-    use std::str::FromStr;
+    extern crate regex;
+    extern crate time;
 
     use dtt::{is_valid, DateTime};
-
-    extern crate time;
     use regex::Regex;
+    use std::str::FromStr;
     use time::{Duration, OffsetDateTime};
 
     #[test]
@@ -32,7 +32,7 @@ mod tests {
     #[test]
     // Test the `is_valid_day` function
     fn test_is_valid_day() {
-        assert!(!DateTime::is_valid_day("32"));
+        assert!(!DateTime::is_valid_day("0"));
         assert!(DateTime::is_valid_day("31"));
     }
     #[test]
@@ -46,8 +46,12 @@ mod tests {
     // Test the `is_valid_iso_8601` function
     fn test_is_valid_iso_8601() {
         assert!(DateTime::is_valid_iso_8601("2022-06-25T17:30:00Z"));
-        assert!(DateTime::is_valid_iso_8601("2022-06-25T17:30:00+01:00"));
-        assert!(DateTime::is_valid_iso_8601("2022-06-25T17:30:00.123456Z"));
+        assert!(DateTime::is_valid_iso_8601(
+            "2022-06-25T17:30:00+01:00"
+        ));
+        assert!(DateTime::is_valid_iso_8601(
+            "2022-06-25T17:30:00.123456Z"
+        ));
         assert!(DateTime::is_valid_iso_8601(
             "2022-06-25T17:30:00.123456+01:00"
         ));
@@ -58,43 +62,67 @@ mod tests {
     fn test_invalid_iso_8601() {
         assert!(!DateTime::is_valid_iso_8601("2022-06-25T17:30:00"));
         assert!(!DateTime::is_valid_iso_8601("2022-06-25 17:30:00Z"));
-        assert!(!DateTime::is_valid_iso_8601("2022-06-25T17:30:00+25:00"));
-        assert!(!DateTime::is_valid_iso_8601("2022-06-25T17:30:00+01:61"));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-06-25T17:30:00+25:00"
+        ));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-06-25T17:30:00+01:61"
+        ));
     }
 
     #[test]
     // Test the month validation
     fn test_month_out_of_range() {
-        assert!(!DateTime::is_valid_iso_8601("2022-13-25T17:30:00.1234567Z"));
-        assert!(!DateTime::is_valid_iso_8601("2022-00-25T17:30:00.1234567Z"));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-13-25T17:30:00.1234567Z"
+        ));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-00-25T17:30:00.1234567Z"
+        ));
     }
 
     #[test]
     // Test the day validation
     fn test_day_out_of_range() {
-        assert!(!DateTime::is_valid_iso_8601("2022-12-32T17:30:00.1234567Z"));
-        assert!(!DateTime::is_valid_iso_8601("2022-12-00T17:30:00.1234567Z"));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-12-32T17:30:00.1234567Z"
+        ));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-12-00T17:30:00.1234567Z"
+        ));
     }
 
     #[test]
     // Test the hour validation
     fn test_hour_out_of_range() {
-        assert!(!DateTime::is_valid_iso_8601("2022-12-31T24:30:00.1234567Z"));
-        assert!(!DateTime::is_valid_iso_8601("2022-12-31T-1:30:00.1234567Z"));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-12-31T24:30:00.1234567Z"
+        ));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-12-31T-1:30:00.1234567Z"
+        ));
     }
 
     #[test]
     // Test the minute validation
     fn test_minute_out_of_range() {
-        assert!(!DateTime::is_valid_iso_8601("2022-12-31T23:60:00.1234567Z"));
-        assert!(!DateTime::is_valid_iso_8601("2022-12-31T23:-1:00.1234567Z"));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-12-31T23:60:00.1234567Z"
+        ));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-12-31T23:-1:00.1234567Z"
+        ));
     }
 
     #[test]
     // Test the second validation
     fn test_second_out_of_range() {
-        assert!(!DateTime::is_valid_iso_8601("2022-12-31T23:59:60.1234567Z"));
-        assert!(!DateTime::is_valid_iso_8601("2022-12-31T23:59:-1.1234567Z"));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-12-31T23:59:60.1234567Z"
+        ));
+        assert!(!DateTime::is_valid_iso_8601(
+            "2022-12-31T23:59:-1.1234567Z"
+        ));
     }
     #[test]
     // Test the timezone validation
@@ -130,8 +158,11 @@ mod tests {
         let minutes = captures[3].parse::<i64>().unwrap();
 
         let actual_offset = time::UtcOffset::from_hms(1, 0, 0);
-        let expected_offset =
-            time::UtcOffset::from_hms(hours.try_into().unwrap(), minutes.try_into().unwrap(), 0);
+        let expected_offset = time::UtcOffset::from_hms(
+            hours.try_into().unwrap(),
+            minutes.try_into().unwrap(),
+            0,
+        );
         let erroneous_offset = time::UtcOffset::from_hms(3, 0, 0);
         assert_eq!(expected_offset, actual_offset);
         assert_ne!(expected_offset, erroneous_offset);
@@ -241,12 +272,17 @@ mod tests {
 
         let now_utc = OffsetDateTime::now_utc();
         let (hours, minutes, _) = offset.as_hms();
-        let total_seconds = (hours as i16 * 3600) + (minutes as i16 * 60);
-        let expected_date_time = now_utc + Duration::seconds(total_seconds as i64);
+        let total_seconds =
+            (hours as i16 * 3600) + (minutes as i16 * 60);
+        let expected_date_time =
+            now_utc + Duration::seconds(total_seconds as i64);
 
         assert_eq!(date_time.hour, expected_date_time.hour());
         assert_eq!(date_time.minute, expected_date_time.minute());
-        assert_eq!(date_time.offset, expected_date_time.offset().to_string());
+        assert_eq!(
+            date_time.offset,
+            expected_date_time.offset().to_string()
+        );
     }
     #[test]
     fn test_new_with_tz_custom() {
@@ -255,12 +291,17 @@ mod tests {
 
         let now_utc = OffsetDateTime::now_utc();
         let (hours, minutes, _) = offset.as_hms();
-        let total_seconds = (hours as i16 * 3600) + (minutes as i16 * 60);
-        let expected_date_time = now_utc + Duration::seconds(total_seconds as i64);
+        let total_seconds =
+            (hours as i16 * 3600) + (minutes as i16 * 60);
+        let expected_date_time =
+            now_utc + Duration::seconds(total_seconds as i64);
 
         assert_eq!(date_time.hour, expected_date_time.hour());
         assert_eq!(date_time.minute, expected_date_time.minute());
-        assert_eq!(date_time.offset, expected_date_time.offset().to_string());
+        assert_eq!(
+            date_time.offset,
+            expected_date_time.offset().to_string()
+        );
     }
     #[test]
     fn test_new_with_tz_to_paris() {
@@ -281,11 +322,12 @@ mod tests {
     }
     #[test]
     fn test_is_valid() {
-        is_valid!(day, u32);
-        let input = "31";
-        let result = day(input);
+        let input = "31".to_string();
+        is_valid!(day, String);
+        let result = day(&input);
         assert!(result);
     }
+
     #[test]
     fn test_display_format() {
         let date_time = DateTime::new();
