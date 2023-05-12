@@ -77,7 +77,7 @@ mod tests {
     fn test_is_valid() {
         let input = "31";
         is_valid!(day, String);
-        let result = day(&input);
+        let result = day(input);
         assert!(result);
     }
 
