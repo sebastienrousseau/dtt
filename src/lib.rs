@@ -1,18 +1,18 @@
-// Copyright © 2022-2023 Mini Functions. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0
-// SPDX-License-Identifier: MIT
+// Copyright © 2023 DateTime (DTT) library. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+
 //!
 //! # A Rust library for parsing, validating, manipulating, and formatting dates and times
 //!
-//! [![Rust](https://raw.githubusercontent.com/sebastienrousseau/vault/main/assets/dtt/logo/logo-dtt.svg)](https://minifunctions.com/dtt/)
+//! [![DTT Banner](https://kura.pro/dtt/images/banners/banner-dtt.svg)](https://minifunctions.com)
 //!
 //! <center>
 //!
-//! [![Rust](https://img.shields.io/badge/rust-f04041?style=for-the-badge&labelColor=c0282d&logo=rust)](https://www.rust-lang.org)
 //! [![Crates.io](https://img.shields.io/crates/v/dtt.svg?style=for-the-badge&color=success&labelColor=27A006)](https://crates.io/crates/dtt)
-//! [![Lib.rs](https://img.shields.io/badge/lib.rs-v0.0.3-success.svg?style=for-the-badge&color=8A48FF&labelColor=6F36E4)](https://lib.rs/crates/dtt)
 //! [![GitHub](https://img.shields.io/badge/github-555555?style=for-the-badge&labelColor=000000&logo=github)](https://github.com/sebastienrousseau/dtt)
+//! [![Lib.rs](https://img.shields.io/badge/lib.rs-v0.0.4-success.svg?style=for-the-badge&color=8A48FF&labelColor=6F36E4)](https://lib.rs/crates/dtt)
 //! [![License](https://img.shields.io/crates/l/dtt.svg?style=for-the-badge&color=007EC6&labelColor=03589B)](http://opensource.org/licenses/MIT)
+//! [![Rust](https://img.shields.io/badge/rust-f04041?style=for-the-badge&labelColor=c0282d&logo=rust)](https://www.rust-lang.org)
 //!
 //! </center>
 //!
@@ -38,23 +38,23 @@
 //!
 //! The `DateTime` struct includes fields such as:
 //!
-//! | Feature | Description |
-//! | --- | --- |
-//! | `day` | Day of the month: (01-31) |
-//! | `hour` | Hour of the day: (00-23) |
-//! | `iso_8601` | ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00") |
-//! | `iso_week` | ISO week number: (1-53) |
-//! | `microsecond` | Microsecond: (0-999999) |
-//! | `minute` | Minute of the hour: (0-59) |
-//! | `month` | Month: (e.g. "January") |
-//! | `now` | Now object: (e.g. "2023-01-01") |
-//! | `offset` | Offset from UTC: (e.g. "+00:00") |
-//! | `ordinal` | Ordinal date: (1-366) |
-//! | `second` | Second of the minute: (0-59) |
-//! | `time` | Time object: (e.g. "00:00:00") |
-//! | `tz` | Time zone object: (e.g. "UTC") |
-//! | `weekday` | Weekday object: (e.g. "Monday") |
-//! | `year` | Year object: (e.g. "2023") |
+//! | Feature | Description | Type |
+//! | --- | --- | --- |
+//! | `day` | Day of the month: (01-31) | `u8` |
+//! | `hour` | Hour of the day: (00-23) | `u8` |
+//! | `iso_8601` | ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00") | `String` |
+//! | `iso_week` | ISO week number: (1-53) | `u8` |
+//! | `microsecond` | Microsecond: (0-999999) | `u32` |
+//! | `minute` | Minute of the hour: (0-59) | `u8` |
+//! | `month` | Month: (e.g. "January") | `String` |
+//! | `now` | Now object: (e.g. "2023-01-01") | `String` |
+//! | `offset` | Offset from UTC: (e.g. "+00:00") | `String` |
+//! | `ordinal` | Ordinal date: (1-366) | `u16` |
+//! | `second` | Second of the minute: (0-59) | `u8` |
+//! | `time` | Time object: (e.g. "00:00:00") | `String` |
+//! | `tz` | Time zone object: (e.g. "UTC") | `String` |
+//! | `weekday` | Weekday object: (e.g. "Monday") | `String` |
+//! | `year` | Year object: (e.g. "2023") | `i32` |
 //!
 //! Each of which represents different aspects of a date and time.
 //!
@@ -146,12 +146,11 @@
 #![deny(dead_code)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_docs)]
-#![deny(rustc::existing_doc_keyword)]
 #![forbid(unsafe_code)]
 #![warn(unreachable_pub)]
 #![doc(
-    html_favicon_url = "https://raw.githubusercontent.com/sebastienrousseau/vault/main/assets/dtt/icons/ico-dtt.svg",
-    html_logo_url = "https://raw.githubusercontent.com/sebastienrousseau/vault/main/assets/dtt/icons/ico-dtt.svg",
+    html_favicon_url = "https://kura.pro/dtt/images/favicon.ico",
+    html_logo_url = "https://kura.pro/dtt/images/logos/dtt.svg",
     html_root_url = "https://docs.rs/dtt"
 )]
 #![crate_name = "dtt"]
@@ -212,6 +211,91 @@ pub struct DateTime {
 }
 
 impl DateTime {
+    /// Parse the input string and create a new `DateTime` object.
+    ///
+    /// This function takes an input string and attempts to parse it into a `DateTime` object.
+    /// The input string can be in ISO 8601 format or a date-only format (YYYY-MM-DD).
+    /// If the input matches the ISO 8601 format, the resulting `DateTime` object will be set
+    /// to the current UTC time. If the input matches the date-only format, the resulting `DateTime`
+    /// object will have the time components set to zero and the timezone set to UTC.
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - A string slice that represents the date and time to parse.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<DateTime, &'static str>` - A result indicating either the successfully parsed `DateTime` object
+    /// or an error message if the input format is invalid.
+    ///
+    pub fn parse(input: &str) -> Result<DateTime, &'static str> {
+        let iso_8601_pattern =
+            r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$";
+        let date_pattern = r"^\d{4}-\d{2}-\d{2}$";
+
+        if Regex::new(iso_8601_pattern).unwrap().is_match(input) {
+            let tz = "UTC";
+            let now_utc = OffsetDateTime::now_utc();
+            let iso_8601 = now_utc.to_string();
+
+            return Ok(DateTime {
+                day: now_utc.day(),
+                hour: now_utc.hour(),
+                iso_8601,
+                iso_week: now_utc.iso_week(),
+                microsecond: now_utc.microsecond(),
+                minute: now_utc.minute(),
+                month: now_utc.month().to_string(),
+                now: now_utc.date().to_string(),
+                offset: now_utc.offset().to_string(),
+                ordinal: now_utc.ordinal(),
+                second: now_utc.second(),
+                time: now_utc.time().to_string(),
+                tz: tz.to_owned(),
+                weekday: now_utc.weekday().to_string(),
+                year: now_utc.year(),
+            });
+        } else if Regex::new(date_pattern).unwrap().is_match(input) {
+            let date_parts: Vec<&str> = input.split('-').collect();
+            if date_parts.len() != 3 {
+                return Err("Invalid date format");
+            }
+
+            let year = date_parts[0]
+                .parse::<i32>()
+                .map_err(|_| "Invalid date format")?;
+            let month = date_parts[1]
+                .parse::<u8>()
+                .map_err(|_| "Invalid date format")?;
+            let day = date_parts[2]
+                .parse::<u8>()
+                .map_err(|_| "Invalid date format")?;
+
+            let now = format!("{:04}-{:02}-{:02}", year, month, day);
+            let iso_8601 = format!("{}T00:00:00+00:00", now);
+
+            return Ok(DateTime {
+                day,
+                hour: 0,
+                iso_8601,
+                iso_week: 0, // Set the ISO week to 0 as it's not applicable in this case
+                microsecond: 0,
+                minute: 0,
+                month: format!("{:02}", month),
+                now,
+                offset: "+00:00".to_string(),
+                ordinal: 0, // Set the ordinal to 0 as it's not applicable in this case
+                second: 0,
+                time: "00:00:00".to_string(),
+                tz: "UTC".to_string(),
+                weekday: "".to_string(), // Set the weekday to an empty string as it's not applicable in this case
+                year,
+            });
+        }
+
+        Err("Invalid date format")
+    }
+
     /// Create a new Date object with UTC timezone.
     pub fn new() -> DateTime {
         Self::new_with_tz("UTC")
@@ -564,4 +648,17 @@ impl std::str::FromStr for DateTime {
             year,
         })
     }
+}
+
+/// This is the main entry point for the `DateTime (DTT)` library.
+pub fn run() -> Result<(), Box<dyn std::error::Error>> {
+    if std::env::var("DTT_TEST_MODE").unwrap_or_default() == "1" {
+        return Err("Simulated error".into());
+    }
+    let name = "dtt";
+    println!("Welcome to `{}` 👋!", { name }.to_uppercase());
+    println!(
+        "A Rust library for parsing, validating, manipulating, and formatting dates and times."
+    );
+    Ok(())
 }

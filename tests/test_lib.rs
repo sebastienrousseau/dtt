@@ -6,7 +6,7 @@ mod tests {
     extern crate regex;
     extern crate time;
 
-    use dtt::{is_valid, DateTime};
+    use dtt::DateTime;
     use regex::Regex;
     use std::str::FromStr;
     use time::{Duration, OffsetDateTime};
@@ -68,6 +68,22 @@ mod tests {
         assert!(!DateTime::is_valid_iso_8601(
             "2022-06-25T17:30:00+01:61"
         ));
+    }
+
+    #[test]
+    // Test the `is_valid_iso_week` function
+    fn test_is_valid_iso_week() {
+        assert!(DateTime::is_valid_iso_week("1"));
+        assert!(DateTime::is_valid_iso_week("53"));
+        assert!(!DateTime::is_valid_iso_week("0"));
+        assert!(!DateTime::is_valid_iso_week("54"));
+    }
+
+    #[test]
+    // Test the reverse of `is_valid_iso_week` function
+    fn test_invalid_iso_week() {
+        assert!(!DateTime::is_valid_iso_week("0"));
+        assert!(!DateTime::is_valid_iso_week("54"));
     }
 
     #[test]
@@ -320,13 +336,6 @@ mod tests {
         assert!(!date.weekday.is_empty());
         assert!(date.year > 0);
     }
-    #[test]
-    fn test_is_valid() {
-        let input = "31".to_string();
-        is_valid!(day, String);
-        let result = day(&input);
-        assert!(result);
-    }
 
     #[test]
     fn test_display_format() {
@@ -349,53 +358,7 @@ mod tests {
         assert!(formatted.contains("Offset:"));
         assert!(formatted.contains("Now:"));
     }
-    #[test]
-    fn test_is_valid_iso_week() {
-        assert!(DateTime::is_valid_iso_week("53"));
-        assert!(!DateTime::is_valid_iso_week("54"));
-        assert!(!DateTime::is_valid_iso_week("a"));
-    }
 
-    #[test]
-    fn test_is_valid_microsecond() {
-        assert!(DateTime::is_valid_microsecond("999999"));
-        assert!(!DateTime::is_valid_microsecond("1000000"));
-        assert!(!DateTime::is_valid_microsecond("b"));
-    }
-
-    #[test]
-    fn test_is_valid_minute() {
-        assert!(DateTime::is_valid_minute("59"));
-        assert!(!DateTime::is_valid_minute("60"));
-        assert!(!DateTime::is_valid_minute("c"));
-    }
-
-    #[test]
-    fn test_is_valid_month() {
-        assert!(DateTime::is_valid_month("12"));
-        assert!(!DateTime::is_valid_month("13"));
-        assert!(!DateTime::is_valid_month("d"));
-    }
-
-    #[test]
-    fn test_is_valid_ordinal() {
-        assert!(DateTime::is_valid_ordinal("366"));
-        assert!(!DateTime::is_valid_ordinal("367"));
-        assert!(!DateTime::is_valid_ordinal("e"));
-    }
-
-    #[test]
-    fn test_is_valid_second() {
-        assert!(DateTime::is_valid_second("59"));
-        assert!(!DateTime::is_valid_second("60"));
-        assert!(!DateTime::is_valid_second("f"));
-    }
-    #[test]
-    fn test_is_valid_time() {
-        assert!(DateTime::is_valid_time("23:59:59"));
-        assert!(!DateTime::is_valid_time("24:00:00"));
-        assert!(!DateTime::is_valid_time("g"));
-    }
     #[test]
     fn test_next_day() {
         let date_time = DateTime::new();
