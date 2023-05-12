@@ -164,6 +164,109 @@ To run the examples, clone the repository and run the following command in your 
 cargo run --example dtt
 ```
 
+#### Example 1: Creating a new DateTime object
+
+```rust
+use dtt::DateTime;
+use dtt::dtt_print;
+
+fn main() {
+    // Create a new DateTime object with the current UTC time
+    let now = DateTime::new();
+    dtt_print!(now);
+}
+```
+
+#### Example 2: Creating a new DateTime object with a custom timezone
+
+```rust
+use dtt::DateTime;
+use dtt::dtt_print;
+
+fn main() {
+    // Create a new DateTime object with a custom timezone (e.g., CEST)
+    let paris_time = DateTime::new_with_tz("CEST");
+    dtt_print!(paris_time);
+}
+```
+
+Custom timezones supported by `DateTime (DTT)` are:
+
+| Abbreviation | UtcOffset                           | Time Zone Description                    |
+|--------------|-------------------------------------|------------------------------------------|
+| ACDT         | `UtcOffset::from_hms(10, 30, 0)`    | Australian Central Daylight Time         |
+| ACST         | `UtcOffset::from_hms(9, 30, 0)`     | Australian Central Standard Time         |
+| ADT          | `UtcOffset::from_hms(-3, 0, 0)`     | Atlantic Daylight Time                    |
+| AEDT         | `UtcOffset::from_hms(11, 0, 0)`     | Australian Eastern Daylight Time          |
+| AEST         | `UtcOffset::from_hms(10, 0, 0)`     | Australian Eastern Standard Time          |
+| AKDT         | `UtcOffset::from_hms(-8, 0, 0)`     | Alaska Daylight Time                      |
+| AKST         | `UtcOffset::from_hms(-9, 0, 0)`     | Alaska Standard Time                      |
+| AST          | `UtcOffset::from_hms(-4, 0, 0)`     | Atlantic Standard Time                    |
+| AWST         | `UtcOffset::from_hms(8, 0, 0)`      | Australian Western Standard Time          |
+| BST          | `UtcOffset::from_hms(1, 0, 0)`      | British Summer Time                       |
+| CDT          | `UtcOffset::from_hms(-5, 0, 0)`     | Central Daylight Time                      |
+| CEST         | `UtcOffset::from_hms(2, 0, 0)`      | Central European Summer Time              |
+| CET          | `UtcOffset::from_hms(1, 0, 0)`      | Central European Time                     |
+| CST          | `UtcOffset::from_hms(-6, 0, 0)`     | Central Standard Time                     |
+| ECT          | `UtcOffset::from_hms(-4, 0, 0)`     | Eastern Caribbean Time                    |
+| EDT          | `UtcOffset::from_hms(-4, 0, 0)`     | Eastern Daylight Time                      |
+| EEST         | `UtcOffset::from_hms(3, 0, 0)`      | Eastern European Summer Time              |
+| EET          | `UtcOffset::from_hms(2, 0, 0)`      | Eastern European Time                     |
+| EST          | `UtcOffset::from_hms(-5, 0, 0)`     | Eastern Standard Time                     |
+| GMT          | `UtcOffset::from_hms(0, 0, 0)`      | Greenwich Mean Time                       |
+| HADT         | `UtcOffset::from_hms(-9, 0, 0)`     | Hawaii-Aleutian Daylight Time              |
+| HAST         | `UtcOffset::from_hms(-10, 0, 0)`    | Hawaii-Aleutian Standard Time              |
+| HKT          | `UtcOffset::from_hms(8, 0, 0)`      | Hong Kong Time                            |
+| IST          | `UtcOffset::from_hms(5, 30, 0)`     | Indian Standard Time                      |
+| IDT          | `UtcOffset::from_hms(3, 0, 0)`      | Israel Daylight Time                       |
+| JST          | `UtcOffset::from_hms(9, 0, 0)`      | Japan Standard Time                       |
+| KST          | `UtcOffset::from_hms(9, 0, 0)`      | Korean Standard Time                      |
+| MDT          | `UtcOffset::from_hms(-6, 0, 0)`     | Mountain Daylight Time                    |
+| MST          | `UtcOffset::from_hms(-7, 0, 0)`     | Mountain Standard Time                    |
+| NZDT         | `UtcOffset::from_hms(13, 0, 0)`     | New Zealand Daylight Time                 |
+| NZST         | `UtcOffset::from_hms(12, 0, 0)`     | New Zealand Standard Time                 |
+| PDT          | `UtcOffset::from_hms(-7, 0, 0)`     | Pacific Daylight Time                      |
+| PST          | `UtcOffset::from_hms(-8, 0, 0)`     | Pacific Standard Time                      |
+| UTC          | `UtcOffset::from_hms(0, 0, 0)`      | Coordinated Universal Time                |
+| WADT         | `UtcOffset::from_hms(8, 45, 0)`     | West Australian Daylight Time             |
+| WAST         | `UtcOffset::from_hms(7, 0, 0)`      | West Australian Standard Time             |
+| WEDT         | `UtcOffset::from_hms(1, 0, 0)`      | Western European Daylight Time            |
+| WEST         | `UtcOffset::from_hms(1, 0, 0)`      | Western European Summer Time              |
+| WET          | `UtcOffset::from_hms(0, 0, 0)`      | Western European Time                     |
+| WST          | `UtcOffset::from_hms(8, 0, 0)`      | Western Standard Time                     |
+
+#### Example 3: Formatting a DateTime object
+
+```rust
+use dtt::DateTime;
+use dtt::dtt_print;
+
+fn main() {
+    // Create a new DateTime object with the current UTC time
+    let now = DateTime::new();
+
+    // Format the DateTime object as a string
+    let formatted_time = now.format("%Y-%m-%d %H:%M:%S");
+    dtt_print!("Formatted time: {}", formatted_time);
+}
+```
+
+#### Example 4: Parsing a string into a DateTime object
+
+```rust
+use dtt::DateTime;
+use dtt::dtt_print;
+
+fn main() {
+    // Parse a string into a DateTime object
+    let date_string = "2023-05-12T12:00:00+00:00";
+    match DateTime::parse(date_string) {
+        Ok(datetime) => dtt_print!("Parsed DateTime: {}", datetime),
+        Err(err) => dtt_print!("Error parsing DateTime: {}", err),
+    }
+}
+```
+
 ## Semantic Versioning Policy 🚥
 
 For transparency into our release cycle and in striving to maintain backward compatibility, `DateTime (DTT)` follows [semantic versioning][7].

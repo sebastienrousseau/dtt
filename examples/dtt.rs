@@ -1,12 +1,15 @@
 extern crate dtt;
 // use std::str::FromStr;
 
+use self::dtt::DateTime;
 use std::str::FromStr;
 
-use self::dtt::DateTime;
-
 pub fn main() {
-    // Example of how to use the `new` function
+    // Create a new DateTime object with a custom timezone (e.g., CET)
+    let paris_time = DateTime::new_with_tz("CET").now;
+    println!("🦀 Paris time:        ✅ {}", paris_time);
+
+    // Example of how to use the `new` function with the UTC timezone
     let date = DateTime::new();
     println!("🦀 Date:              ✅ {}", date.now);
     println!("🦀 Day:               ✅ {}", date.day);
@@ -25,14 +28,20 @@ pub fn main() {
     println!("🦀 Year:              ✅ {}", date.year);
 
     // Example of how to use the `is_valid_day` function
-    println!("🦀 Invalid day (32):  ❌ {}", DateTime::is_valid_day("32"));
+    println!(
+        "🦀 Invalid day (32):  ❌ {}",
+        DateTime::is_valid_day("32")
+    );
     println!(
         "🦀 Valid day:         ✅ {}",
         DateTime::is_valid_day(&date.day.to_string())
     );
 
     // Example of how to use the `is_valid_hour` function
-    println!("🦀 Invalid hour (24): ❌ {}", DateTime::is_valid_hour("24"));
+    println!(
+        "🦀 Invalid hour (24): ❌ {}",
+        DateTime::is_valid_hour("24")
+    );
     println!(
         "🦀 Valid hour:        ✅ {}",
         DateTime::is_valid_hour(&date.hour.to_string())

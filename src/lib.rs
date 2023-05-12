@@ -161,7 +161,7 @@ extern crate serde;
 use serde::{Deserialize, Serialize};
 
 extern crate time;
-use time::{Duration, OffsetDateTime};
+use time::{Duration, OffsetDateTime, UtcOffset};
 
 extern crate regex;
 use regex::Regex;
@@ -302,40 +302,132 @@ impl DateTime {
     }
 
     /// Create a new DateTime object with a custom timezone.
+    /// Custom timezones supported by `DateTime (DTT)` are:
+    ///
+    /// | Abbreviation | UtcOffset                           | Time Zone Description                    |
+    /// |--------------|-------------------------------------|------------------------------------------|
+    /// | ACDT         | `UtcOffset::from_hms(10, 30, 0)`    | Australian Central Daylight Time         |
+    /// | ACST         | `UtcOffset::from_hms(9, 30, 0)`     | Australian Central Standard Time         |
+    /// | ADT          | `UtcOffset::from_hms(-3, 0, 0)`     | Atlantic Daylight Time                    |
+    /// | AEDT         | `UtcOffset::from_hms(11, 0, 0)`     | Australian Eastern Daylight Time          |
+    /// | AEST         | `UtcOffset::from_hms(10, 0, 0)`     | Australian Eastern Standard Time          |
+    /// | AKDT         | `UtcOffset::from_hms(-8, 0, 0)`     | Alaska Daylight Time                      |
+    /// | AKST         | `UtcOffset::from_hms(-9, 0, 0)`     | Alaska Standard Time                      |
+    /// | AST          | `UtcOffset::from_hms(-4, 0, 0)`     | Atlantic Standard Time                    |
+    /// | AWST         | `UtcOffset::from_hms(8, 0, 0)`      | Australian Western Standard Time          |
+    /// | BST          | `UtcOffset::from_hms(1, 0, 0)`      | British Summer Time                       |
+    /// | CDT          | `UtcOffset::from_hms(-5, 0, 0)`     | Central Daylight Time                      |
+    /// | CEST         | `UtcOffset::from_hms(2, 0, 0)`      | Central European Summer Time              |
+    /// | CET          | `UtcOffset::from_hms(1, 0, 0)`      | Central European Time                     |
+    /// | CST          | `UtcOffset::from_hms(-6, 0, 0)`     | Central Standard Time                     |
+    /// | ECT          | `UtcOffset::from_hms(-4, 0, 0)`     | Eastern Caribbean Time                    |
+    /// | EDT          | `UtcOffset::from_hms(-4, 0, 0)`     | Eastern Daylight Time                      |
+    /// | EEST         | `UtcOffset::from_hms(3, 0, 0)`      | Eastern European Summer Time              |
+    /// | EET          | `UtcOffset::from_hms(2, 0, 0)`      | Eastern European Time                     |
+    /// | EST          | `UtcOffset::from_hms(-5, 0, 0)`     | Eastern Standard Time                     |
+    /// | GMT          | `UtcOffset::from_hms(0, 0, 0)`      | Greenwich Mean Time                       |
+    /// | HADT         | `UtcOffset::from_hms(-9, 0, 0)`     | Hawaii-Aleutian Daylight Time              |
+    /// | HAST         | `UtcOffset::from_hms(-10, 0, 0)`    | Hawaii-Aleutian Standard Time              |
+    /// | HKT          | `UtcOffset::from_hms(8, 0, 0)`      | Hong Kong Time                            |
+    /// | IST          | `UtcOffset::from_hms(5, 30, 0)`     | Indian Standard Time                      |
+    /// | IDT          | `UtcOffset::from_hms(3, 0, 0)`      | Israel Daylight Time                       |
+    /// | JST          | `UtcOffset::from_hms(9, 0, 0)`      | Japan Standard Time                       |
+    /// | KST          | `UtcOffset::from_hms(9, 0, 0)`      | Korean Standard Time                      |
+    /// | MDT          | `UtcOffset::from_hms(-6, 0, 0)`     | Mountain Daylight Time                    |
+    /// | MST          | `UtcOffset::from_hms(-7, 0, 0)`     | Mountain Standard Time                    |
+    /// | NZDT         | `UtcOffset::from_hms(13, 0, 0)`     | New Zealand Daylight Time                 |
+    /// | NZST         | `UtcOffset::from_hms(12, 0, 0)`     | New Zealand Standard Time                 |
+    /// | PDT          | `UtcOffset::from_hms(-7, 0, 0)`     | Pacific Daylight Time                      |
+    /// | PST          | `UtcOffset::from_hms(-8, 0, 0)`     | Pacific Standard Time                      |
+    /// | UTC          | `UtcOffset::from_hms(0, 0, 0)`      | Coordinated Universal Time                |
+    /// | WADT         | `UtcOffset::from_hms(8, 45, 0)`     | West Australian Daylight Time             |
+    /// | WAST         | `UtcOffset::from_hms(7, 0, 0)`      | West Australian Standard Time             |
+    /// | WEDT         | `UtcOffset::from_hms(1, 0, 0)`      | Western European Daylight Time            |
+    /// | WEST         | `UtcOffset::from_hms(1, 0, 0)`      | Western European Summer Time              |
+    /// | WET          | `UtcOffset::from_hms(0, 0, 0)`      | Western European Time                     |
+    /// | WST          | `UtcOffset::from_hms(8, 0, 0)`      | Western Standard Time                     |
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use dtt::DateTime;
+    /// use dtt::dtt_print;
+    ///
+    /// let paris_time = DateTime::new_with_tz("CEST");
+    /// dtt_print!(paris_time);
+    /// ```
+    ///
     pub fn new_with_tz(tz: &str) -> Self {
         let offset = match tz {
-            "UTC" => time::UtcOffset::UTC,
-            _ => time::UtcOffset::from_hms(0, 0, 0).unwrap(),
+            "ACDT" => UtcOffset::from_hms(10, 30, 0), // Australian Central Daylight Time
+            "ACST" => UtcOffset::from_hms(9, 30, 0), // Australian Central Standard Time
+            "ADT" => UtcOffset::from_hms(-3, 0, 0), // Atlantic Daylight Time
+            "AEDT" => UtcOffset::from_hms(11, 0, 0), // Australian Eastern Daylight Time
+            "AEST" => UtcOffset::from_hms(10, 0, 0), // Australian Eastern Standard Time
+            "AKDT" => UtcOffset::from_hms(-8, 0, 0), // Alaska Daylight Time
+            "AKST" => UtcOffset::from_hms(-9, 0, 0), // Alaska Standard Time
+            "AST" => UtcOffset::from_hms(-4, 0, 0), // Atlantic Standard Time
+            "AWST" => UtcOffset::from_hms(8, 0, 0), // Australian Western Standard Time
+            "BST" => UtcOffset::from_hms(1, 0, 0), // British Summer Time
+            "CDT" => UtcOffset::from_hms(-5, 0, 0), // Central Daylight Time
+            "CEST" => UtcOffset::from_hms(2, 0, 0), // Central European Summer Time
+            "CET" => UtcOffset::from_hms(1, 0, 0), // Central European Time
+            "CST" => UtcOffset::from_hms(-6, 0, 0), // Central Standard Time
+            "ECT" => UtcOffset::from_hms(-4, 0, 0), // Eastern Caribbean Time
+            "EDT" => UtcOffset::from_hms(-4, 0, 0), // Eastern Daylight Time
+            "EEST" => UtcOffset::from_hms(3, 0, 0), // Eastern European Summer Time
+            "EET" => UtcOffset::from_hms(2, 0, 0), // Eastern European Time
+            "EST" => UtcOffset::from_hms(-5, 0, 0), // Eastern Standard Time
+            "GMT" => UtcOffset::from_hms(0, 0, 0), // Greenwich Mean Time
+            "HADT" => UtcOffset::from_hms(-9, 0, 0), // Hawaii-Aleutian Daylight Time
+            "HAST" => UtcOffset::from_hms(-10, 0, 0), // Hawaii-Aleutian Standard Time
+            "HKT" => UtcOffset::from_hms(8, 0, 0),    // Hong Kong Time
+            "IST" => UtcOffset::from_hms(5, 30, 0), // Indian Standard Time
+            "IDT" => UtcOffset::from_hms(3, 0, 0), // Israel Daylight Time
+            "JST" => UtcOffset::from_hms(9, 0, 0), // Japan Standard Time
+            "KST" => UtcOffset::from_hms(9, 0, 0), // Korean Standard Time
+            "MDT" => UtcOffset::from_hms(-6, 0, 0), // Mountain Daylight Time
+            "MST" => UtcOffset::from_hms(-7, 0, 0), // Mountain Standard Time
+            "NZDT" => UtcOffset::from_hms(13, 0, 0), // New Zealand Daylight Time
+            "NZST" => UtcOffset::from_hms(12, 0, 0), // New Zealand Standard Time
+            "PDT" => UtcOffset::from_hms(-7, 0, 0), // Pacific Daylight Time
+            "PST" => UtcOffset::from_hms(-8, 0, 0), // Pacific Standard Time
+            "UTC" => UtcOffset::from_hms(0, 0, 0), // Coordinated Universal Time
+            "WADT" => UtcOffset::from_hms(8, 45, 0), // West Australian Daylight Time
+            "WAST" => UtcOffset::from_hms(7, 0, 0), // West Australian Standard Time
+            "WEDT" => UtcOffset::from_hms(1, 0, 0), // Western European Daylight Time
+            "WEST" => UtcOffset::from_hms(1, 0, 0), // Western European Summer Time
+            "WET" => UtcOffset::from_hms(0, 0, 0), // Western European Time
+            _ => {
+                let hours: i8 = tz.parse().unwrap_or(0);
+                UtcOffset::from_hms(hours, 0, 0)
+            }
         };
-        let now_utc = if tz == "UTC" {
-            OffsetDateTime::now_utc()
-        } else {
-            let (hours, minutes, _) = offset.as_hms();
-            let total_seconds =
-                (hours as i16 * 3600) + (minutes as i16 * 60);
-            OffsetDateTime::now_utc()
-                + Duration::seconds(total_seconds as i64)
-        };
-        let iso_8601 = now_utc.to_string();
+
+        let offset = offset.unwrap();
+
+        let now_with_offset =
+            OffsetDateTime::now_utc().to_offset(offset);
 
         Self {
-            day: now_utc.day(),
-            hour: now_utc.hour(),
-            iso_8601,
-            iso_week: now_utc.iso_week(),
-            microsecond: now_utc.microsecond(),
-            minute: now_utc.minute(),
-            month: now_utc.month().to_string(),
-            now: now_utc.date().to_string(),
-            offset: now_utc.offset().to_string(),
-            ordinal: now_utc.ordinal(),
-            second: now_utc.second(),
-            time: now_utc.time().to_string(),
+            day: now_with_offset.day(),
+            hour: now_with_offset.hour(),
+            iso_8601: now_with_offset.to_string(),
+            iso_week: now_with_offset.iso_week(),
+            microsecond: now_with_offset.nanosecond() / 1_000,
+            minute: now_with_offset.minute(),
+            month: now_with_offset.month().to_string(),
+            now: now_with_offset.to_string(),
+            offset: offset.to_string(),
+            ordinal: now_with_offset.ordinal(),
+            second: now_with_offset.second(),
+            time: now_with_offset.time().to_string(),
             tz: tz.to_owned(),
-            weekday: now_utc.weekday().to_string(),
-            year: now_utc.year(),
+            weekday: now_with_offset.weekday().to_string(),
+            year: now_with_offset.year(),
         }
     }
+
     /// Check if the input is a valid day.
     /// 31 is valid.
     /// 32 is not valid.
@@ -487,7 +579,12 @@ impl DateTime {
             let re = Regex::new(r"([+-])(\d{2}):(\d{2})").unwrap();
             let captures = re.captures(self.tz.as_str());
 
-            let captures = captures.unwrap();
+            // Check if captures is Some before unwrapping
+            let captures = match captures {
+                Some(captures) => captures,
+                None => return "Invalid timezone format".to_string(),
+            };
+
             let hours = captures[2].parse::<i64>().unwrap();
             let minutes = captures[3].parse::<i64>().unwrap();
 
@@ -497,9 +594,23 @@ impl DateTime {
                 + Duration::seconds(total_seconds as i64)
         };
 
-        self.time = now_utc.to_string();
-        self.time.clone()
+        let year = now_utc.year();
+        let month = now_utc.month();
+        let day = now_utc.day();
+        let hour = now_utc.hour();
+        let minute = now_utc.minute();
+        let second = now_utc.second();
+        let nanosecond = now_utc.nanosecond();
+
+        let formatted = format!(
+            "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09} +00:00",
+            year, month, day, hour, minute, second, nanosecond
+        );
+
+        self.time = formatted.clone();
+        formatted
     }
+
     /// Calculate the next day.
     /// Returns a new DateTime struct.
     /// The time zone is not updated.
