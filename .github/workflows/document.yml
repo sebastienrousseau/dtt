@@ -3,12 +3,10 @@ name: 🧪 Document
 on:
   push:
     branches:
-      - feat/dtt
+      - main
   pull_request:
     branches:
-      - feat/dtt
-  release:
-    types: [created]
+      - main
 
 jobs:
   all:
