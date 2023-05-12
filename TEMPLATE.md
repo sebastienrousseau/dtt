@@ -7,7 +7,7 @@ alt="DateTime (DTT) logo" height="261" width="261" align="right" />
 
 # DateTime (DTT)
 
-## A Rust library for parsing, validating, manipulating, and formatting dates and times
+A Rust library for parsing, validating, manipulating, and formatting dates and times
 
 *Part of the [Mini Functions][0] family of libraries.*
 
