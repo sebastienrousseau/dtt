@@ -1,18 +1,28 @@
 [package]
-authors = ["Sebastian Rousseau <sebastian.rousseau@gmail.com"]
-categories = ["date-and-time"]
+authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
+build = "build.rs"
+categories = ["date-and-time", "parser-implementations", "value-formatting"]
 description = "A Rust library for parsing, validating, manipulating, and formatting dates and times."
+documentation = "https://docs.rs/dtt"
 edition = "2021"
+exclude = [
+    "/.git/*",
+    "/.github/*",
+    "/.gitignore",
+    "/.vscode/*"
+    ]
 homepage = "https://minifunctions.com/"
 keywords = ["dtt", "date", "datetime", "time", "timezone"]
 license = "MIT OR Apache-2.0"
 name = "dtt"
-repository = "https://github.com/sebastienrousseau/mini-functions/tree/main/dtt/"
-rust-version = "1.67"
-version = "0.0.3"
+readme = "README.md"
+repository = "https://github.com/sebastienrousseau/dtt.git"
+rust-version = "1.69.0"
+version = "0.0.4"
 include = [
-    "../../LICENSE-APACHE",
-    "../../LICENSE-MIT",
+    "/CONTRIBUTING.md",
+    "/LICENSE-APACHE",
+    "/LICENSE-MIT",
     "/benches/**",
     "/build.rs",
     "/Cargo.toml",
@@ -20,19 +30,27 @@ include = [
     "/README.md",
     "/src/**",
     "/tests/**",
+    "/xtask/**",
 ]
 
+[workspace]
+members = ["xtask"]
+
 [[bench]]
-name = "dtt"
+name = "benchmark"
 harness = false
-path = "benches/dtt.rs"
+path = "benches/criterion.rs"
+
+[profile.bench]
+debug = true
 
 [dependencies]
-regex = "1.7.1"
-serde = { version = "1.0.154", features = ["derive"] }
-time = "0.3.20"
+regex = "1.8.1"
+serde = { version = "1.0.163", features = ["derive"] }
+time = "0.3.21"
 
 [dev-dependencies]
+assert_cmd = "2.0.11"
 criterion = "0.4.0"
 
 [lib]
@@ -42,9 +60,6 @@ path = "src/lib.rs"
 
 [features]
 default = []
-
-[workspace]
-members = ["xtask"]
 
 [package.metadata.docs.rs]
 all-features = true
