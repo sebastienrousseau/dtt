@@ -1,23 +1,21 @@
 [package]
-authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
+authors = ["The DateTime (DTT) contributors"]
 build = "build.rs"
 categories = ["date-and-time", "parser-implementations", "value-formatting"]
-description = "A Rust library for parsing, validating, manipulating, and formatting dates and times."
+description = """
+    A Rust library for parsing, validating, manipulating, and formatting dates
+    and times.
+"""
 documentation = "https://docs.rs/dtt"
 edition = "2021"
-exclude = [
-    "/.git/*",
-    "/.github/*",
-    "/.gitignore",
-    "/.vscode/*"
-    ]
-homepage = "https://minifunctions.com/"
+exclude = ["/.git/*", "/.github/*", "/.gitignore", "/.vscode/*"]
+homepage = "https://dttlib.one/"
 keywords = ["dtt", "date", "datetime", "time", "timezone"]
 license = "MIT OR Apache-2.0"
 name = "dtt"
 readme = "README.md"
 repository = "https://github.com/sebastienrousseau/dtt.git"
-rust-version = "1.69.0"
+rust-version = "1.71.1"
 version = "0.0.5"
 include = [
     "/CONTRIBUTING.md",
@@ -77,16 +75,16 @@ rpath = false
 strip = false
 
 [profile.release]
-codegen-units = 1        # Compile crates one after another so the compiler can optimize better
-debug = false            # Disable debug information
-debug-assertions = false # Disable debug assertions
-incremental = false      # Disable incremental compilation
-lto = true               # Enables link to optimizations
-opt-level = "s"          # Optimize for binary size
-overflow-checks = false  # Disable overflow checks
-panic = "abort"          # Strip expensive panic clean-up logic
-rpath = false            # Disable rpath
-strip = "symbols"        # Automatically strip symbols from the binary.
+codegen-units = 1
+debug = false
+debug-assertions = false
+incremental = false
+lto = true
+opt-level = "s"
+overflow-checks = false
+panic = "abort"
+rpath = false
+strip = "symbols"
 
 [profile.test]
 codegen-units = 256

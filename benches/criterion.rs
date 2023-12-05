@@ -60,6 +60,7 @@ fn new_year(c: &mut Criterion) {
     c.bench_function("year", move |b| b.iter(|| date.year));
 }
 
+// Entry point for all benchmarks.
 criterion_group!(
     benches,
     new_date,
@@ -76,4 +77,6 @@ criterion_group!(
     new_weekday,
     new_year,
 );
+
+// Run benchmarks.
 criterion_main!(benches);
