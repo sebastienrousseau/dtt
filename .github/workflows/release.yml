@@ -2,10 +2,6 @@ name: 🧪 Release
 
 on: [push, pull_request]
 
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   # Build the project for all the targets and generate artifacts.
   build:
@@ -48,92 +44,113 @@ jobs:
           - arm-unknown-linux-gnueabi # ARMv6 Linux (kernel 3.2, glibc 2.17)
           - arm-unknown-linux-gnueabihf # ARMv7 Linux, hardfloat (kernel 3.2, glibc 2.17)
           - armv7-unknown-linux-gnueabihf # ARMv7 Linux, hardfloat (kernel 3.2, glibc 2.17)
+          - mips-unknown-linux-gnu # MIPS Linux (kernel 3.2, glibc 2.17)
+          - mips64-unknown-linux-gnuabi64 # MIPS64 Linux (kernel 3.2, glibc 2.17)
+          - mips64el-unknown-linux-gnuabi64 # MIPS64el Linux (kernel 3.2, glibc 2.17)
+          - mipsel-unknown-linux-gnu # MIPSel Linux (kernel 3.2, glibc 2.17)
           - powerpc-unknown-linux-gnu # PowerPC Linux (kernel 3.2, glibc 2.17)
           - powerpc64-unknown-linux-gnu # PowerPC64 Linux (kernel 3.2, glibc 2.17)
           - powerpc64le-unknown-linux-gnu # PowerPC64le Linux (kernel 3.2, glibc 2.17)
           - riscv64gc-unknown-linux-gnu # RISC-V Linux (kernel 3.2, glibc 2.17)
           - s390x-unknown-linux-gnu # s390x Linux (kernel 3.2, glibc 2.17)
           - x86_64-unknown-freebsd # 64-bit FreeBSD on x86-64
+          # # - x86_64-unknown-illumos # 64-bit Illumos on x86-64
           - x86_64-unknown-linux-musl # 64-bit Linux (kernel 2.6.32+, musl libc)
+          - x86_64-unknown-netbsd # 64-bit NetBSD on x86-64
 
-          include:
-            # Tier 1 platforms 🏆
-            - target: aarch64-unknown-linux-gnu
-              os: ubuntu-latest
-              cross: true
-            - target: i686-pc-windows-gnu
-              os: ubuntu-latest
-              cross: true
-            - target: i686-pc-windows-msvc
-              os: windows-latest
-              cross: true
-            - target: i686-unknown-linux-gnu
-              os: ubuntu-latest
-              cross: true
-            - target: x86_64-apple-darwin
-              os: macos-latest
-              cross: true
-            - target: x86_64-pc-windows-gnu
-              os: ubuntu-latest
-              cross: true
-            - target: x86_64-pc-windows-msvc
-              os: windows-latest
-              cross: true
-            - target: x86_64-unknown-linux-gnu
-              os: ubuntu-latest
-              cross: true
-  
-            # Tier 2 platforms 🥈
-            - target: aarch64-apple-darwin
-              os: macos-latest
-              cross: true
-            - target: aarch64-pc-windows-msvc
-              os: windows-latest
-              cross: true
-            - target: aarch64-unknown-linux-musl
-              os: ubuntu-latest
-              cross: true
-            - target: arm-unknown-linux-gnueabi
-              os: ubuntu-latest
-              cross: true
-            - target: arm-unknown-linux-gnueabihf
-              os: ubuntu-latest
-              cross: true
-            - target: armv7-unknown-linux-gnueabihf
-              os: ubuntu-latest
-              cross: true
-            - target: powerpc-unknown-linux-gnu
-              os: ubuntu-latest
-              cross: true
-            - target: powerpc64-unknown-linux-gnu
-              os: ubuntu-latest
-              cross: true
-            - target: powerpc64le-unknown-linux-gnu
-              os: ubuntu-latest
-              cross: true
-            - target: riscv64gc-unknown-linux-gnu
-              os: ubuntu-latest
-              cross: true
-            - target: s390x-unknown-linux-gnu
-              os: ubuntu-latest
-              cross: true
-            - target: x86_64-unknown-freebsd
-              os: ubuntu-latest
-              cross: true
-            - target: x86_64-unknown-linux-musl
-              os: ubuntu-latest
-              cross: true
-            # - target: x86_64-unknown-netbsd
-            #   os: ubuntu-latest
-            #   cross: true
+        include:
+          # Tier 1 platforms 🏆
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: i686-pc-windows-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: i686-pc-windows-msvc
+            os: windows-latest
+            cross: true
+          - target: i686-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            cross: true
+          - target: x86_64-pc-windows-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            cross: true
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
 
-      runs-on: ${{ matrix.os }}
+          # Tier 2 platforms 🥈
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            cross: true
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+            cross: true
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            cross: true
+          - target: arm-unknown-linux-gnueabi
+            os: ubuntu-latest
+            cross: true
+          - target: arm-unknown-linux-gnueabihf
+            os: ubuntu-latest
+            cross: true
+          - target: armv7-unknown-linux-gnueabihf
+            os: ubuntu-latest
+            cross: true
+          - target: mips-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: mips64-unknown-linux-gnuabi64
+            os: ubuntu-latest
+            cross: true
+          - target: mips64el-unknown-linux-gnuabi64
+            os: ubuntu-latest
+            cross: true
+          - target: mipsel-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: powerpc-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: powerpc64-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: powerpc64le-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: riscv64gc-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: s390x-unknown-linux-gnu
+            os: ubuntu-latest
+            cross: true
+          - target: x86_64-unknown-freebsd
+            os: ubuntu-latest
+            cross: true
+          # - target: x86_64-unknown-illumos
+          #   os: ubuntu-latest
+          #   cross: true
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            cross: true
+          - target: x86_64-unknown-netbsd
+            os: ubuntu-latest
+            cross: true
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       # Check out the repository code.
       - name: Checkout sources
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       # Install the stable Rust toolchain.
       - name: Install stable toolchain
@@ -143,27 +160,11 @@ jobs:
           toolchain: stable
           override: true
 
-      # Cache dependencies to speed up subsequent builds.
-      - name: Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: release-${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
-
       # Install the targets for the cross-compilation toolchain
       - name: Install target
         id: install-target
         run: rustup target add ${{ env.TARGET }}
 
-      # Install the cross-compilation toolchain
       - name: Install Cross and clean artifacts
         run: |
           # Install cross
@@ -172,6 +173,20 @@ jobs:
           # Clean the build artifacts
           cargo clean --verbose
         shell: bash
+
+      # Cache dependencies to speed up subsequent builds.
+      - name: Cache dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: release-${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
 
       # Build the targets
       - name: Build targets
@@ -210,11 +225,11 @@ jobs:
     steps:
       # Check out the repository code
       - name: Checkout sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       # Install the stable Rust toolchain
       - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.6
         with:
           toolchain: stable
           override: true
@@ -305,12 +320,12 @@ jobs:
     steps:
       # Check out the repository code
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       # Install the stable Rust toolchain
       - name: Install stable toolchain
         id: install-toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.6
         with:
           toolchain: stable
           override: true
@@ -340,7 +355,7 @@ jobs:
       # Publish the Rust library to Crate.io
       - name: Publish Library to Crate.io
         id: publish-library
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v1.0.1
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_TOKEN }}
         with:
