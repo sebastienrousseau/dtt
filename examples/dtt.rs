@@ -29,7 +29,7 @@ pub fn main() {
 
     // Example of how to use the `is_valid_day` function
     println!(
-        "🦀 Invalid day (32):  ❌ {}",
+        "🦀 Valid day (32):    ❌ {}",
         DateTime::is_valid_day("32")
     );
     println!(
@@ -39,7 +39,7 @@ pub fn main() {
 
     // Example of how to use the `is_valid_hour` function
     println!(
-        "🦀 Invalid hour (24): ❌ {}",
+        "🦀 Valid hour (24):   ❌ {}",
         DateTime::is_valid_hour("24")
     );
     println!(
