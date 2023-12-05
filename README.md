@@ -142,7 +142,7 @@ To use the `DateTime (DTT)` library in your project, add the following to your `
 
 ```toml
 [dependencies]
-dtt = "0.0.4"
+dtt = "0.0.5"
 ```
 
 Add the following to your `main.rs` file:

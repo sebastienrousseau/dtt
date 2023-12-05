@@ -1,10 +1,9 @@
 extern crate dtt;
-// use std::str::FromStr;
-
 use self::dtt::DateTime;
 use std::str::FromStr;
 
-pub fn main() {
+/// This is the main function for the build script.
+pub fn main() { 
     // Create a new DateTime object with a custom timezone (e.g., CET)
     let paris_time = DateTime::new_with_tz("CET").now;
     println!("🦀 Paris time:        ✅ {}", paris_time);
@@ -29,7 +28,7 @@ pub fn main() {
 
     // Example of how to use the `is_valid_day` function
     println!(
-        "🦀 Invalid day (32):  ❌ {}",
+        "🦀 Valid day (32):    ❌ {}",
         DateTime::is_valid_day("32")
     );
     println!(
@@ -39,7 +38,7 @@ pub fn main() {
 
     // Example of how to use the `is_valid_hour` function
     println!(
-        "🦀 Invalid hour (24): ❌ {}",
+        "🦀 Valid hour (24):   ❌ {}",
         DateTime::is_valid_hour("24")
     );
     println!(
