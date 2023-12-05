@@ -1,5 +1,5 @@
-var sourcesIndex = JSON.parse('{\
+var srcIndex = JSON.parse('{\
 "dtt":["",[],["lib.rs","macros.rs"]],\
 "xtask":["",[],["main.rs"]]\
 }');
-createSourceSidebar();
+createSrcSidebar();
