@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A Rust library for parsing, validating, manipulating, and formatting dates and times"><title>dtt - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (0e2dac837 2023-12-04)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt=""></a></nav><nav class="sidebar"><div class="sidebar-crate"><a class="logo-container" href="../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="logo"></a><h2><a href="../dtt/index.html">dtt</a><span class="version">0.0.5</span></h2></div><div class="sidebar-elems"><ul class="block">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A Rust library for parsing, validating, manipulating, and formatting dates and times"><title>dtt - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (e9013ac0e 2023-12-05)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt=""></a></nav><nav class="sidebar"><div class="sidebar-crate"><a class="logo-container" href="../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="logo"></a><h2><a href="../dtt/index.html">dtt</a><span class="version">0.0.5</span></h2></div><div class="sidebar-elems"><ul class="block">
             <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#functions">Functions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">dtt</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/dtt/lib.rs.html#4-775">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="a-rust-library-for-parsing-validating-manipulating-and-formatting-dates-and-times"><a href="#a-rust-library-for-parsing-validating-manipulating-and-formatting-dates-and-times">A Rust library for parsing, validating, manipulating, and formatting dates and times</a></h2>
 <p><a href="https://minifunctions.com"><img src="https://kura.pro/dtt/images/banners/banner-dtt.svg" alt="DTT Banner" /></a></p>
 <center>
@@ -62,49 +62,49 @@ types.</li>
 </span><span class="kw">let </span>dt = DateTime::new();
 
 <span class="comment">// Display the current date.
-</span><span class="macro">println!</span>(<span class="string">&quot;Date: {}&quot;</span>, dt.now); <span class="comment">// 2023-01-01
+</span><span class="macro">println!</span>(<span class="string">"Date: {}"</span>, dt.now); <span class="comment">// 2023-01-01
 
 // Display the current day.
-</span><span class="macro">println!</span>(<span class="string">&quot;Day: {}&quot;</span>, dt.day); <span class="comment">// 01
+</span><span class="macro">println!</span>(<span class="string">"Day: {}"</span>, dt.day); <span class="comment">// 01
 
 // Display the current hour.
-</span><span class="macro">println!</span>(<span class="string">&quot;Hour: {}&quot;</span>, dt.hour); <span class="comment">// 00
+</span><span class="macro">println!</span>(<span class="string">"Hour: {}"</span>, dt.hour); <span class="comment">// 00
 
 // Display the current ISO 8601 date and time.
-</span><span class="macro">println!</span>(<span class="string">&quot;ISO 8601: {}&quot;</span>, dt.iso_8601); <span class="comment">// 2023-01-01T00:00:00+00:00
+</span><span class="macro">println!</span>(<span class="string">"ISO 8601: {}"</span>, dt.iso_8601); <span class="comment">// 2023-01-01T00:00:00+00:00
 
 // Display the current ISO week number.
-</span><span class="macro">println!</span>(<span class="string">&quot;ISO Week Number: {}&quot;</span>, dt.iso_week); <span class="comment">// 1
+</span><span class="macro">println!</span>(<span class="string">"ISO Week Number: {}"</span>, dt.iso_week); <span class="comment">// 1
 
 // Display the current microsecond.
-</span><span class="macro">println!</span>(<span class="string">&quot;Microsecond: {}&quot;</span>, dt.microsecond); <span class="comment">// 000000
+</span><span class="macro">println!</span>(<span class="string">"Microsecond: {}"</span>, dt.microsecond); <span class="comment">// 000000
 
 // Display the current minute.
-</span><span class="macro">println!</span>(<span class="string">&quot;Minute: {}&quot;</span>, dt.minute); <span class="comment">// 00
+</span><span class="macro">println!</span>(<span class="string">"Minute: {}"</span>, dt.minute); <span class="comment">// 00
 
 // Display the current month.
-</span><span class="macro">println!</span>(<span class="string">&quot;Month: {}&quot;</span>, dt.month); <span class="comment">// January
+</span><span class="macro">println!</span>(<span class="string">"Month: {}"</span>, dt.month); <span class="comment">// January
 
 // Display the current offset.
-</span><span class="macro">println!</span>(<span class="string">&quot;Offset: {}&quot;</span>, dt.offset); <span class="comment">// +00:00
+</span><span class="macro">println!</span>(<span class="string">"Offset: {}"</span>, dt.offset); <span class="comment">// +00:00
 
 // Display the current ordinal date.
-</span><span class="macro">println!</span>(<span class="string">&quot;Ordinal Date: {}&quot;</span>, dt.ordinal); <span class="comment">// 1
+</span><span class="macro">println!</span>(<span class="string">"Ordinal Date: {}"</span>, dt.ordinal); <span class="comment">// 1
 
 // Display the current second.
-</span><span class="macro">println!</span>(<span class="string">&quot;Second: {}&quot;</span>, dt.second); <span class="comment">// 00
+</span><span class="macro">println!</span>(<span class="string">"Second: {}"</span>, dt.second); <span class="comment">// 00
 
 // Display the current time.
-</span><span class="macro">println!</span>(<span class="string">&quot;Time: {}&quot;</span>, dt.time); <span class="comment">// 00:00:00
+</span><span class="macro">println!</span>(<span class="string">"Time: {}"</span>, dt.time); <span class="comment">// 00:00:00
 
 // Display the current timezone.
-</span><span class="macro">println!</span>(<span class="string">&quot;Timezone: {}&quot;</span>, dt.tz); <span class="comment">// UTC
+</span><span class="macro">println!</span>(<span class="string">"Timezone: {}"</span>, dt.tz); <span class="comment">// UTC
 
 // Display the current weekday.
-</span><span class="macro">println!</span>(<span class="string">&quot;Weekday: {}&quot;</span>, dt.weekday); <span class="comment">// Monday
+</span><span class="macro">println!</span>(<span class="string">"Weekday: {}"</span>, dt.weekday); <span class="comment">// Monday
 
 // Display the current year.
-</span><span class="macro">println!</span>(<span class="string">&quot;Year: {}&quot;</span>, dt.year);
+</span><span class="macro">println!</span>(<span class="string">"Year: {}"</span>, dt.year);
 </code></pre></div>
 <h3 id="license"><a href="#license">License</a></h3>
 <p>The project is licensed under the terms of both the MIT license and

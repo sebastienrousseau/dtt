@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (0e2dac837 2023-12-04)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="dtt"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (e9013ac0e 2023-12-05)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="dtt"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -817,19 +817,19 @@
 //! | --- | --- | --- |
 //! | `day` | Day of the month: (01-31) | `u8` |
 //! | `hour` | Hour of the day: (00-23) | `u8` |
-//! | `iso_8601` | ISO 8601 date and time: (e.g. &quot;2023-01-01T00:00:00+00:00&quot;) | `String` |
+//! | `iso_8601` | ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00") | `String` |
 //! | `iso_week` | ISO week number: (1-53) | `u8` |
 //! | `microsecond` | Microsecond: (0-999999) | `u32` |
 //! | `minute` | Minute of the hour: (0-59) | `u8` |
-//! | `month` | Month: (e.g. &quot;January&quot;) | `String` |
-//! | `now` | Now object: (e.g. &quot;2023-01-01&quot;) | `String` |
-//! | `offset` | Offset from UTC: (e.g. &quot;+00:00&quot;) | `String` |
+//! | `month` | Month: (e.g. "January") | `String` |
+//! | `now` | Now object: (e.g. "2023-01-01") | `String` |
+//! | `offset` | Offset from UTC: (e.g. "+00:00") | `String` |
 //! | `ordinal` | Ordinal date: (1-366) | `u16` |
 //! | `second` | Second of the minute: (0-59) | `u8` |
-//! | `time` | Time object: (e.g. &quot;00:00:00&quot;) | `String` |
-//! | `tz` | Time zone object: (e.g. &quot;UTC&quot;) | `String` |
-//! | `weekday` | Weekday object: (e.g. &quot;Monday&quot;) | `String` |
-//! | `year` | Year object: (e.g. &quot;2023&quot;) | `i32` |
+//! | `time` | Time object: (e.g. "00:00:00") | `String` |
+//! | `tz` | Time zone object: (e.g. "UTC") | `String` |
+//! | `weekday` | Weekday object: (e.g. "Monday") | `String` |
+//! | `year` | Year object: (e.g. "2023") | `i32` |
 //!
 //! Each of which represents different aspects of a date and time.
 //!
@@ -855,49 +855,49 @@
 //! let dt = DateTime::new();
 //!
 //! // Display the current date.
-//! println!(&quot;Date: {}&quot;, dt.now); // 2023-01-01
+//! println!("Date: {}", dt.now); // 2023-01-01
 //!
 //! // Display the current day.
-//! println!(&quot;Day: {}&quot;, dt.day); // 01
+//! println!("Day: {}", dt.day); // 01
 //!
 //! // Display the current hour.
-//! println!(&quot;Hour: {}&quot;, dt.hour); // 00
+//! println!("Hour: {}", dt.hour); // 00
 //!
 //! // Display the current ISO 8601 date and time.
-//! println!(&quot;ISO 8601: {}&quot;, dt.iso_8601); // 2023-01-01T00:00:00+00:00
+//! println!("ISO 8601: {}", dt.iso_8601); // 2023-01-01T00:00:00+00:00
 //!
 //! // Display the current ISO week number.
-//! println!(&quot;ISO Week Number: {}&quot;, dt.iso_week); // 1
+//! println!("ISO Week Number: {}", dt.iso_week); // 1
 //!
 //! // Display the current microsecond.
-//! println!(&quot;Microsecond: {}&quot;, dt.microsecond); // 000000
+//! println!("Microsecond: {}", dt.microsecond); // 000000
 //!
 //! // Display the current minute.
-//! println!(&quot;Minute: {}&quot;, dt.minute); // 00
+//! println!("Minute: {}", dt.minute); // 00
 //!
 //! // Display the current month.
-//! println!(&quot;Month: {}&quot;, dt.month); // January
+//! println!("Month: {}", dt.month); // January
 //!
 //! // Display the current offset.
-//! println!(&quot;Offset: {}&quot;, dt.offset); // +00:00
+//! println!("Offset: {}", dt.offset); // +00:00
 //!
 //! // Display the current ordinal date.
-//! println!(&quot;Ordinal Date: {}&quot;, dt.ordinal); // 1
+//! println!("Ordinal Date: {}", dt.ordinal); // 1
 //!
 //! // Display the current second.
-//! println!(&quot;Second: {}&quot;, dt.second); // 00
+//! println!("Second: {}", dt.second); // 00
 //!
 //! // Display the current time.
-//! println!(&quot;Time: {}&quot;, dt.time); // 00:00:00
+//! println!("Time: {}", dt.time); // 00:00:00
 //!
 //! // Display the current timezone.
-//! println!(&quot;Timezone: {}&quot;, dt.tz); // UTC
+//! println!("Timezone: {}", dt.tz); // UTC
 //!
 //! // Display the current weekday.
-//! println!(&quot;Weekday: {}&quot;, dt.weekday); // Monday
+//! println!("Weekday: {}", dt.weekday); // Monday
 //!
 //! // Display the current year.
-//! println!(&quot;Year: {}&quot;, dt.year);
+//! println!("Year: {}", dt.year);
 //!
 //! ```
 //! ## License
@@ -917,19 +917,19 @@
 //!
 //! [`serde`]: https://github.com/serde-rs/serde
 //!
-</span><span class="attr">#![cfg_attr(feature = <span class="string">&quot;bench&quot;</span>, feature(test))]
+</span><span class="attr">#![cfg_attr(feature = <span class="string">"bench"</span>, feature(test))]
 #![deny(dead_code)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_docs)]
 #![forbid(unsafe_code)]
 #![warn(unreachable_pub)]
 #![doc(
-    html_favicon_url = <span class="string">&quot;https://kura.pro/dtt/images/favicon.ico&quot;</span>,
-    html_logo_url = <span class="string">&quot;https://kura.pro/dtt/images/logos/dtt.svg&quot;</span>,
-    html_root_url = <span class="string">&quot;https://docs.rs/dtt&quot;
+    html_favicon_url = <span class="string">"https://kura.pro/dtt/images/favicon.ico"</span>,
+    html_logo_url = <span class="string">"https://kura.pro/dtt/images/logos/dtt.svg"</span>,
+    html_root_url = <span class="string">"https://docs.rs/dtt"
 </span>)]
-#![crate_name = <span class="string">&quot;dtt&quot;</span>]
-#![crate_type = <span class="string">&quot;lib&quot;</span>]
+#![crate_name = <span class="string">"dtt"</span>]
+#![crate_type = <span class="string">"lib"</span>]
 
 </span><span class="kw">extern crate </span>serde;
 
@@ -957,7 +957,7 @@
     </span><span class="kw">pub </span>day: u8,
     <span class="doccomment">/// Hour of the day: (0-23)
     </span><span class="kw">pub </span>hour: u8,
-    <span class="doccomment">/// ISO 8601 date and time: (e.g. &quot;2023-01-01T00:00:00+00:00&quot;)
+    <span class="doccomment">/// ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00")
     </span><span class="kw">pub </span>iso_8601: String,
     <span class="doccomment">/// ISO week number: (1-53)
     </span><span class="kw">pub </span>iso_week: u8,
@@ -965,23 +965,23 @@
     </span><span class="kw">pub </span>microsecond: u32,
     <span class="doccomment">/// Minute of the hour: (0-59)
     </span><span class="kw">pub </span>minute: u8,
-    <span class="doccomment">/// Month: (e.g. &quot;January&quot;)
+    <span class="doccomment">/// Month: (e.g. "January")
     </span><span class="kw">pub </span>month: String,
-    <span class="doccomment">/// Now object: (e.g. &quot;2023-01-01&quot;)
+    <span class="doccomment">/// Now object: (e.g. "2023-01-01")
     </span><span class="kw">pub </span>now: String,
-    <span class="doccomment">/// Offset from UTC: (e.g. &quot;+00:00&quot;)
+    <span class="doccomment">/// Offset from UTC: (e.g. "+00:00")
     </span><span class="kw">pub </span>offset: String,
     <span class="doccomment">/// Ordinal date: (1-366)
     </span><span class="kw">pub </span>ordinal: u16,
     <span class="doccomment">/// Second of the minute: (0-59)
     </span><span class="kw">pub </span>second: u8,
-    <span class="doccomment">/// Time object: (e.g. &quot;00:00:00&quot;)
+    <span class="doccomment">/// Time object: (e.g. "00:00:00")
     </span><span class="kw">pub </span>time: String,
-    <span class="doccomment">/// Tz object: (e.g. &quot;UTC&quot;)
+    <span class="doccomment">/// Tz object: (e.g. "UTC")
     </span><span class="kw">pub </span>tz: String,
-    <span class="doccomment">/// Weekday object: (e.g. &quot;Monday&quot;)
+    <span class="doccomment">/// Weekday object: (e.g. "Monday")
     </span><span class="kw">pub </span>weekday: String,
-    <span class="doccomment">/// Year object: (e.g. &quot;2023&quot;)
+    <span class="doccomment">/// Year object: (e.g. "2023")
     </span><span class="kw">pub </span>year: i32,
 }
 
@@ -1000,16 +1000,16 @@
     ///
     /// # Returns
     ///
-    /// * `Result&lt;DateTime, &amp;&#39;static str&gt;` - A result indicating either the successfully parsed `DateTime` object
+    /// * `Result&lt;DateTime, &amp;'static str&gt;` - A result indicating either the successfully parsed `DateTime` object
     /// or an error message if the input format is invalid.
     ///
-    </span><span class="kw">pub fn </span>parse(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;DateTime, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+    </span><span class="kw">pub fn </span>parse(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;DateTime, <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
         <span class="kw">let </span>iso_8601_pattern =
-        <span class="string">r&quot;^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-]\d{2}:\d{2}$&quot;</span>;
-        <span class="kw">let </span>date_pattern = <span class="string">r&quot;^\d{4}-\d{2}-\d{2}$&quot;</span>;
+        <span class="string">r"^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-]\d{2}:\d{2}$"</span>;
+        <span class="kw">let </span>date_pattern = <span class="string">r"^\d{4}-\d{2}-\d{2}$"</span>;
 
         <span class="kw">if </span>Regex::new(iso_8601_pattern).unwrap().is_match(input) {
-            <span class="kw">let </span>tz = <span class="string">&quot;UTC&quot;</span>;
+            <span class="kw">let </span>tz = <span class="string">"UTC"</span>;
             <span class="kw">let </span>now_utc = OffsetDateTime::now_utc();
             <span class="kw">let </span>iso_8601 = now_utc.to_string();
 
@@ -1031,49 +1031,49 @@
                 year: now_utc.year(),
             });
         } <span class="kw">else if </span>Regex::new(date_pattern).unwrap().is_match(input) {
-            <span class="kw">let </span>date_parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = input.split(<span class="string">&#39;-&#39;</span>).collect();
+            <span class="kw">let </span>date_parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = input.split(<span class="string">'-'</span>).collect();
             <span class="kw">if </span>date_parts.len() != <span class="number">3 </span>{
-                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Invalid date format&quot;</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"Invalid date format"</span>);
             }
 
             <span class="kw">let </span>year = date_parts[<span class="number">0</span>]
                 .parse::&lt;i32&gt;()
-                .map_err(|<span class="kw">_</span>| <span class="string">&quot;Invalid date format&quot;</span>)<span class="question-mark">?</span>;
+                .map_err(|<span class="kw">_</span>| <span class="string">"Invalid date format"</span>)<span class="question-mark">?</span>;
             <span class="kw">let </span>month = date_parts[<span class="number">1</span>]
                 .parse::&lt;u8&gt;()
-                .map_err(|<span class="kw">_</span>| <span class="string">&quot;Invalid date format&quot;</span>)<span class="question-mark">?</span>;
+                .map_err(|<span class="kw">_</span>| <span class="string">"Invalid date format"</span>)<span class="question-mark">?</span>;
             <span class="kw">let </span>day = date_parts[<span class="number">2</span>]
                 .parse::&lt;u8&gt;()
-                .map_err(|<span class="kw">_</span>| <span class="string">&quot;Invalid date format&quot;</span>)<span class="question-mark">?</span>;
+                .map_err(|<span class="kw">_</span>| <span class="string">"Invalid date format"</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>now = <span class="macro">format!</span>(<span class="string">&quot;{:04}-{:02}-{:02}&quot;</span>, year, month, day);
-            <span class="kw">let </span>iso_8601 = <span class="macro">format!</span>(<span class="string">&quot;{}T00:00:00+00:00&quot;</span>, now);
+            <span class="kw">let </span>now = <span class="macro">format!</span>(<span class="string">"{:04}-{:02}-{:02}"</span>, year, month, day);
+            <span class="kw">let </span>iso_8601 = <span class="macro">format!</span>(<span class="string">"{}T00:00:00+00:00"</span>, now);
 
             <span class="kw">return </span><span class="prelude-val">Ok</span>(DateTime {
                 day,
                 hour: <span class="number">0</span>,
                 iso_8601,
-                iso_week: <span class="number">0</span>, <span class="comment">// Set the ISO week to 0 as it&#39;s not applicable in this case
+                iso_week: <span class="number">0</span>, <span class="comment">// Set the ISO week to 0 as it's not applicable in this case
                 </span>microsecond: <span class="number">0</span>,
                 minute: <span class="number">0</span>,
-                month: <span class="macro">format!</span>(<span class="string">&quot;{:02}&quot;</span>, month),
+                month: <span class="macro">format!</span>(<span class="string">"{:02}"</span>, month),
                 now,
-                offset: <span class="string">&quot;+00:00&quot;</span>.to_string(),
-                ordinal: <span class="number">0</span>, <span class="comment">// Set the ordinal to 0 as it&#39;s not applicable in this case
+                offset: <span class="string">"+00:00"</span>.to_string(),
+                ordinal: <span class="number">0</span>, <span class="comment">// Set the ordinal to 0 as it's not applicable in this case
                 </span>second: <span class="number">0</span>,
-                time: <span class="string">&quot;00:00:00&quot;</span>.to_string(),
-                tz: <span class="string">&quot;UTC&quot;</span>.to_string(),
-                weekday: <span class="string">&quot;&quot;</span>.to_string(), <span class="comment">// Set the weekday to an empty string as it&#39;s not applicable in this case
+                time: <span class="string">"00:00:00"</span>.to_string(),
+                tz: <span class="string">"UTC"</span>.to_string(),
+                weekday: <span class="string">""</span>.to_string(), <span class="comment">// Set the weekday to an empty string as it's not applicable in this case
                 </span>year,
             });
         }
 
-        <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid date format&quot;</span>)
+        <span class="prelude-val">Err</span>(<span class="string">"Invalid date format"</span>)
     }
 
     <span class="doccomment">/// Create a new Date object with UTC timezone.
     </span><span class="kw">pub fn </span>new() -&gt; DateTime {
-        <span class="self">Self</span>::new_with_tz(<span class="string">&quot;UTC&quot;</span>)
+        <span class="self">Self</span>::new_with_tz(<span class="string">"UTC"</span>)
     }
 
     <span class="doccomment">/// Create a new DateTime object with a custom timezone.
@@ -1128,51 +1128,51 @@
     /// use dtt::DateTime;
     /// use dtt::dtt_print;
     ///
-    /// let paris_time = DateTime::new_with_tz(&quot;CEST&quot;);
+    /// let paris_time = DateTime::new_with_tz("CEST");
     /// dtt_print!(paris_time);
     /// ```
     ///
     </span><span class="kw">pub fn </span>new_with_tz(tz: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>offset = <span class="kw">match </span>tz {
-            <span class="string">&quot;ACDT&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">10</span>, <span class="number">30</span>, <span class="number">0</span>), <span class="comment">// Australian Central Daylight Time
-            </span><span class="string">&quot;ACST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">9</span>, <span class="number">30</span>, <span class="number">0</span>), <span class="comment">// Australian Central Standard Time
-            </span><span class="string">&quot;ADT&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Atlantic Daylight Time
-            </span><span class="string">&quot;AEDT&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">11</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Australian Eastern Daylight Time
-            </span><span class="string">&quot;AEST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Australian Eastern Standard Time
-            </span><span class="string">&quot;AKDT&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Alaska Daylight Time
-            </span><span class="string">&quot;AKST&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Alaska Standard Time
-            </span><span class="string">&quot;AST&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Atlantic Standard Time
-            </span><span class="string">&quot;AWST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Australian Western Standard Time
-            </span><span class="string">&quot;BST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// British Summer Time
-            </span><span class="string">&quot;CDT&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Central Daylight Time
-            </span><span class="string">&quot;CEST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Central European Summer Time
-            </span><span class="string">&quot;CET&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Central European Time
-            </span><span class="string">&quot;CST&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Central Standard Time
-            </span><span class="string">&quot;ECT&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern Caribbean Time
-            </span><span class="string">&quot;EDT&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern Daylight Time
-            </span><span class="string">&quot;EEST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern European Summer Time
-            </span><span class="string">&quot;EET&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern European Time
-            </span><span class="string">&quot;EST&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern Standard Time
-            </span><span class="string">&quot;GMT&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Greenwich Mean Time
-            </span><span class="string">&quot;HADT&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Hawaii-Aleutian Daylight Time
-            </span><span class="string">&quot;HAST&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Hawaii-Aleutian Standard Time
-            </span><span class="string">&quot;HKT&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>),    <span class="comment">// Hong Kong Time
-            </span><span class="string">&quot;IST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">5</span>, <span class="number">30</span>, <span class="number">0</span>), <span class="comment">// Indian Standard Time
-            </span><span class="string">&quot;IDT&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Israel Daylight Time
-            </span><span class="string">&quot;JST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Japan Standard Time
-            </span><span class="string">&quot;KST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Korean Standard Time
-            </span><span class="string">&quot;MDT&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Mountain Daylight Time
-            </span><span class="string">&quot;MST&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Mountain Standard Time
-            </span><span class="string">&quot;NZDT&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">13</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// New Zealand Daylight Time
-            </span><span class="string">&quot;NZST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">12</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// New Zealand Standard Time
-            </span><span class="string">&quot;PDT&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Pacific Daylight Time
-            </span><span class="string">&quot;PST&quot; </span>=&gt; UtcOffset::from_hms(-<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Pacific Standard Time
-            </span><span class="string">&quot;UTC&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Coordinated Universal Time
-            </span><span class="string">&quot;WADT&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">8</span>, <span class="number">45</span>, <span class="number">0</span>), <span class="comment">// West Australian Daylight Time
-            </span><span class="string">&quot;WAST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// West Australian Standard Time
-            </span><span class="string">&quot;WEDT&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Western European Daylight Time
-            </span><span class="string">&quot;WEST&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Western European Summer Time
-            </span><span class="string">&quot;WET&quot; </span>=&gt; UtcOffset::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Western European Time
+            <span class="string">"ACDT" </span>=&gt; UtcOffset::from_hms(<span class="number">10</span>, <span class="number">30</span>, <span class="number">0</span>), <span class="comment">// Australian Central Daylight Time
+            </span><span class="string">"ACST" </span>=&gt; UtcOffset::from_hms(<span class="number">9</span>, <span class="number">30</span>, <span class="number">0</span>), <span class="comment">// Australian Central Standard Time
+            </span><span class="string">"ADT" </span>=&gt; UtcOffset::from_hms(-<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Atlantic Daylight Time
+            </span><span class="string">"AEDT" </span>=&gt; UtcOffset::from_hms(<span class="number">11</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Australian Eastern Daylight Time
+            </span><span class="string">"AEST" </span>=&gt; UtcOffset::from_hms(<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Australian Eastern Standard Time
+            </span><span class="string">"AKDT" </span>=&gt; UtcOffset::from_hms(-<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Alaska Daylight Time
+            </span><span class="string">"AKST" </span>=&gt; UtcOffset::from_hms(-<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Alaska Standard Time
+            </span><span class="string">"AST" </span>=&gt; UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Atlantic Standard Time
+            </span><span class="string">"AWST" </span>=&gt; UtcOffset::from_hms(<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Australian Western Standard Time
+            </span><span class="string">"BST" </span>=&gt; UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// British Summer Time
+            </span><span class="string">"CDT" </span>=&gt; UtcOffset::from_hms(-<span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Central Daylight Time
+            </span><span class="string">"CEST" </span>=&gt; UtcOffset::from_hms(<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Central European Summer Time
+            </span><span class="string">"CET" </span>=&gt; UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Central European Time
+            </span><span class="string">"CST" </span>=&gt; UtcOffset::from_hms(-<span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Central Standard Time
+            </span><span class="string">"ECT" </span>=&gt; UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern Caribbean Time
+            </span><span class="string">"EDT" </span>=&gt; UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern Daylight Time
+            </span><span class="string">"EEST" </span>=&gt; UtcOffset::from_hms(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern European Summer Time
+            </span><span class="string">"EET" </span>=&gt; UtcOffset::from_hms(<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern European Time
+            </span><span class="string">"EST" </span>=&gt; UtcOffset::from_hms(-<span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Eastern Standard Time
+            </span><span class="string">"GMT" </span>=&gt; UtcOffset::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Greenwich Mean Time
+            </span><span class="string">"HADT" </span>=&gt; UtcOffset::from_hms(-<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Hawaii-Aleutian Daylight Time
+            </span><span class="string">"HAST" </span>=&gt; UtcOffset::from_hms(-<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Hawaii-Aleutian Standard Time
+            </span><span class="string">"HKT" </span>=&gt; UtcOffset::from_hms(<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>),    <span class="comment">// Hong Kong Time
+            </span><span class="string">"IST" </span>=&gt; UtcOffset::from_hms(<span class="number">5</span>, <span class="number">30</span>, <span class="number">0</span>), <span class="comment">// Indian Standard Time
+            </span><span class="string">"IDT" </span>=&gt; UtcOffset::from_hms(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Israel Daylight Time
+            </span><span class="string">"JST" </span>=&gt; UtcOffset::from_hms(<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Japan Standard Time
+            </span><span class="string">"KST" </span>=&gt; UtcOffset::from_hms(<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Korean Standard Time
+            </span><span class="string">"MDT" </span>=&gt; UtcOffset::from_hms(-<span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Mountain Daylight Time
+            </span><span class="string">"MST" </span>=&gt; UtcOffset::from_hms(-<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Mountain Standard Time
+            </span><span class="string">"NZDT" </span>=&gt; UtcOffset::from_hms(<span class="number">13</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// New Zealand Daylight Time
+            </span><span class="string">"NZST" </span>=&gt; UtcOffset::from_hms(<span class="number">12</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// New Zealand Standard Time
+            </span><span class="string">"PDT" </span>=&gt; UtcOffset::from_hms(-<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Pacific Daylight Time
+            </span><span class="string">"PST" </span>=&gt; UtcOffset::from_hms(-<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Pacific Standard Time
+            </span><span class="string">"UTC" </span>=&gt; UtcOffset::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Coordinated Universal Time
+            </span><span class="string">"WADT" </span>=&gt; UtcOffset::from_hms(<span class="number">8</span>, <span class="number">45</span>, <span class="number">0</span>), <span class="comment">// West Australian Daylight Time
+            </span><span class="string">"WAST" </span>=&gt; UtcOffset::from_hms(<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// West Australian Standard Time
+            </span><span class="string">"WEDT" </span>=&gt; UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Western European Daylight Time
+            </span><span class="string">"WEST" </span>=&gt; UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Western European Summer Time
+            </span><span class="string">"WET" </span>=&gt; UtcOffset::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">// Western European Time
             </span><span class="kw">_ </span>=&gt; {
                 <span class="kw">let </span>hours: i8 = tz.parse().unwrap_or(<span class="number">0</span>);
                 UtcOffset::from_hms(hours, <span class="number">0</span>, <span class="number">0</span>)
@@ -1220,7 +1220,7 @@
     /// 24:00 is not valid.
     </span><span class="kw">pub fn </span>is_valid_hour(input: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="kw">let </span>re: Regex =
-            Regex::new(<span class="string">r&quot;^([0-1][0-9]|2[0-3])(:[0-5][0-9])?$&quot;</span>).unwrap();
+            Regex::new(<span class="string">r"^([0-1][0-9]|2[0-3])(:[0-5][0-9])?$"</span>).unwrap();
         re.is_match(input)
     }
     <span class="doccomment">/// Check if the input is a valid minute.
@@ -1276,7 +1276,7 @@
     /// 24:00:00 is not valid.
     </span><span class="kw">pub fn </span>is_valid_time(input: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="kw">let </span>re =
-            Regex::new(<span class="string">r&quot;^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$&quot;</span>)
+            Regex::new(<span class="string">r"^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"</span>)
                 .unwrap();
         re.is_match(input)
     }
@@ -1285,7 +1285,7 @@
     /// 2023-01-01T00:00:00+00:00:00 is not valid.
     </span><span class="kw">pub fn </span>is_valid_iso_8601(input: <span class="kw-2">&amp;</span>str) -&gt; bool {
         <span class="kw">let </span>re = Regex::new(
-            <span class="string">r&quot;^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$&quot;</span>,
+            <span class="string">r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$"</span>,
         )
         .unwrap();
         <span class="kw">if </span>!re.is_match(input) {
@@ -1307,8 +1307,8 @@
         </span>{
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">if </span>tz != <span class="string">&quot;Z&quot; </span>{
-            <span class="kw">let </span>re = Regex::new(<span class="string">r&quot;^[+-](\d{2}):(\d{2})$&quot;</span>).unwrap();
+        <span class="kw">if </span>tz != <span class="string">"Z" </span>{
+            <span class="kw">let </span>re = Regex::new(<span class="string">r"^[+-](\d{2}):(\d{2})$"</span>).unwrap();
             <span class="kw">let </span>captures = re.captures(<span class="kw-2">&amp;</span>tz).unwrap();
             <span class="kw">let </span>tz_hour = captures[<span class="number">1</span>].parse::&lt;i32&gt;().unwrap();
             <span class="kw">let </span>tz_minute = captures[<span class="number">2</span>].parse::&lt;i32&gt;().unwrap();
@@ -1348,16 +1348,16 @@
 
     <span class="doccomment">/// Update the date and time.
     </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; String {
-        <span class="kw">let </span>now_utc = <span class="kw">if </span><span class="self">self</span>.tz == <span class="string">&quot;UTC&quot; </span>{
+        <span class="kw">let </span>now_utc = <span class="kw">if </span><span class="self">self</span>.tz == <span class="string">"UTC" </span>{
             OffsetDateTime::now_utc()
         } <span class="kw">else </span>{
-            <span class="kw">let </span>re = Regex::new(<span class="string">r&quot;([+-])(\d{2}):(\d{2})&quot;</span>).unwrap();
+            <span class="kw">let </span>re = Regex::new(<span class="string">r"([+-])(\d{2}):(\d{2})"</span>).unwrap();
             <span class="kw">let </span>captures = re.captures(<span class="self">self</span>.tz.as_str());
 
             <span class="comment">// Check if captures is Some before unwrapping
             </span><span class="kw">let </span>captures = <span class="kw">match </span>captures {
                 <span class="prelude-val">Some</span>(captures) =&gt; captures,
-                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="string">&quot;Invalid timezone format&quot;</span>.to_string(),
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="string">"Invalid timezone format"</span>.to_string(),
             };
 
             <span class="kw">let </span>hours = captures[<span class="number">2</span>].parse::&lt;i64&gt;().unwrap();
@@ -1378,7 +1378,7 @@
         <span class="kw">let </span>nanosecond = now_utc.nanosecond();
 
         <span class="kw">let </span>formatted = <span class="macro">format!</span>(
-            <span class="string">&quot;{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09} +00:00&quot;</span>,
+            <span class="string">"{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:09} +00:00"</span>,
             year, month, day, hour, minute, second, nanosecond
         );
 
@@ -1491,8 +1491,8 @@
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>DateTime {
     <span class="doccomment">/// Display the date and time in ISO 8601 format.
-    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;Year: {}\nMonth: {}\nDay: {}\nWeekday: {}\nHour: {}\nMinute: {}\nSecond: {}\nMicrosecond: {}\nOrdinal: {}\nIso 8601: {}\nIso Week: {}\nTime: {}\nTZ: {}\nOffset: {}\nNow: {}&quot;</span>, <span class="self">self</span>.year, <span class="self">self</span>.month, <span class="self">self</span>.day, <span class="self">self</span>.weekday, <span class="self">self</span>.hour, <span class="self">self</span>.minute, <span class="self">self</span>.second, <span class="self">self</span>.microsecond, <span class="self">self</span>.ordinal, <span class="self">self</span>.iso_8601, <span class="self">self</span>.iso_week, <span class="self">self</span>.time, <span class="self">self</span>.tz, <span class="self">self</span>.offset, <span class="self">self</span>.now)
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"Year: {}\nMonth: {}\nDay: {}\nWeekday: {}\nHour: {}\nMinute: {}\nSecond: {}\nMicrosecond: {}\nOrdinal: {}\nIso 8601: {}\nIso Week: {}\nTime: {}\nTZ: {}\nOffset: {}\nNow: {}"</span>, <span class="self">self</span>.year, <span class="self">self</span>.month, <span class="self">self</span>.day, <span class="self">self</span>.weekday, <span class="self">self</span>.hour, <span class="self">self</span>.minute, <span class="self">self</span>.second, <span class="self">self</span>.microsecond, <span class="self">self</span>.ordinal, <span class="self">self</span>.iso_8601, <span class="self">self</span>.iso_week, <span class="self">self</span>.time, <span class="self">self</span>.tz, <span class="self">self</span>.offset, <span class="self">self</span>.now)
     }
 }
 
@@ -1500,7 +1500,7 @@
     <span class="kw">type </span><span class="prelude-val">Err </span>= ();
 
     <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
-        <span class="kw">let </span>re = Regex::new(<span class="string">r&quot;^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\+(\d{2}):(\d{2})$&quot;</span>)
+        <span class="kw">let </span>re = Regex::new(<span class="string">r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\+(\d{2}):(\d{2})$"</span>)
             .unwrap();
         <span class="kw">let </span>captures = <span class="kw">match </span>re.captures(s) {
             <span class="prelude-val">Some</span>(c) =&gt; c,
@@ -1538,13 +1538,13 @@
 
 <span class="doccomment">/// This is the main entry point for the `DateTime (DTT)` library.
 </span><span class="kw">pub fn </span>run() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
-    <span class="kw">if </span>std::env::var(<span class="string">&quot;DTT_TEST_MODE&quot;</span>).unwrap_or_default() == <span class="string">&quot;1&quot; </span>{
-        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Simulated error&quot;</span>.into());
+    <span class="kw">if </span>std::env::var(<span class="string">"DTT_TEST_MODE"</span>).unwrap_or_default() == <span class="string">"1" </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"Simulated error"</span>.into());
     }
-    <span class="kw">let </span>name = <span class="string">&quot;dtt&quot;</span>;
-    <span class="macro">println!</span>(<span class="string">&quot;Welcome to `{}` 👋!&quot;</span>, { name }.to_uppercase());
+    <span class="kw">let </span>name = <span class="string">"dtt"</span>;
+    <span class="macro">println!</span>(<span class="string">"Welcome to `{}` 👋!"</span>, { name }.to_uppercase());
     <span class="macro">println!</span>(
-        <span class="string">&quot;A Rust library for parsing, validating, manipulating, and formatting dates and times.&quot;
+        <span class="string">"A Rust library for parsing, validating, manipulating, and formatting dates and times."
     </span>);
     <span class="prelude-val">Ok</span>(())
 }

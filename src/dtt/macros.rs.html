@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/macros.rs`."><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (0e2dac837 2023-12-04)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="dtt"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/macros.rs`."><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (e9013ac0e 2023-12-05)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="dtt"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -348,11 +348,11 @@
 //! use dtt::{dtt, dtt_print, dtt_vec, dtt_map, dtt_assert, dtt_min, dtt_max, dtt_split, dtt_join, dtt_print_vec};
 //!
 //! // dtt macro - parsing a string into a DateTime struct
-//! let input = &quot;2023-01-01T00:00:00Z&quot;;
+//! let input = "2023-01-01T00:00:00Z";
 //! let result = dtt!(input);
 //!
 //! // dtt_print macro - printing a string to the console
-//! let message = &quot;Hello, world!&quot;;
+//! let message = "Hello, world!";
 //! dtt_print!(message);
 //!
 //! // dtt_vec macro - creating a new vector of the given elements
@@ -360,9 +360,9 @@
 //! assert_eq!(v, vec![1, 2, 3, 4, 5]);
 //!
 //! // dtt_map macro - creating a new map of the given key-value pairs
-//! let m = dtt_map!{&quot;one&quot; =&gt; 1, &quot;two&quot; =&gt; 2};
-//! assert_eq!(m[&quot;one&quot;], 1);
-//! assert_eq!(m[&quot;two&quot;], 2);
+//! let m = dtt_map!{"one" =&gt; 1, "two" =&gt; 2};
+//! assert_eq!(m["one"], 1);
+//! assert_eq!(m["two"], 2);
 //!
 //! // dtt_assert macro - checking if the given expression is true
 //! dtt_assert!(1 + 1 == 2); // does not panic
@@ -376,16 +376,16 @@
 //! assert_eq!(max, 9);
 //!
 //! // dtt_split macro - splitting a string into a vector of words
-//! let words = dtt_split!(&quot;Hello, world!&quot;);
-//! assert_eq!(words, vec![&quot;Hello,&quot;, &quot;world!&quot;]);
+//! let words = dtt_split!("Hello, world!");
+//! assert_eq!(words, vec!["Hello,", "world!"]);
 //!
 //! // dtt_join macro - joining a vector of strings together into a single string
-//! let sentence = dtt_join!(&quot;Hello&quot;, &quot;, &quot;, &quot;world&quot;, &quot;!&quot;);
-//! assert_eq!(sentence, &quot;Hello, world!&quot;);
+//! let sentence = dtt_join!("Hello", ", ", "world", "!");
+//! assert_eq!(sentence, "Hello, world!");
 //!
 //! // dtt_print_vec macro - printing a vector of elements to the console
 //! let v = vec![1, 2, 3, 4, 5];
-//! dtt_print_vec!(v); // prints &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot; each on their own line
+//! dtt_print_vec!(v); // prints "1", "2", "3", "4", "5" each on their own line
 //! ```
 //!
 //! ## Macro for validating a string input against a regex.
@@ -418,56 +418,56 @@
 //! use dtt::DateTime;
 //!
 //! // Validation of a day
-//! let input = &quot;31&quot;.to_string();
+//! let input = "31".to_string();
 //! is_valid!(day, String);
 //! let result = day(&amp;input);
 //! assert!(result);
 //!
 //! // Validation of an hour
-//! let input = &quot;23&quot;.to_string();
+//! let input = "23".to_string();
 //! is_valid!(hour, String);
 //! let result = hour(&amp;input);
 //! assert!(result);
 //!
 //!
 //! // Validation of a minute
-//! let input = &quot;59&quot;.to_string();
+//! let input = "59".to_string();
 //! is_valid!(minute, String);
 //! let result = minute(&amp;input);
 //! assert!(result);
 //!
 //! // Validation of a month
-//! let input = &quot;12&quot;.to_string();
+//! let input = "12".to_string();
 //! is_valid!(month, String);
 //! let result = month(&amp;input);
 //! assert!(result);
 //!
 //! // Validation of a second
-//! let input = &quot;59&quot;.to_string();
+//! let input = "59".to_string();
 //! is_valid!(second, String);
 //! let result = second(&amp;input);
 //! assert!(result);
 //!
 //! // Validation of a microsecond
-//! let input = &quot;999999&quot;.to_string();
+//! let input = "999999".to_string();
 //! is_valid!(microsecond, String);
 //! let result = microsecond(&amp;input);
 //! assert!(result);
 //!
 //! // Validation of an ordinal
-//! let input = &quot;365&quot;.to_string();
+//! let input = "365".to_string();
 //! is_valid!(ordinal, String);
 //! let result = ordinal(&amp;input);
 //! assert!(result);
 //!
 //! // Validation of a time
-//! let input = &quot;23:59:59&quot;.to_string();
+//! let input = "23:59:59".to_string();
 //! is_valid!(time, String);
 //! let result = time(&amp;input);
 //! assert!(result);
 //!
 //! // Validation of an iso_8601
-//! let input = &quot;2022-01-01T12:00:00+01:00&quot;.to_string();
+//! let input = "2022-01-01T12:00:00+01:00".to_string();
 //! is_valid!(iso_8601, String);
 //! let result = iso_8601(&amp;input);
 //! ```
@@ -495,7 +495,7 @@
 </span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>dtt_print {
     ($(<span class="macro-nonterminal">$arg</span>:tt)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, $(<span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>));
+        <span class="macro">println!</span>(<span class="string">"{}"</span>, <span class="macro">format_args!</span>(<span class="string">"{}"</span>, $(<span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>));
     };
 }
 
@@ -525,7 +525,7 @@
 </span><span class="macro">macro_rules! </span>dtt_assert {
     ($(<span class="macro-nonterminal">$arg</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="kw">if </span>!$(<span class="macro-nonterminal">$arg</span>)* {
-            <span class="macro">panic!</span>(<span class="string">&quot;Assertion failed!&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Assertion failed!"</span>);
         }
     };
 }
@@ -585,7 +585,7 @@
 </span><span class="macro">macro_rules! </span>dtt_print_vec {
     ($(<span class="macro-nonterminal">$v</span>:expr),<span class="kw-2">*</span>) =&gt; {{
         <span class="kw">for </span>v <span class="kw">in </span>$(<span class="macro-nonterminal">$v</span>),* {
-            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, v);
+            <span class="macro">println!</span>(<span class="string">"{}"</span>, v);
         }
     }};
 }
@@ -598,31 +598,31 @@
         <span class="kw">fn </span><span class="macro-nonterminal">$name</span>(input: <span class="kw-2">&amp;</span>str) -&gt; bool {
             <span class="kw">match </span>input.parse::&lt;<span class="macro-nonterminal">$</span><span class="kw">type</span>&gt;() {
                 <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">parsed_val</span>) =&gt; <span class="kw">match </span><span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>) {
-                    <span class="string">&quot;day&quot; </span>=&gt; {
+                    <span class="string">"day" </span>=&gt; {
                         DateTime::is_valid_day(<span class="kw-2">&amp;</span>parsed_val.to_string())
                     }
-                    <span class="string">&quot;hour&quot; </span>=&gt; {
+                    <span class="string">"hour" </span>=&gt; {
                         DateTime::is_valid_hour(<span class="kw-2">&amp;</span>parsed_val.to_string())
                     }
-                    <span class="string">&quot;minute&quot; </span>=&gt; DateTime::is_valid_minute(
+                    <span class="string">"minute" </span>=&gt; DateTime::is_valid_minute(
                         <span class="kw-2">&amp;</span>parsed_val.to_string(),
                     ),
-                    <span class="string">&quot;month&quot; </span>=&gt; DateTime::is_valid_month(
+                    <span class="string">"month" </span>=&gt; DateTime::is_valid_month(
                         <span class="kw-2">&amp;</span>parsed_val.to_string(),
                     ),
-                    <span class="string">&quot;second&quot; </span>=&gt; DateTime::is_valid_second(
+                    <span class="string">"second" </span>=&gt; DateTime::is_valid_second(
                         <span class="kw-2">&amp;</span>parsed_val.to_string(),
                     ),
-                    <span class="string">&quot;microsecond&quot; </span>=&gt; DateTime::is_valid_microsecond(
+                    <span class="string">"microsecond" </span>=&gt; DateTime::is_valid_microsecond(
                         <span class="kw-2">&amp;</span>parsed_val.to_string(),
                     ),
-                    <span class="string">&quot;ordinal&quot; </span>=&gt; DateTime::is_valid_ordinal(
+                    <span class="string">"ordinal" </span>=&gt; DateTime::is_valid_ordinal(
                         <span class="kw-2">&amp;</span>parsed_val.to_string(),
                     ),
-                    <span class="string">&quot;time&quot; </span>=&gt; {
+                    <span class="string">"time" </span>=&gt; {
                         DateTime::is_valid_time(<span class="kw-2">&amp;</span>parsed_val.to_string())
                     }
-                    <span class="string">&quot;iso_8601&quot; </span>=&gt; DateTime::is_valid_iso_8601(
+                    <span class="string">"iso_8601" </span>=&gt; DateTime::is_valid_iso_8601(
                         <span class="kw-2">&amp;</span>parsed_val.to_string(),
                     ),
                     <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,

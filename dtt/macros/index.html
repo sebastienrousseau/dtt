@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The `macros` module contains functions for generating macros. Macros for the dtt crate."><title>dtt::macros - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (0e2dac837 2023-12-04)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt=""></a></nav><nav class="sidebar"><div class="sidebar-crate"><a class="logo-container" href="../../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="logo"></a><h2><a href="../../dtt/index.html">dtt</a><span class="version">0.0.5</span></h2></div><h2 class="location"><a href="#">Module macros</a></h2><div class="sidebar-elems"><h2><a href="../index.html">In crate dtt</a></h2></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../index.html">dtt</a>::<wbr><a class="mod" href="#">macros</a><button id="copy-path" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../../src/dtt/macros.rs.html#4-317">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The <code>macros</code> module contains functions for generating macros.
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The `macros` module contains functions for generating macros. Macros for the dtt crate."><title>dtt::macros - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (e9013ac0e 2023-12-05)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt=""></a></nav><nav class="sidebar"><div class="sidebar-crate"><a class="logo-container" href="../../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="logo"></a><h2><a href="../../dtt/index.html">dtt</a><span class="version">0.0.5</span></h2></div><h2 class="location"><a href="#">Module macros</a></h2><div class="sidebar-elems"><h2><a href="../index.html">In crate dtt</a></h2></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../index.html">dtt</a>::<wbr><a class="mod" href="#">macros</a><button id="copy-path" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../../src/dtt/macros.rs.html#4-317">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The <code>macros</code> module contains functions for generating macros.
 Macros for the dtt crate.</p>
 <p>This module bundles all macros used across the dtt crate.
 These include macros for validating input, and macros for
@@ -22,11 +22,11 @@ generating the DateTime struct.</p>
 <span class="kw">use </span>dtt::{dtt, dtt_print, dtt_vec, dtt_map, dtt_assert, dtt_min, dtt_max, dtt_split, dtt_join, dtt_print_vec};
 
 <span class="comment">// dtt macro - parsing a string into a DateTime struct
-</span><span class="kw">let </span>input = <span class="string">&quot;2023-01-01T00:00:00Z&quot;</span>;
+</span><span class="kw">let </span>input = <span class="string">"2023-01-01T00:00:00Z"</span>;
 <span class="kw">let </span>result = <span class="macro">dtt!</span>(input);
 
 <span class="comment">// dtt_print macro - printing a string to the console
-</span><span class="kw">let </span>message = <span class="string">&quot;Hello, world!&quot;</span>;
+</span><span class="kw">let </span>message = <span class="string">"Hello, world!"</span>;
 <span class="macro">dtt_print!</span>(message);
 
 <span class="comment">// dtt_vec macro - creating a new vector of the given elements
@@ -34,9 +34,9 @@ generating the DateTime struct.</p>
 <span class="macro">assert_eq!</span>(v, <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]);
 
 <span class="comment">// dtt_map macro - creating a new map of the given key-value pairs
-</span><span class="kw">let </span>m = <span class="macro">dtt_map!</span>{<span class="string">&quot;one&quot; </span>=&gt; <span class="number">1</span>, <span class="string">&quot;two&quot; </span>=&gt; <span class="number">2</span>};
-<span class="macro">assert_eq!</span>(m[<span class="string">&quot;one&quot;</span>], <span class="number">1</span>);
-<span class="macro">assert_eq!</span>(m[<span class="string">&quot;two&quot;</span>], <span class="number">2</span>);
+</span><span class="kw">let </span>m = <span class="macro">dtt_map!</span>{<span class="string">"one" </span>=&gt; <span class="number">1</span>, <span class="string">"two" </span>=&gt; <span class="number">2</span>};
+<span class="macro">assert_eq!</span>(m[<span class="string">"one"</span>], <span class="number">1</span>);
+<span class="macro">assert_eq!</span>(m[<span class="string">"two"</span>], <span class="number">2</span>);
 
 <span class="comment">// dtt_assert macro - checking if the given expression is true
 </span><span class="macro">dtt_assert!</span>(<span class="number">1 </span>+ <span class="number">1 </span>== <span class="number">2</span>); <span class="comment">// does not panic
@@ -50,16 +50,16 @@ generating the DateTime struct.</p>
 <span class="macro">assert_eq!</span>(max, <span class="number">9</span>);
 
 <span class="comment">// dtt_split macro - splitting a string into a vector of words
-</span><span class="kw">let </span>words = <span class="macro">dtt_split!</span>(<span class="string">&quot;Hello, world!&quot;</span>);
-<span class="macro">assert_eq!</span>(words, <span class="macro">vec!</span>[<span class="string">&quot;Hello,&quot;</span>, <span class="string">&quot;world!&quot;</span>]);
+</span><span class="kw">let </span>words = <span class="macro">dtt_split!</span>(<span class="string">"Hello, world!"</span>);
+<span class="macro">assert_eq!</span>(words, <span class="macro">vec!</span>[<span class="string">"Hello,"</span>, <span class="string">"world!"</span>]);
 
 <span class="comment">// dtt_join macro - joining a vector of strings together into a single string
-</span><span class="kw">let </span>sentence = <span class="macro">dtt_join!</span>(<span class="string">&quot;Hello&quot;</span>, <span class="string">&quot;, &quot;</span>, <span class="string">&quot;world&quot;</span>, <span class="string">&quot;!&quot;</span>);
-<span class="macro">assert_eq!</span>(sentence, <span class="string">&quot;Hello, world!&quot;</span>);
+</span><span class="kw">let </span>sentence = <span class="macro">dtt_join!</span>(<span class="string">"Hello"</span>, <span class="string">", "</span>, <span class="string">"world"</span>, <span class="string">"!"</span>);
+<span class="macro">assert_eq!</span>(sentence, <span class="string">"Hello, world!"</span>);
 
 <span class="comment">// dtt_print_vec macro - printing a vector of elements to the console
 </span><span class="kw">let </span>v = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
-<span class="macro">dtt_print_vec!</span>(v); <span class="comment">// prints &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot; each on their own line</span></code></pre></div>
+<span class="macro">dtt_print_vec!</span>(v); <span class="comment">// prints "1", "2", "3", "4", "5" each on their own line</span></code></pre></div>
 <h3 id="macro-for-validating-a-string-input-against-a-regex"><a href="#macro-for-validating-a-string-input-against-a-regex">Macro for validating a string input against a regex.</a></h3>
 <p>This macro generates a function that takes a string as input and returns a boolean.</p>
 <p>It takes two arguments:</p>
@@ -83,56 +83,56 @@ generating the DateTime struct.</p>
 <span class="kw">use </span>dtt::DateTime;
 
 <span class="comment">// Validation of a day
-</span><span class="kw">let </span>input = <span class="string">&quot;31&quot;</span>.to_string();
+</span><span class="kw">let </span>input = <span class="string">"31"</span>.to_string();
 <span class="macro">is_valid!</span>(day, String);
 <span class="kw">let </span>result = day(<span class="kw-2">&amp;</span>input);
 <span class="macro">assert!</span>(result);
 
 <span class="comment">// Validation of an hour
-</span><span class="kw">let </span>input = <span class="string">&quot;23&quot;</span>.to_string();
+</span><span class="kw">let </span>input = <span class="string">"23"</span>.to_string();
 <span class="macro">is_valid!</span>(hour, String);
 <span class="kw">let </span>result = hour(<span class="kw-2">&amp;</span>input);
 <span class="macro">assert!</span>(result);
 
 
 <span class="comment">// Validation of a minute
-</span><span class="kw">let </span>input = <span class="string">&quot;59&quot;</span>.to_string();
+</span><span class="kw">let </span>input = <span class="string">"59"</span>.to_string();
 <span class="macro">is_valid!</span>(minute, String);
 <span class="kw">let </span>result = minute(<span class="kw-2">&amp;</span>input);
 <span class="macro">assert!</span>(result);
 
 <span class="comment">// Validation of a month
-</span><span class="kw">let </span>input = <span class="string">&quot;12&quot;</span>.to_string();
+</span><span class="kw">let </span>input = <span class="string">"12"</span>.to_string();
 <span class="macro">is_valid!</span>(month, String);
 <span class="kw">let </span>result = month(<span class="kw-2">&amp;</span>input);
 <span class="macro">assert!</span>(result);
 
 <span class="comment">// Validation of a second
-</span><span class="kw">let </span>input = <span class="string">&quot;59&quot;</span>.to_string();
+</span><span class="kw">let </span>input = <span class="string">"59"</span>.to_string();
 <span class="macro">is_valid!</span>(second, String);
 <span class="kw">let </span>result = second(<span class="kw-2">&amp;</span>input);
 <span class="macro">assert!</span>(result);
 
 <span class="comment">// Validation of a microsecond
-</span><span class="kw">let </span>input = <span class="string">&quot;999999&quot;</span>.to_string();
+</span><span class="kw">let </span>input = <span class="string">"999999"</span>.to_string();
 <span class="macro">is_valid!</span>(microsecond, String);
 <span class="kw">let </span>result = microsecond(<span class="kw-2">&amp;</span>input);
 <span class="macro">assert!</span>(result);
 
 <span class="comment">// Validation of an ordinal
-</span><span class="kw">let </span>input = <span class="string">&quot;365&quot;</span>.to_string();
+</span><span class="kw">let </span>input = <span class="string">"365"</span>.to_string();
 <span class="macro">is_valid!</span>(ordinal, String);
 <span class="kw">let </span>result = ordinal(<span class="kw-2">&amp;</span>input);
 <span class="macro">assert!</span>(result);
 
 <span class="comment">// Validation of a time
-</span><span class="kw">let </span>input = <span class="string">&quot;23:59:59&quot;</span>.to_string();
+</span><span class="kw">let </span>input = <span class="string">"23:59:59"</span>.to_string();
 <span class="macro">is_valid!</span>(time, String);
 <span class="kw">let </span>result = time(<span class="kw-2">&amp;</span>input);
 <span class="macro">assert!</span>(result);
 
 <span class="comment">// Validation of an iso_8601
-</span><span class="kw">let </span>input = <span class="string">&quot;2022-01-01T12:00:00+01:00&quot;</span>.to_string();
+</span><span class="kw">let </span>input = <span class="string">"2022-01-01T12:00:00+01:00"</span>.to_string();
 <span class="macro">is_valid!</span>(iso_8601, String);
 <span class="kw">let </span>result = iso_8601(<span class="kw-2">&amp;</span>input);</code></pre></div>
 </div></details></section></div></main></body></html>
