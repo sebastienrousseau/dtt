@@ -44,7 +44,7 @@ debug = true
 
 [dependencies]
 regex = "1.10.2"
-serde = { version = "1.0.193", features = ["derive"] }
+serde = { version = "1.0.194", features = ["derive"] }
 time = "0.3.31"
 
 [dev-dependencies]
