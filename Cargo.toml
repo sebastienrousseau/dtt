@@ -43,7 +43,7 @@ path = "benches/criterion.rs"
 debug = true
 
 [dependencies]
-regex = "1.10.3"
+regex = "1.10.4"
 serde = { version = "1.0.196", features = ["derive"] }
 time = "0.3.36"
 
