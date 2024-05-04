@@ -10,7 +10,7 @@
 //!
 //! [![Crates.io](https://img.shields.io/crates/v/dtt.svg?style=for-the-badge&color=success&labelColor=27A006)](https://crates.io/crates/dtt)
 //! [![GitHub](https://img.shields.io/badge/github-555555?style=for-the-badge&labelColor=000000&logo=github)](https://github.com/sebastienrousseau/dtt)
-//! [![Lib.rs](https://img.shields.io/badge/lib.rs-v0.0.4-success.svg?style=for-the-badge&color=8A48FF&labelColor=6F36E4)](https://lib.rs/crates/dtt)
+//! [![Lib.rs](https://img.shields.io/badge/lib.rs-v0.0.6-success.svg?style=for-the-badge&color=8A48FF&labelColor=6F36E4)](https://lib.rs/crates/dtt)
 //! [![License](https://img.shields.io/crates/l/dtt.svg?style=for-the-badge&color=007EC6&labelColor=03589B)](http://opensource.org/licenses/MIT)
 //! [![Rust](https://img.shields.io/badge/rust-f04041?style=for-the-badge&labelColor=c0282d&logo=rust)](https://www.rust-lang.org)
 //!
@@ -143,11 +143,6 @@
 //! [`serde`]: https://github.com/serde-rs/serde
 //!
 #![cfg_attr(feature = "bench", feature(test))]
-#![deny(dead_code)]
-#![deny(missing_debug_implementations)]
-#![deny(missing_docs)]
-#![forbid(unsafe_code)]
-#![warn(unreachable_pub)]
 #![doc(
     html_favicon_url = "https://kura.pro/dtt/images/favicon.ico",
     html_logo_url = "https://kura.pro/dtt/images/logos/dtt.svg",
@@ -156,15 +151,9 @@
 #![crate_name = "dtt"]
 #![crate_type = "lib"]
 
-extern crate serde;
-
-use serde::{Deserialize, Serialize};
-
-extern crate time;
-use time::{Duration, OffsetDateTime, UtcOffset};
-
-extern crate regex;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
+use time::{Duration, OffsetDateTime, UtcOffset};
 
 /// The `macros` module contains functions for generating macros.
 pub mod macros;
@@ -229,8 +218,7 @@ impl DateTime {
     /// or an error message if the input format is invalid.
     ///
     pub fn parse(input: &str) -> Result<DateTime, &'static str> {
-        let iso_8601_pattern =
-        r"^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-]\d{2}:\d{2}$";
+        let iso_8601_pattern = r"^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-]\d{2}:\d{2}$";
         let date_pattern = r"^\d{4}-\d{2}-\d{2}$";
 
         if Regex::new(iso_8601_pattern).unwrap().is_match(input) {
@@ -607,7 +595,7 @@ impl DateTime {
             year, month, day, hour, minute, second, nanosecond
         );
 
-        self.time = formatted.clone();
+        self.time.clone_from(&formatted);
         formatted
     }
 

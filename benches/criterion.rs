@@ -1,7 +1,8 @@
-extern crate criterion;
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
-extern crate dtt;
-use self::dtt::DateTime;
+#![allow(missing_docs)]
+use criterion::{
+    black_box, criterion_group, criterion_main, Criterion,
+};
+use dtt::DateTime;
 
 fn new_date(c: &mut Criterion) {
     c.bench_function("new", |b| b.iter(|| DateTime::new));
@@ -19,7 +20,9 @@ fn new_hour(c: &mut Criterion) {
 
 fn new_iso_8601(c: &mut Criterion) {
     let date = black_box(DateTime::new());
-    c.bench_function("iso_8601", move |b| b.iter(|| date.iso_8601.to_owned()));
+    c.bench_function("iso_8601", move |b| {
+        b.iter(|| date.iso_8601.to_owned())
+    });
 }
 fn new_iso_week(c: &mut Criterion) {
     let date = black_box(DateTime::new());
@@ -32,11 +35,15 @@ fn new_minute(c: &mut Criterion) {
 
 fn new_month(c: &mut Criterion) {
     let date = black_box(DateTime::new());
-    c.bench_function("month", move |b| b.iter(|| date.month.to_owned()));
+    c.bench_function("month", move |b| {
+        b.iter(|| date.month.to_owned())
+    });
 }
 fn new_offset(c: &mut Criterion) {
     let date = black_box(DateTime::new());
-    c.bench_function("offset", move |b| b.iter(|| date.offset.to_owned()));
+    c.bench_function("offset", move |b| {
+        b.iter(|| date.offset.to_owned())
+    });
 }
 fn new_ordinal(c: &mut Criterion) {
     let date = black_box(DateTime::new());
@@ -52,7 +59,9 @@ fn new_time(c: &mut Criterion) {
 }
 fn new_weekday(c: &mut Criterion) {
     let date = black_box(DateTime::new());
-    c.bench_function("weekday", move |b| b.iter(|| date.weekday.to_owned()));
+    c.bench_function("weekday", move |b| {
+        b.iter(|| date.weekday.to_owned())
+    });
 }
 
 fn new_year(c: &mut Criterion) {

@@ -2,10 +2,6 @@
 
 mod tests {
 
-    extern crate dtt;
-    extern crate regex;
-    extern crate time;
-
     use dtt::DateTime;
     use regex::Regex;
     use std::str::FromStr;

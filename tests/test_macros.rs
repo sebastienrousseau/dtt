@@ -2,7 +2,6 @@
 
 mod tests {
 
-    extern crate dtt;
     use dtt::*;
 
     #[test]

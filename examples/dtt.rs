@@ -1,9 +1,10 @@
-extern crate dtt;
+#![allow(missing_docs)]
 use self::dtt::DateTime;
+use dtt;
 use std::str::FromStr;
 
 /// This is the main function for the build script.
-pub fn main() { 
+pub fn main() {
     // Create a new DateTime object with a custom timezone (e.g., CET)
     let paris_time = DateTime::new_with_tz("CET").now;
     println!("🦀 Paris time:        ✅ {}", paris_time);
