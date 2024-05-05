@@ -1,5 +1,6 @@
-// Copyright © 2023 DateTime (DTT) library. All rights reserved.
+// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
+// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
 //! Macros for the dtt crate.
 //!
@@ -277,7 +278,7 @@ macro_rules! dtt_print_vec {
 /// returns a boolean.
 #[macro_export]
 macro_rules! is_valid {
-    ( $name:ident, $type:ty ) => {
+    ($name:ident, $type:ty) => {
         fn $name(input: &str) -> bool {
             match input.parse::<$type>() {
                 Ok(parsed_val) => match stringify!($name) {
