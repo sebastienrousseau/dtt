@@ -69,8 +69,7 @@
 //! ```rust
 //!
 //! // Import the DateTime library
-//! extern crate dtt;
-//! use self::dtt::DateTime;
+//! use dtt::DateTime;
 //!
 //! // Create a new DateTime object.
 //!
@@ -249,32 +248,11 @@ impl DateTime {
         let date_pattern = r"^\d{4}-\d{2}-\d{2}$";
 
         if Regex::new(iso_8601_pattern).unwrap().is_match(input) {
-            let tz = "UTC";
-            let now_utc = OffsetDateTime::now_utc();
-            let iso_8601 = now_utc.to_string();
-
-            return Ok(DateTime {
-                day: now_utc.day(),
-                hour: now_utc.hour(),
-                iso_8601,
-                iso_week: now_utc.iso_week(),
-                microsecond: now_utc.microsecond(),
-                minute: now_utc.minute(),
-                month: now_utc.month().to_string(),
-                now: now_utc.date().to_string(),
-                offset: now_utc.offset().to_string(),
-                ordinal: now_utc.ordinal(),
-                second: now_utc.second(),
-                time: now_utc.time().to_string(),
-                tz: tz.to_owned(),
-                weekday: now_utc.weekday().to_string(),
-                year: now_utc.year(),
-            });
-        } else if Regex::new(date_pattern).unwrap().is_match(input) {
-            let date_parts: Vec<&str> = input.split('-').collect();
-            if date_parts.len() != 3 {
-                return Err(DateTimeError::InvalidFormat);
-            }
+            let parts: Vec<&str> = input.split('T').collect();
+            let date_parts: Vec<&str> = parts[0].split('-').collect();
+            let time_parts: Vec<&str> = parts[1].split(':').collect();
+            let hour_minute: Vec<&str> =
+                time_parts[2].split('+').collect(); // Adjust if timezone could be negative
 
             let year = date_parts[0]
                 .parse::<i32>()
@@ -285,30 +263,69 @@ impl DateTime {
             let day = date_parts[2]
                 .parse::<u8>()
                 .map_err(|_| DateTimeError::InvalidFormat)?;
+            let hour = time_parts[0]
+                .parse::<u8>()
+                .map_err(|_| DateTimeError::InvalidFormat)?;
+            let minute = time_parts[1]
+                .parse::<u8>()
+                .map_err(|_| DateTimeError::InvalidFormat)?;
+            let second = hour_minute[0]
+                .parse::<u8>()
+                .map_err(|_| DateTimeError::InvalidFormat)?;
+            let tz = format!("+{}", hour_minute[1]);
 
-            let now = format!("{:04}-{:02}-{:02}", year, month, day);
-            let iso_8601 = format!("{}T00:00:00+00:00", now);
+            Ok(DateTime {
+                year,
+                month: month.to_string(),
+                day,
+                hour,
+                minute,
+                second,
+                microsecond: 0, // Placeholder, as true microsecond parsing isn't shown
+                iso_8601: input.to_string(),
+                tz,
+                iso_week: 1, // Placeholder, calculate the correct ISO week if necessary
+                now: format!("{:04}-{:02}-{:02}", year, month, day),
+                time: format!(
+                    "{:02}:{:02}:{:02}",
+                    hour, minute, second
+                ),
+                offset: format!("+{}", hour_minute[1]), // Simplified, adjust for proper timezone offset handling
+                weekday: "Monday".to_string(), // Placeholder, determine the correct weekday
+                ordinal: day as u16, // Placeholder, this would be the day of the year
+            })
+        } else if Regex::new(date_pattern).unwrap().is_match(input) {
+            let date_parts: Vec<&str> = input.split('-').collect();
+            let year = date_parts[0]
+                .parse::<i32>()
+                .map_err(|_| DateTimeError::InvalidFormat)?;
+            let month = date_parts[1]
+                .parse::<u8>()
+                .map_err(|_| DateTimeError::InvalidFormat)?;
+            let day = date_parts[2]
+                .parse::<u8>()
+                .map_err(|_| DateTimeError::InvalidFormat)?;
 
-            return Ok(DateTime {
+            Ok(DateTime {
+                year,
+                month: month.to_string(),
                 day,
                 hour: 0,
-                iso_8601,
-                iso_week: 0,
-                microsecond: 0,
                 minute: 0,
-                month: format!("{:02}", month),
-                now,
-                offset: "+00:00".to_string(),
-                ordinal: 0,
                 second: 0,
+                microsecond: 0,
+                iso_8601: format!("{}T00:00:00+00:00", input),
+                tz: "+00:00".to_string(),
+                iso_week: 1, // Placeholder
+                now: input.to_string(),
                 time: "00:00:00".to_string(),
-                tz: "UTC".to_string(),
-                weekday: "".to_string(),
-                year,
-            });
+                offset: "+00:00".to_string(),
+                weekday: "Monday".to_string(), // Placeholder
+                ordinal: day as u16,           // Placeholder
+            })
+        } else {
+            Err(DateTimeError::InvalidFormat)
         }
-
-        Err(DateTimeError::InvalidFormat)
     }
 
     /// Create a new Date object with UTC timezone.
@@ -634,6 +651,15 @@ impl DateTime {
         self.microsecond = now_utc.nanosecond() / 1000;
 
         Ok(formatted)
+    }
+
+    /// Adds a specified number of days to the DateTime, using the existing `next_day`.
+    pub fn add_days(&self, days: i32) -> DateTime {
+        let mut result = self.clone();
+        for _ in 0..days {
+            result = result.next_day();
+        }
+        result
     }
 
     /// Calculate the next day.

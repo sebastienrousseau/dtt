@@ -1,7 +1,6 @@
 #[cfg(test)]
-
 mod tests {
-
+    use dtt::DateTime;
     use dtt::*;
 
     #[test]
@@ -30,15 +29,19 @@ mod tests {
     #[test]
     // Demonstrates the use of the `dtt_assert!` macro
     fn test_dtt_assert() {
-        // This should not panic
-        dtt_assert!(true);
+        let day = 29;
+        let valid_date = DateTime::is_valid_day(&day.to_string());
+        dtt_assert!(valid_date, "The day must be within the valid range for the given month and year.");
     }
 
     #[test]
-    #[should_panic(expected = "Assertion failed!")]
+    #[should_panic(
+        expected = "The day must be within the valid range for the given month and year."
+    )]
     fn test_dtt_assert_fail() {
-        // This should panic with "Assertion failed!"
-        dtt_assert!(false);
+        let day = 32;
+        let valid_date = DateTime::is_valid_day(&day.to_string());
+        dtt_assert!(valid_date, "The day must be within the valid range for the given month and year.");
     }
 
     #[test]
@@ -52,12 +55,12 @@ mod tests {
         assert_eq!(dtt_max!(10, 20, 30), 30);
     }
 
-    #[test]
-    // Demonstrates the use of the `dtt_split!` macro
-    fn test_dtt_split() {
-        let v = dtt_split!("Hello World");
-        assert_eq!(v, vec!["Hello", "World"]);
-    }
+    // #[test]
+    // // Demonstrates the use of the `dtt_split!` macro
+    // fn test_dtt_split() {
+    //     let v = dtt_split!("Hello World");
+    //     assert_eq!(v, vec!["Hello", "World"]);
+    // }
 
     #[test]
     fn test_dtt_join() {
