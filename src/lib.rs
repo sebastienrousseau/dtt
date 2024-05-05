@@ -161,6 +161,30 @@ use time::{Duration, Month, OffsetDateTime, UtcOffset};
 /// The `macros` module contains functions for generating macros.
 pub mod macros;
 
+/// Custom error type for DateTime parsing.
+#[derive(Debug)]
+pub enum DateTimeError {
+    /// Invalid date format.
+    InvalidFormat,
+    /// Invalid timezone.
+    InvalidTimezone,
+}
+
+impl fmt::Display for DateTimeError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            DateTimeError::InvalidFormat => {
+                write!(f, "Invalid date format")
+            }
+            DateTimeError::InvalidTimezone => {
+                write!(f, "Invalid timezone")
+            }
+        }
+    }
+}
+
+impl Error for DateTimeError {}
+
 ///
 /// DateTime struct to ease dates and times manipulation.
 ///
@@ -201,30 +225,6 @@ pub struct DateTime {
     /// Year object: (e.g. "2023")
     pub year: i32,
 }
-
-/// Custom error type for DateTime parsing.
-#[derive(Debug)]
-pub enum DateTimeError {
-    /// Invalid date format.
-    InvalidFormat,
-    /// Invalid timezone.
-    InvalidTimezone,
-}
-
-impl fmt::Display for DateTimeError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            DateTimeError::InvalidFormat => {
-                write!(f, "Invalid date format")
-            }
-            DateTimeError::InvalidTimezone => {
-                write!(f, "Invalid timezone")
-            }
-        }
-    }
-}
-
-impl Error for DateTimeError {}
 
 impl DateTime {
     /// Parse the input string and create a new `DateTime` object.
