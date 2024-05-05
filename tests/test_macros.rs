@@ -1,5 +1,10 @@
+// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+
 #[cfg(test)]
 mod tests {
+    use dtt::is_valid;
     use dtt::DateTime;
     use dtt::*;
 
@@ -275,5 +280,67 @@ mod tests {
     fn test_parse_error_int() {
         // Pass an input that cannot be parsed as an i32 to trigger the Err(_) branch.
         assert!(!integer("not_a_number"));
+    }
+
+    #[test]
+    fn test_dtt_now() {
+        use dtt::dtt_now;
+        let now = dtt_now!();
+        println!("Current date and time: {}", now.iso_8601);
+    }
+
+    #[test]
+    fn test_dtt_parse() {
+        let input = "2022-01-01T12:00:00+01:00";
+        match dtt_parse!(input) {
+            Ok(date) => {
+                assert_eq!(date.year, 2022);
+                assert_eq!(date.month.parse::<u8>().unwrap(), 1);
+                assert_eq!(date.day, 1);
+                assert_eq!(date.hour, 12);
+                assert_eq!(date.minute, 0);
+                assert_eq!(date.second, 0);
+            }
+            Err(err) => panic!("Parsing failed: {}", err),
+        }
+    }
+
+    #[test]
+    fn test_dtt_add_days() {
+        let dt = DateTime::parse("2023-01-01T12:00:00+00:00").unwrap();
+        let future_date = dtt_add_days!(dt, 5);
+        assert_eq!(future_date.day, 6);
+    }
+
+    #[test]
+    fn test_dtt_diff_hours() {
+        let dt1 = "2023-01-01T12:00:00+00:00";
+        let dt2 = "2023-01-02T12:00:00+00:00";
+        let hours_difference = dtt_diff_hours!(dt1, dt2);
+        assert!(hours_difference > 23.to_string());
+    }
+
+    #[test]
+    fn test_dtt_diff_minutes() {
+        let dt1 = "2023-01-01T12:00:00+00:00";
+        let dt2 = "2023-01-02T12:00:00+00:00";
+        let minutes_difference = dtt_diff_minutes!(dt1, dt2);
+        assert!(minutes_difference > 60.to_string());
+    }
+
+    #[test]
+    fn test_dtt_diff_seconds() {
+        let dt1 = "1640995200"; // Unix timestamp for 2023-01-01T12:00:00Z
+        let dt2 = "1640995230"; // Unix timestamp for 2023-01-01T12:00:30Z
+        let seconds_difference = dtt_diff_seconds!(dt1, dt2);
+        assert_eq!(seconds_difference, "30");
+    }
+
+    #[test]
+    fn test_dtt_diff_days() {
+        let dt1 = "1640995200"; // Unix timestamp for 2023-01-01T00:00:00Z
+        let dt2 = "1641081600"; // Unix timestamp for 2023-01-02T00:00:00Z
+        let days_difference = dtt_diff_days!(dt1, dt2);
+        assert_eq!(days_difference, 1);
     }
 }

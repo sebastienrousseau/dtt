@@ -42,6 +42,12 @@
 ///
 /// A new `DateTime` instance.
 ///
+/// # Examples
+/// ```
+/// use dtt::dtt_now;
+/// let now = dtt_now!();
+/// println!("Current date and time: {}", now.iso_8601);
+/// ```
 #[macro_export]
 macro_rules! dtt_now {
     () => {{
