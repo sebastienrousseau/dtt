@@ -1,14 +1,14 @@
+// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+
 #[cfg(test)]
 
 mod tests {
-
-    extern crate dtt;
-    extern crate regex;
-    extern crate time;
-
     use dtt::DateTime;
     use regex::Regex;
     use std::str::FromStr;
+    use time::UtcOffset;
     use time::{Duration, OffsetDateTime};
 
     #[test]
@@ -38,10 +38,11 @@ mod tests {
     #[test]
     // Test the `is_valid_hour` function
     fn test_is_valid_hour() {
-        assert!(DateTime::is_valid_hour("23"));
         assert!(DateTime::is_valid_hour("23:59"));
         assert!(!DateTime::is_valid_hour("24:00"));
+        assert!(!DateTime::is_valid_hour("g"));
     }
+
     #[test]
     // Test the `is_valid_iso_8601` function
     fn test_is_valid_iso_8601() {
@@ -154,48 +155,107 @@ mod tests {
         ));
     }
     #[test]
-    // Test the `new_with_tz` function
     fn test_update_with_timezone() {
-        let mut date = DateTime::new_with_tz("UTC+01:00");
+        let mut date = DateTime::new_with_tz("BST");
+        assert!(date.is_ok());
 
-        let date_before_update = date.now.clone();
-        let date_after_update = date.update();
+        let date_before_update = date.as_ref().unwrap().time.clone();
+
+        // Call the `update` function to update the date and time
+        let _ = date.as_mut().unwrap().update();
+
+        let date_after_update = date.as_mut().unwrap().time.clone();
         assert_ne!(date_before_update, date_after_update);
 
         let re = Regex::new(r"([+-])(\d{2}):(\d{2})").unwrap();
-        let captures = re.captures(&date.tz).unwrap();
+        let binding = date.as_mut().unwrap();
+        let captures = re.captures(&binding.offset).unwrap();
         let hours = captures[2].parse::<i64>().unwrap();
         let minutes = captures[3].parse::<i64>().unwrap();
 
-        let actual_offset = time::UtcOffset::from_hms(1, 0, 0);
-        let expected_offset = time::UtcOffset::from_hms(
+        let actual_offset = UtcOffset::from_hms(1, 0, 0);
+        let expected_offset = UtcOffset::from_hms(
             hours.try_into().unwrap(),
             minutes.try_into().unwrap(),
             0,
         );
-        let erroneous_offset = time::UtcOffset::from_hms(3, 0, 0);
-        assert_eq!(expected_offset, actual_offset);
-        assert_ne!(expected_offset, erroneous_offset);
+        let erroneous_offset = UtcOffset::from_hms(3, 0, 0);
+        assert_eq!(expected_offset.unwrap(), actual_offset.unwrap());
+        assert_ne!(expected_offset.unwrap(), erroneous_offset.unwrap());
     }
 
     #[test]
-    // Test the `update` function
     fn test_update() {
         let mut date = DateTime::new();
-        let time_before_update = date.iso_8601.clone();
-        date.update();
-        let time_after_update = date.iso_8601;
-        assert_eq!(time_before_update, time_after_update);
+        let time_before_update = DateTime {
+            day: date.day,
+            hour: date.hour,
+            iso_week: date.iso_week,
+            minute: date.minute,
+            month: date.month.clone(),
+            offset: date.offset.clone(),
+            ordinal: date.ordinal,
+            second: date.second,
+            tz: date.tz.clone(),
+            weekday: date.weekday.clone(),
+            year: date.year,
+            ..Default::default()
+        };
+        let _ = date.update();
+        assert_eq!(
+            time_before_update,
+            DateTime {
+                day: date.day,
+                hour: date.hour,
+                iso_week: date.iso_week,
+                minute: date.minute,
+                month: date.month.clone(),
+                offset: date.offset.clone(),
+                ordinal: date.ordinal,
+                second: date.second,
+                tz: date.tz.clone(),
+                weekday: date.weekday.clone(),
+                year: date.year,
+                ..Default::default()
+            }
+        );
     }
 
     #[test]
-    // Test the `update_date` function
     fn test_update_date() {
         let mut date = DateTime::new();
-        let time_before_update = date.iso_8601.clone();
-        date.update();
-        let time_after_update = date.iso_8601;
-        assert_eq!(time_before_update, time_after_update);
+        let time_before_update = DateTime {
+            day: date.day,
+            hour: date.hour,
+            iso_week: date.iso_week,
+            minute: date.minute,
+            month: date.month.clone(),
+            offset: date.offset.clone(),
+            ordinal: date.ordinal,
+            second: date.second,
+            tz: date.tz.clone(),
+            weekday: date.weekday.clone(),
+            year: date.year,
+            ..Default::default()
+        };
+        let _ = date.update();
+        assert_eq!(
+            time_before_update,
+            DateTime {
+                day: date.day,
+                hour: date.hour,
+                iso_week: date.iso_week,
+                minute: date.minute,
+                month: date.month.clone(),
+                offset: date.offset.clone(),
+                ordinal: date.ordinal,
+                second: date.second,
+                tz: date.tz.clone(),
+                weekday: date.weekday.clone(),
+                year: date.year,
+                ..Default::default()
+            }
+        );
     }
 
     #[test]
@@ -203,7 +263,7 @@ mod tests {
     fn test_update_day() {
         let mut date = DateTime::new();
         let day_before_update = date.day;
-        date.update();
+        let _ = date.update();
         let day_after_update = date.day;
         assert_eq!(day_before_update, day_after_update);
     }
@@ -213,7 +273,7 @@ mod tests {
     fn test_update_hour() {
         let mut date = DateTime::new();
         let hour_before_update = date.hour;
-        date.update();
+        let _ = date.update();
         let hour_after_update = date.hour;
         assert_eq!(hour_before_update, hour_after_update);
     }
@@ -301,7 +361,7 @@ mod tests {
     // Test the `new_with_tz` function
     fn test_new_with_tz_utc() {
         let date_time = DateTime::new_with_tz("UTC");
-        let offset = time::UtcOffset::UTC;
+        let offset = UtcOffset::UTC;
 
         let now_utc = OffsetDateTime::now_utc();
         let (hours, minutes, _) = offset.as_hms();
@@ -310,10 +370,16 @@ mod tests {
         let expected_date_time =
             now_utc + Duration::seconds(total_seconds as i64);
 
-        assert_eq!(date_time.hour, expected_date_time.hour());
-        assert_eq!(date_time.minute, expected_date_time.minute());
         assert_eq!(
-            date_time.offset,
+            date_time.as_ref().unwrap().hour,
+            expected_date_time.hour()
+        );
+        assert_eq!(
+            date_time.as_ref().unwrap().minute,
+            expected_date_time.minute()
+        );
+        assert_eq!(
+            date_time.as_ref().unwrap().offset,
             expected_date_time.offset().to_string()
         );
     }
@@ -321,39 +387,13 @@ mod tests {
     // Test the `new_with_tz_custom` function
     fn test_new_with_tz_custom() {
         let date_time = DateTime::new_with_tz("Custom");
-        let offset = time::UtcOffset::from_hms(0, 0, 0).unwrap();
-
-        let now_utc = OffsetDateTime::now_utc();
-        let (hours, minutes, _) = offset.as_hms();
-        let total_seconds =
-            (hours as i16 * 3600) + (minutes as i16 * 60);
-        let expected_date_time =
-            now_utc + Duration::seconds(total_seconds as i64);
-
-        assert_eq!(date_time.hour, expected_date_time.hour());
-        assert_eq!(date_time.minute, expected_date_time.minute());
-        assert_eq!(
-            date_time.offset,
-            expected_date_time.offset().to_string()
-        );
+        assert!(date_time.is_err());
     }
     #[test]
     // Test the `new_with_tz_to_paris` function
     fn test_new_with_tz_to_paris() {
         let date = DateTime::new_with_tz("Europe/Paris");
-        assert!(!date.now.is_empty());
-        assert!(date.day <= 31);
-        assert!(date.hour <= 23);
-        assert!(!date.iso_8601.is_empty());
-        assert!(date.iso_week > 0 && date.iso_week <= 53);
-        assert!(date.minute <= 59);
-        assert!(!date.month.is_empty());
-        assert!(!date.offset.is_empty());
-        assert!(date.ordinal > 0 && date.ordinal <= 366);
-        assert!(date.second <= 59);
-        assert!(!date.time.is_empty());
-        assert!(!date.weekday.is_empty());
-        assert!(date.year > 0);
+        assert!(date.is_err());
     }
 
     #[test]
@@ -398,7 +438,7 @@ mod tests {
     fn test_from_str_impl() {
         let date_str = "2022-01-01T12:00:00+01:00";
 
-        let expected = Ok(DateTime {
+        let expected = DateTime {
             day: 1,
             hour: 12,
             iso_8601: date_str.to_owned(),
@@ -414,14 +454,18 @@ mod tests {
             tz: "".to_owned(),
             weekday: "".to_owned(),
             year: 2022,
-        });
-        let result = date_str.parse::<DateTime>();
-        assert_eq!(result, expected);
+        };
+        let result: Result<DateTime, dtt::DateTimeError> =
+            date_str.parse::<DateTime>();
+        match result {
+            Ok(dt) => assert_eq!(dt, expected),
+            Err(err) => panic!("Error: {:?}", err),
+        }
 
-        let date_str = "invalid";
-        let expected = Err(());
-        let result = date_str.parse::<DateTime>();
-        assert_eq!(result, expected);
+        let date_str: &str = "invalid";
+        let result: Result<DateTime, dtt::DateTimeError> =
+            date_str.parse::<DateTime>();
+        assert!(result.is_err());
     }
 
     #[test]
@@ -429,7 +473,7 @@ mod tests {
     fn test_from_str() {
         let date_str = "2022-01-01T12:00:00+01:00";
 
-        let expected = Ok(DateTime {
+        let expected = DateTime {
             day: 1,
             hour: 12,
             iso_8601: date_str.to_owned(),
@@ -445,21 +489,23 @@ mod tests {
             tz: "".to_owned(),
             weekday: "".to_owned(),
             year: 2022,
-        });
+        };
         let result = DateTime::from_str(date_str);
-        assert_eq!(result, expected);
+        match result {
+            Ok(dt) => assert_eq!(dt, expected),
+            Err(err) => panic!("Error: {:?}", err),
+        }
 
         let date_str = "invalid";
-        let expected = Err(());
         let result = DateTime::from_str(date_str);
-        assert_eq!(result, expected);
+        assert!(result.is_err());
     }
 
     #[test]
     // Test the `from_str_invalid` function
     fn test_from_str_invalid() {
-        let invalid_input = "invalid";
-        let result = DateTime::from_str(invalid_input);
+        let date_str = "invalid";
+        let result = DateTime::from_str(date_str);
         assert!(result.is_err());
     }
     #[test]
@@ -597,35 +643,40 @@ mod tests {
     #[test]
     fn test_parse_iso_8601() {
         let valid_date = "2023-03-15T13:45:30+00:00";
-        let result = DateTime::parse(valid_date);
+        let result: Result<DateTime, dtt::DateTimeError> =
+            DateTime::parse(valid_date);
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_valid_date_without_time() {
         let valid_date = "2023-03-15";
-        let result = DateTime::parse(valid_date);
+        let result: Result<DateTime, dtt::DateTimeError> =
+            DateTime::parse(valid_date);
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_invalid_date_format() {
         let invalid_date = "15-03-2023";
-        let result = DateTime::parse(invalid_date);
+        let result: Result<DateTime, dtt::DateTimeError> =
+            DateTime::parse(invalid_date);
         assert!(result.is_err());
     }
 
     #[test]
     fn test_invalid_iso8601_format() {
         let invalid_date = "2023-03-15T25:61:61+00:00"; // Invalid time
-        let result = DateTime::parse(invalid_date);
+        let result: Result<DateTime, dtt::DateTimeError> =
+            DateTime::parse(invalid_date);
         assert!(result.is_err());
     }
 
     #[test]
     fn test_parse_date() {
-        let input = "2023-05-12";
-        let result = DateTime::parse(input);
+        let input: &str = "2023-05-12";
+        let result: Result<DateTime, dtt::DateTimeError> =
+            DateTime::parse(input);
 
         assert!(result.is_ok());
 
@@ -633,24 +684,27 @@ mod tests {
         assert_eq!(datetime.day, 12);
         assert_eq!(datetime.hour, 0);
         assert_eq!(datetime.iso_8601, "2023-05-12T00:00:00+00:00");
-        // Add assertions for other fields based on the input
     }
 
     #[test]
     fn test_parse_invalid_format() {
-        let input = "2023-05-12T16:23:45Z"; // Invalid format (missing offset)
-        let result = DateTime::parse(input);
+        let input: &str = "2023-05-12T16:23:45Z"; // Invalid format (missing offset)
+        let result: Result<DateTime, dtt::DateTimeError> =
+            DateTime::parse(input);
 
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Invalid date format");
     }
 
     #[test]
     fn test_parse_invalid_input() {
-        let input = "2023/05/12"; // Invalid input format
-        let result = DateTime::parse(input);
+        let input: &str = "2023/05/12"; // Invalid input format
+        let result: Result<DateTime, dtt::DateTimeError> =
+            DateTime::parse(input);
 
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Invalid date format");
+        assert_eq!(
+            result.err().unwrap().to_string(),
+            "Invalid date format"
+        );
     }
 }

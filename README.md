@@ -7,7 +7,8 @@ alt="DateTime (DTT) logo" height="261" width="261" align="right" />
 
 # DateTime (DTT)
 
-A Rust library for parsing, validating, manipulating, and formatting dates and times
+A Rust library for parsing, validating, manipulating, and formatting dates and
+times
 
 *Part of the [Mini Functions][0] family of libraries.*
 
@@ -29,41 +30,85 @@ A Rust library for parsing, validating, manipulating, and formatting dates and t
 
 ## Overview 📖
 
-The `DateTime (DTT)` library is a comprehensive and flexible tool that enables developers to manage dates and times with ease.
+The `DateTime (DTT)` library is a comprehensive and flexible tool that enables
+developers to manage dates and times with ease. It offers a range of functions
+and data structures that allow you to perform various date and time operations
+with ease, such as determining the day of the month, hour of the day, working
+with ISO 8601 date and time formats, and many others.
 
-It offers a range of functions and data structures that allow you to perform various date and time operations with ease, such as determining the day of the month, hour of the day, working with ISO 8601 date and time formats, and many others.
-
-The library supports the creation of new DateTime objects with either UTC or custom timezone specifications, ensuring that you always have accurate and relevant date and time information. Additionally, it provides a mechanism to validate input dates and times, ensuring that you always have accurate information to work with.
+The library supports the creation of new `DateTime` objects with either UTC or
+custom timezone specifications, ensuring that you always have accurate and
+relevant date and time information. Additionally, it provides a mechanism to
+validate input dates and times, ensuring that you always have accurate
+information to work with.
 
 ## Features ✨
 
-The library `DateTime (DTT)` provides date and time types and methods to make it easier to manipulate dates and times. It uses the serde library to derive the Deserialize and Serialize traits to convert the `DateTime (DTT)` struct to and from various data formats. It also uses the time and regex crates to deal with time conversions and regular expressions respectively.
+The `DateTime (DTT)` struct includes the following fields and methods:
 
-The `DateTime (DTT)` struct includes fields such as:
+### Fields
 
-| Feature | Description |
-| --- | --- |
-| `day` | Day of the month: (01-31) |
-| `hour` | Hour of the day: (00-23) |
-| `iso_8601` | ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00") |
-| `iso_week` | ISO week number: (1-53) |
-| `microsecond` | Microsecond: (0-999999) |
-| `minute` | Minute of the hour: (0-59) |
-| `month` | Month: (e.g. "January") |
-| `now` | Now object: (e.g. "2023-01-01") |
-| `offset` | Offset from UTC: (e.g. "+00:00") |
-| `ordinal` | Ordinal date: (1-366) |
-| `second` | Second of the minute: (0-59) |
-| `time` | Time object: (e.g. "00:00:00") |
-| `tz` | Time zone object: (e.g. "UTC") |
-| `weekday` | Weekday object: (e.g. "Monday") |
-| `year` | Year object: (e.g. "2023") |
+| Feature | Description | Type |
+| --- | --- | --- |
+| `day` | Day of the month: (1-31) | `u8` |
+| `hour` | Hour of the day: (0-23) | `u8` |
+| `iso_8601` | ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00") | `String` |
+| `iso_week` | ISO week number: (1-53) | `u8` |
+| `microsecond` | Microsecond: (0-999999) | `u32` |
+| `minute` | Minute of the hour: (0-59) | `u8` |
+| `month` | Month: (e.g. "January") | `String` |
+| `now` | Now object: (e.g. "2023-01-01") | `String` |
+| `offset` | Offset from UTC: (e.g. "+00:00") | `String` |
+| `ordinal` | Ordinal date: (1-366) | `u16` |
+| `second` | Second of the minute: (0-59) | `u8` |
+| `time` | Time object: (e.g. "00:00:00") | `String` |
+| `tz` | Time zone object: (e.g. "UTC") | `String` |
+| `weekday` | Weekday object: (e.g. "Monday") | `String` |
+| `year` | Year object: (e.g. "2023") | `i32` |
 
-Each of which represents different aspects of a date and time.
+### Methods
 
-The `DateTime (DTT)` struct has two methods to create instances: `new` and `new_with_tz`. `new` creates a new `DateTime (DTT)` object with UTC timezone, and `new_with_tz` creates a new `DateTime (DTT)` object with a custom timezone.
+- `new()`: Creates a new `DateTime` object with the current UTC time.
+- `new_with_tz(tz: &str)`: Creates a new `DateTime` object with the specified
+  timezone.
+- `is_valid_day(input: &str)`: Checks if the input represents a valid day of the
+  month.
+- `is_valid_hour(input: &str)`: Checks if the input represents a valid hour of
+  the day.
+- `is_valid_second(input: &str)`: Checks if the input represents a valid second
+  of the minute.
+- `is_valid_minute(input: &str)`: Checks if the input represents a valid minute
+  of the hour.
+- `is_valid_month(input: &str)`: Checks if the input represents a valid month of
+  the year.
+- `is_valid_ordinal(input: &str)`: Checks if the input represents a valid
+  ordinal date.
+- `is_valid_time(input: &str)`: Checks if the input represents a valid time.
+- `is_valid_iso_week(input: &str)`: Checks if the input represents a valid ISO
+  week number.
+- `is_valid_iso_8601(input: &str)`: Checks if the input represents a valid ISO
+  8601 date and time.
+- `is_valid_microsecond(input: &str)`: Checks if the input represents a valid
+  microsecond.
+- `update(&mut self)`: Updates the `DateTime` object with the current date and
+  time based on the timezone.
+- `add_days(&self, days: i32)`: Creates a new `DateTime` object with the
+  specified number of days added.
+- `next_day(&self)`: Creates a new `DateTime` object representing the next day.
+- `previous_day(&self)`: Creates a new `DateTime` object representing the
+  previous day.
+- `relative_delta(&self)`: Creates a new `DateTime` object with the relative
+  delta based on the current date and time.
+- `format(&self, format_str: &str)`: Formats the `DateTime` object as a string
+  using the specified format.
 
-It also includes a method `is_valid_day` which checks if the input string represents a valid day of the week. It also includes a method `is_valid_month` which checks if the input string represents a valid month of the year.
+The library also provides various getter methods to extract the individual
+components of the `DateTime` object, such as `year()`, `month()`, `day()`,
+`hour()`, `minute()`, `second()`, `microsecond()`, `weekday()`, `ordinal()`,
+`iso_8601()`, `iso_week()`, `time()`, `tz()`, and `offset()`.
+
+Additionally, the `DateTime (DTT)` struct implements the `FromStr` trait,
+allowing for parsing a string into a `DateTime` object.
 
 ## Getting Started 🚀
 
@@ -71,9 +116,12 @@ It takes just a few minutes to get up and running with `DateTime (DTT)`.
 
 ### Installation
 
-To install `DateTime (DTT)`, you need to have the Rust toolchain installed on your machine. You can install the Rust toolchain by following the instructions on the [Rust website][14].
+To install `DateTime (DTT)`, you need to have the Rust toolchain installed on
+your machine. You can install the Rust toolchain by following the instructions
+on the [Rust website][14].
 
-Once you have the Rust toolchain installed, you can install `DateTime (DTT)` using the following command:
+Once you have the Rust toolchain installed, you can install `DateTime (DTT)`
+using the following command:
 
 ```shell
 cargo install dtt
@@ -87,49 +135,13 @@ dtt --help
 
 ### Requirements
 
-The minimum supported Rust toolchain version is currently Rust **1.69.0** or later (stable). It is recommended that you install the latest stable version of Rust.
+The minimum supported Rust toolchain version is currently Rust **1.60** or later
+(stable). It is recommended that you install the latest stable version of Rust.
 
 ### Platform support
 
-`DateTime (DTT)` is supported and tested on the following platforms:
-
-#### Tier 1 platforms 🏆
-
-| Operating System | Target | Description |
-| --- | --- | --- |
-| Linux   | aarch64-unknown-linux-gnu | 64-bit Linux systems on ARM architecture |
-| Linux   | i686-unknown-linux-gnu | 32-bit Linux (kernel 3.2+, glibc 2.17+) |
-| Linux   | x86_64-unknown-linux-gnu | 64-bit Linux (kernel 2.6.32+, glibc 2.11+) |
-| macOS   | x86_64-apple-darwin | 64-bit macOS (10.7 Lion or later) |
-| Windows | i686-pc-windows-gnu | 32-bit Windows (7 or later) |
-| Windows | i686-pc-windows-msvc | 32-bit Windows (7 or later) |
-| Windows | x86_64-pc-windows-gnu | 64-bit Windows (7 or later) |
-| Windows | x86_64-pc-windows-msvc | 64-bit Windows (7 or later) |
-
-#### Tier 2 platforms 🥈
-
-| Operating System | Target | Description |
-| --- | --- | --- |
-| 64-bit Linux | x86_64-unknown-linux-musl | 64-bit Linux (kernel 2.6.32+, musl libc) |
-| ARM64 Linux | aarch64-unknown-linux-musl | 64-bit Linux systems on ARM architecture |
-| ARM64 macOS | aarch64-apple-darwin | 64-bit macOS on Apple Silicon |
-| ARM64 Windows | aarch64-pc-windows-msvc | 64-bit Windows (aarch64-pc-windows-msvc) |
-| ARMv6 Linux | arm-unknown-linux-gnueabi | ARMv6 Linux (kernel 3.2, glibc 2.17) |
-| ARMv6 Linux, hardfloat | arm-unknown-linux-gnueabihf | ARMv7 Linux, hardfloat (kernel 3.2, glibc 2.17) |
-| ARMv7 Linux, hardfloat | armv7-unknown-linux-gnueabihf | ARMv7 Linux, hardfloat (kernel 3.2, glibc 2.17) |
-| FreeBSD  | x86_64-unknown-freebsd | 64-bit FreeBSD on x86-64 |
-| MIPS (LE) Linux | mipsel-unknown-linux-gnu | MIPSel Linux (kernel 2.6.32+, glibc 2.11+) |
-| MIPS Linux | mips-unknown-linux-gnu | MIPS Linux (kernel 2.6.32+, glibc 2.11+) |
-| MIPS64 (LE) Linux | mips64el-unknown-linux-gnuabi64 | MIPS64el Linux (kernel 2.6.32+, glibc 2.11+) |
-| MIPS64 Linux | mips64-unknown-linux-gnuabi64 | MIPS64 Linux (kernel 2.6.32+, glibc 2.11+) |
-| NetBSD  | x86_64-unknown-netbsd | 64-bit NetBSD on x86-64 |
-| PowerPC Linux | powerpc-unknown-linux-gnu | PowerPC Linux (kernel 3.2, glibc 2.17) |
-| PPC64 Linux | powerpc64-unknown-linux-gnu | PowerPC64 Linux (kernel 3.2, glibc 2.17) |
-| PPC64LE Linux | powerpc64le-unknown-linux-gnu | PowerPC64le Linux (kernel 3.2, glibc 2.17) |
-| RISC-V Linux | riscv64gc-unknown-linux-gnu | RISC-V Linux (kernel 3.2, glibc 2.17) |
-| S390x Linux | s390x-unknown-linux-gnu | s390x Linux (kernel 3.2, glibc 2.17) |
-
-The [GitHub Actions][11] shows the platforms in which the `DateTime (DTT)` library tests are run.
+`DateTime (DTT)` is supported and tested on a wide range of platforms, including
+various Linux distributions, macOS, and Windows.
 
 ### Documentation
 
@@ -138,11 +150,12 @@ You can find our documentation on [docs.rs][9], [lib.rs][10] and [crates.io][8].
 
 ## Usage 📖
 
-To use the `DateTime (DTT)` library in your project, add the following to your `Cargo.toml` file:
+To use the `DateTime (DTT)` library in your project, add the following to your
+`Cargo.toml` file:
 
 ```toml
 [dependencies]
-dtt = "0.0.5"
+dtt = "0.0.6"
 ```
 
 Add the following to your `main.rs` file:
@@ -154,146 +167,150 @@ use dtt::*;
 
 then you can use the functions in your application code.
 
-### Examples
+### Examples and Test Cases
 
-To get started with `DateTime (DTT)`, you can use the examples provided in the `examples` directory of the project.
+The library provides several examples and test cases to help you get started.
+You can find these in the `examples` and `tests` directories of the project.
 
-To run the examples, clone the repository and run the following command in your terminal from the project root directory.
-
-```shell
-cargo run --example dtt
-```
-
-#### Example 1: Creating a new DateTime object
+#### Example 1: Creating a new DateTime object and printing it
 
 ```rust
+// Import the DateTime struct and the dtt_print macro
 use dtt::DateTime;
 use dtt::dtt_print;
 
-fn main() {
-    // Create a new DateTime object with the current UTC time
+#[test]
+fn example_1() {
+    // Create a new DateTime object and print it
     let now = DateTime::new();
     dtt_print!(now);
 }
 ```
 
-#### Example 2: Creating a new DateTime object with a custom timezone
+#### Example 2: Validate methods for various date and time components
 
 ```rust
+// Import the DateTime struct and the validation macros
 use dtt::DateTime;
-use dtt::dtt_print;
+use dtt::{
+    is_valid_day,
+    is_valid_hour,
+    is_valid_minute,
+    is_valid_month,
+    is_valid_second,
+    is_valid_microsecond,
+    is_valid_ordinal,
+    is_valid_time,
+    is_valid_iso_8601
+};
 
-fn main() {
-    // Create a new DateTime object with a custom timezone (e.g., CEST)
-    let paris_time = DateTime::new_with_tz("CEST");
-    dtt_print!(paris_time);
-}
+// Validate microsecond values
+assert!(DateTime::is_valid_microsecond("999999"));
+assert!(!DateTime::is_valid_microsecond("1000000"));
+
+// Validate second values
+assert!(DateTime::is_valid_second("59"));
+assert!(!DateTime::is_valid_second("60"));
+
+// Validate minute values
+assert!(DateTime::is_valid_minute("59"));
+assert!(!DateTime::is_valid_minute("60"));
+
+// Validate hour values
+assert!(DateTime::is_valid_hour("23"));
+assert!(!DateTime::is_valid_hour("24"));
+
+// Validate month values
+assert!(DateTime::is_valid_month("12"));
+assert!(!DateTime::is_valid_month("13"));
+
+// Validate year values
+assert!(DateTime::is_valid_ordinal("366"));
+assert!(!DateTime::is_valid_ordinal("367"));
+
+// Validate time values
+assert!(DateTime::is_valid_time("23:59:59"));
+assert!(!DateTime::is_valid_time("24:00:00"));
+
+// Validate ISO 8601 values
+assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00Z"));
+assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00+01:00"));
 ```
 
-Custom timezones supported by `DateTime (DTT)` are:
-
-| Abbreviation | UtcOffset                           | Time Zone Description                    |
-|--------------|-------------------------------------|------------------------------------------|
-| ACDT         | `UtcOffset::from_hms(10, 30, 0)`    | Australian Central Daylight Time         |
-| ACST         | `UtcOffset::from_hms(9, 30, 0)`     | Australian Central Standard Time         |
-| ADT          | `UtcOffset::from_hms(-3, 0, 0)`     | Atlantic Daylight Time                    |
-| AEDT         | `UtcOffset::from_hms(11, 0, 0)`     | Australian Eastern Daylight Time          |
-| AEST         | `UtcOffset::from_hms(10, 0, 0)`     | Australian Eastern Standard Time          |
-| AKDT         | `UtcOffset::from_hms(-8, 0, 0)`     | Alaska Daylight Time                      |
-| AKST         | `UtcOffset::from_hms(-9, 0, 0)`     | Alaska Standard Time                      |
-| AST          | `UtcOffset::from_hms(-4, 0, 0)`     | Atlantic Standard Time                    |
-| AWST         | `UtcOffset::from_hms(8, 0, 0)`      | Australian Western Standard Time          |
-| BST          | `UtcOffset::from_hms(1, 0, 0)`      | British Summer Time                       |
-| CDT          | `UtcOffset::from_hms(-5, 0, 0)`     | Central Daylight Time                      |
-| CEST         | `UtcOffset::from_hms(2, 0, 0)`      | Central European Summer Time              |
-| CET          | `UtcOffset::from_hms(1, 0, 0)`      | Central European Time                     |
-| CST          | `UtcOffset::from_hms(-6, 0, 0)`     | Central Standard Time                     |
-| ECT          | `UtcOffset::from_hms(-4, 0, 0)`     | Eastern Caribbean Time                    |
-| EDT          | `UtcOffset::from_hms(-4, 0, 0)`     | Eastern Daylight Time                      |
-| EEST         | `UtcOffset::from_hms(3, 0, 0)`      | Eastern European Summer Time              |
-| EET          | `UtcOffset::from_hms(2, 0, 0)`      | Eastern European Time                     |
-| EST          | `UtcOffset::from_hms(-5, 0, 0)`     | Eastern Standard Time                     |
-| GMT          | `UtcOffset::from_hms(0, 0, 0)`      | Greenwich Mean Time                       |
-| HADT         | `UtcOffset::from_hms(-9, 0, 0)`     | Hawaii-Aleutian Daylight Time              |
-| HAST         | `UtcOffset::from_hms(-10, 0, 0)`    | Hawaii-Aleutian Standard Time              |
-| HKT          | `UtcOffset::from_hms(8, 0, 0)`      | Hong Kong Time                            |
-| IST          | `UtcOffset::from_hms(5, 30, 0)`     | Indian Standard Time                      |
-| IDT          | `UtcOffset::from_hms(3, 0, 0)`      | Israel Daylight Time                       |
-| JST          | `UtcOffset::from_hms(9, 0, 0)`      | Japan Standard Time                       |
-| KST          | `UtcOffset::from_hms(9, 0, 0)`      | Korean Standard Time                      |
-| MDT          | `UtcOffset::from_hms(-6, 0, 0)`     | Mountain Daylight Time                    |
-| MST          | `UtcOffset::from_hms(-7, 0, 0)`     | Mountain Standard Time                    |
-| NZDT         | `UtcOffset::from_hms(13, 0, 0)`     | New Zealand Daylight Time                 |
-| NZST         | `UtcOffset::from_hms(12, 0, 0)`     | New Zealand Standard Time                 |
-| PDT          | `UtcOffset::from_hms(-7, 0, 0)`     | Pacific Daylight Time                      |
-| PST          | `UtcOffset::from_hms(-8, 0, 0)`     | Pacific Standard Time                      |
-| UTC          | `UtcOffset::from_hms(0, 0, 0)`      | Coordinated Universal Time                |
-| WADT         | `UtcOffset::from_hms(8, 45, 0)`     | West Australian Daylight Time             |
-| WAST         | `UtcOffset::from_hms(7, 0, 0)`      | West Australian Standard Time             |
-| WEDT         | `UtcOffset::from_hms(1, 0, 0)`      | Western European Daylight Time            |
-| WEST         | `UtcOffset::from_hms(1, 0, 0)`      | Western European Summer Time              |
-| WET          | `UtcOffset::from_hms(0, 0, 0)`      | Western European Time                     |
-| WST          | `UtcOffset::from_hms(8, 0, 0)`      | Western Standard Time                     |
-
-#### Example 3: Formatting a DateTime object
+#### Example 3: Validate string to `DateTime` conversion
 
 ```rust
 use dtt::DateTime;
-use dtt::dtt_print;
+use std::str::FromStr;
 
-fn main() {
-    // Create a new DateTime object with the current UTC time
-    let now = DateTime::new();
+let date_str = "2022-01-01T12:00:00+01:00";
+let mut result: Result<DateTime, dtt::DateTimeError> = DateTime::from_str(date_str);
 
-    // Format the DateTime object as a string
-    let formatted_time = now.format("%Y-%m-%d %H:%M:%S");
-    dtt_print!("Formatted time: {}", formatted_time);
-}
-```
-
-#### Example 4: Parsing a string into a DateTime object
-
-```rust
-use dtt::DateTime;
-use dtt::dtt_print;
-
-fn main() {
-    // Parse a string into a DateTime object
-    let date_string = "2023-05-12T12:00:00+00:00";
-    match DateTime::parse(date_string) {
-        Ok(datetime) => dtt_print!("Parsed DateTime: {}", datetime),
-        Err(err) => dtt_print!("Error parsing DateTime: {}", err),
-    }
-}
+assert_eq!(result.as_mut().unwrap().iso_8601, date_str);
+assert_eq!(result.as_mut().unwrap().year, 2022);
+assert_eq!(result.as_mut().unwrap().month, "01");
+assert_eq!(result.as_mut().unwrap().day, 1);
+assert_eq!(result.as_mut().unwrap().hour, 12);
+assert_eq!(result.as_mut().unwrap().minute, 0);
+assert_eq!(result.as_mut().unwrap().second, 0);
+assert_eq!(result.as_mut().unwrap().offset, "+01:00");
+assert_eq!(result.as_mut().unwrap().time, "12:00:00");
+assert_eq!(result.as_mut().unwrap().tz, "CET");
+assert_eq!(result.as_mut().unwrap().iso_week, 52);
+assert_eq!(result.as_mut().unwrap().weekday, "Saturday");
+assert_eq!(result.as_mut().unwrap().ordinal, 1);
+assert_eq!(result.as_mut().unwrap().microsecond, 0);
 ```
 
 ## Semantic Versioning Policy 🚥
 
-For transparency into our release cycle and in striving to maintain backward compatibility, `DateTime (DTT)` follows [semantic versioning][7].
+For transparency into our release cycle and in striving to maintain backward
+compatibility, `DateTime (DTT)` follows [semantic versioning][7].
 
 ## License 📝
 
-The project is licensed under the terms of both the MIT license and the Apache License (Version 2.0).
+The project is licensed under the terms of both the MIT license and the Apache
+License (Version 2.0).
 
 - [Apache License, Version 2.0][2]
 - [MIT license][3]
 
 ## Contribution 🤝
 
-We welcome all people who want to contribute. Please see the [contributing instructions][5] for more information.
+We welcome all people who want to contribute. Please see the
+[contributing instructions][5] for more information.
 
-Contributions in any form (issues, pull requests, etc.) to this project must adhere to the [Rust's Code of Conduct][12].
+Contributions in any form (issues, pull requests, etc.) to this project must
+adhere to the [Rust's Code of Conduct][12].
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
+
+## Troubleshooting
+
+If you encounter any issues while using the `DateTime (DTT)` library, please
+check the following:
+
+1. Ensure that you have the correct Rust toolchain installed and that it meets
+   the minimum version requirement.
+2. Verify that you have correctly added the library to your project's
+   dependencies.
+3. Check the documentation and examples for the specific functionality you're
+   trying to use.
+4. If the issue persists, please [report a bug][4] so that the project
+   maintainers can assist you.
 
 ## Acknowledgements 💙
 
-A big thank you to all the awesome contributors of the [DateTime (DTT) Library][6] for their help and support.
+A big thank you to all the awesome contributors of the
+[DateTime (DTT) Library][6] for their help and support.
 
-A special thank you goes to the [Rust Reddit][13] community for providing a lot of useful suggestions on how to improve this project.
+A special thank you goes to the [Rust Reddit][13] community for providing a lot
+of useful suggestions on how to improve this project.
 
 [0]: https://minifunctions.com/ "MiniFunctions"
-[1]: https://dttlib.one "DateTime (DTT) Library Website"
+[1]: https://dttlib.com "DateTime (DTT) Library Website"
 [2]: https://opensource.org/license/apache-2-0/ "Apache License, Version 2.0"
 [3]: https://opensource.org/licenses/MIT "MIT license"
 [4]: https://github.com/sebastienrousseau/dtt/issues "Issues"
@@ -303,7 +320,6 @@ A special thank you goes to the [Rust Reddit][13] community for providing a lot 
 [8]: https://crates.io/crates/dtt "Crates.io"
 [9]: https://docs.rs/dtt "Docs.rs"
 [10]: https://lib.rs/crates/dtt "Lib.rs"
-[11]: https://github.com/sebastienrousseau/dtt/actions "GitHub Actions"
 [12]: https://www.rust-lang.org/policies/code-of-conduct "Rust's Code of Conduct"
 [13]: https://reddit.com/r/rust "Rust Reddit"
 [14]: https://www.rust-lang.org "The Rust Programming Language"
@@ -314,6 +330,6 @@ A special thank you goes to the [Rust Reddit][13] community for providing a lot 
 [crates-badge]: https://img.shields.io/crates/v/dtt.svg?style=for-the-badge 'Crates.io badge'
 [divider]: https://kura.pro/common/images/elements/divider.svg "divider"
 [docs-badge]: https://img.shields.io/docsrs/dtt.svg?style=for-the-badge 'Docs.rs badge'
-[libs-badge]: https://img.shields.io/badge/lib.rs-v0.0.4-orange.svg?style=for-the-badge 'Lib.rs badge'
+[libs-badge]: https://img.shields.io/badge/lib.rs-v0.0.6-orange.svg?style=for-the-badge 'Lib.rs badge'
 [license-badge]: https://img.shields.io/crates/l/dtt.svg?style=for-the-badge 'License badge'
 [made-with-rust-badge]: https://img.shields.io/badge/rust-f04041?style=for-the-badge&labelColor=c0282d&logo=rust 'Made With Rust badge'

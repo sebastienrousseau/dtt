@@ -3,10 +3,12 @@ name: 🧪 Document
 on:
   push:
     branches:
-      - main
+      - feat/dtt
   pull_request:
     branches:
-      - main
+      - feat/dtt
+  release:
+    types: [created]
 
 jobs:
   all:
@@ -43,7 +45,7 @@ jobs:
           retention-days: 1
 
       - name: Write CNAME file
-        run: echo 'doc.dttlib.one' > ./target/doc/CNAME
+        run: echo 'docs.dttlib.one' > ./target/doc/CNAME
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

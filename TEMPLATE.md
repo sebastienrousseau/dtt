@@ -66,7 +66,7 @@ The `DateTime (DTT)` struct has two methods to create instances: `new` and `new_
 It also includes a method `is_valid_day` which checks if the input string represents a valid day of the week. It also includes a method `is_valid_month` which checks if the input string represents a valid month of the year.
 
 [0]: https://minifunctions.com/ "MiniFunctions"
-[1]: https://dttlib.one "DateTime (DTT) Library Website"
+[1]: https://dttlib.com "DateTime (DTT) Library Website"
 [2]: https://opensource.org/license/apache-2-0/ "Apache License, Version 2.0"
 [4]: https://github.com/sebastienrousseau/dtt/issues "Issues"
 [5]: https://github.com/sebastienrousseau/dtt/blob/main/CONTRIBUTING.md "Contributing Instructions"
@@ -81,7 +81,7 @@ It also includes a method `is_valid_day` which checks if the input string repres
 [crates-badge]: https://img.shields.io/crates/v/dtt.svg?style=for-the-badge 'Crates.io badge'
 [divider]: https://kura.pro/common/images/elements/divider.svg "divider"
 [docs-badge]: https://img.shields.io/docsrs/dtt.svg?style=for-the-badge 'Docs.rs badge'
-[libs-badge]: https://img.shields.io/badge/lib.rs-v0.0.4-orange.svg?style=for-the-badge 'Lib.rs badge'
+[libs-badge]: https://img.shields.io/badge/lib.rs-v0.0.6-orange.svg?style=for-the-badge 'Lib.rs badge'
 [license-badge]: https://img.shields.io/crates/l/dtt.svg?style=for-the-badge 'License badge'
 [made-with-rust-badge]: https://img.shields.io/badge/rust-f04041?style=for-the-badge&labelColor=c0282d&logo=rust 'Made With Rust badge'
 

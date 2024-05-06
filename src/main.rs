@@ -1,5 +1,6 @@
-// Copyright © 2023 DateTime (DTT) library. All rights reserved.
+// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
+// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
 //! This is the main entry point for the dtt application.
 fn main() {

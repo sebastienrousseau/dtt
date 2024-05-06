@@ -1,11 +1,17 @@
-extern crate dtt;
+// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+
+#![allow(missing_docs)]
+
 use self::dtt::DateTime;
+use dtt;
 use std::str::FromStr;
 
 /// This is the main function for the build script.
-pub fn main() { 
+pub fn main() {
     // Create a new DateTime object with a custom timezone (e.g., CET)
-    let paris_time = DateTime::new_with_tz("CET").now;
+    let paris_time = DateTime::new_with_tz("CET").unwrap().now;
     println!("🦀 Paris time:        ✅ {}", paris_time);
 
     // Example of how to use the `new` function with the UTC timezone
@@ -48,51 +54,30 @@ pub fn main() {
 
     // Example of how to use the `next_day` function
     let nd = DateTime::next_day(&date);
-    println!(
-        "🦀 Next day:          ✅ {}",
-        String::from(&nd.day.to_string())
-    );
+    println!("🦀 Next day:          ✅ {}", nd.day);
 
     // Example of how to use the `previous_day` function
     let pd = DateTime::previous_day(&date);
-    println!(
-        "🦀 Previous day:      ✅ {}",
-        String::from(&pd.day.to_string())
-    );
+    println!("🦀 Previous day:      ✅ {}", pd.day);
 
     // Example of how to use the `from_str` function
     let date_str = "2022-01-01T12:00:00+01:00";
-    let expected = Ok(DateTime {
-        day: 1,
-        hour: 12,
-        iso_8601: date_str.to_owned(),
-        iso_week: 0,
-        microsecond: 0,
-        minute: 0,
-        month: "".to_owned(),
-        now: "".to_owned(),
-        offset: "".to_owned(),
-        ordinal: 0,
-        second: 0,
-        time: "".to_owned(),
-        tz: "".to_owned(),
-        weekday: "".to_owned(),
-        year: 2022,
-    });
-    let result = DateTime::from_str(date_str);
-    println!("🦀 from_str():        ✅ {}", result == expected);
-    println!("🦀 from_str(day):     ✅ {}", result.unwrap().day);
+    let result: Result<DateTime, dtt::DateTimeError> =
+        DateTime::from_str(date_str);
+    // Print the result
+    println!("🦀 from_str():        ✅ {:?}", result);
+    println!("🦀 from_str(day):     ✅ {:?}", result.unwrap().day);
 
     // Example of how to use the `relative_delta` function
     let mut dt = DateTime::new();
-    dt.day = "11".parse::<u8>().unwrap();
-    dt.hour = "08".parse::<u8>().unwrap();
-    dt.iso_week = "19".parse::<u8>().unwrap();
-    dt.microsecond = "000000".parse::<u32>().unwrap();
-    dt.minute = "08".parse::<u8>().unwrap();
+    dt.day = 11;
+    dt.hour = 8;
+    dt.iso_week = 19;
+    dt.microsecond = 0;
+    dt.minute = 8;
     dt.month = String::from("05");
-    dt.second = "00".parse::<u8>().unwrap();
-    dt.year = "1975".parse::<i32>().unwrap();
+    dt.second = 0;
+    dt.year = 1975;
 
     let new_dt = dt.relative_delta();
     println!("🦀 Rd day:(11)        ✅ {}", new_dt.day);
