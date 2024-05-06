@@ -5,7 +5,7 @@
 //!
 //! # A Rust library for parsing, validating, manipulating, and formatting dates and times
 //!
-//! [![DTT Banner](https://kura.pro/dtt/images/banners/banner-dtt.svg)](https://minifunctions.com)
+//! [![DTT Banner](https://kura.pro/dtt/images/banners/banner-dtt.svg)](https://dttlib.com)
 //!
 //! <center>
 //!
@@ -17,32 +17,22 @@
 //!
 //! </center>
 //!
-//! ## Overview
+//! ## Overview 📖
 //!
-//! The DateTime (DTT) library is a comprehensive and flexible tool that
-//! enables developers to manage dates and times with ease.
+//! The `DateTime (DTT)` library is a comprehensive and flexible tool that enables developers to manage dates and times with ease. It offers a range of functions and data structures that allow you to perform various date and time operations with ease, such as determining the day of the month, hour of the day, working with ISO 8601 date and time formats, and many others.
 //!
-//! It provides drop-in replacement methods for parsing, validating,
-//! manipulating, and formatting dates and times in Rust.
+//! The library supports the creation of new `DateTime` objects with either UTC or custom timezone specifications, ensuring that you always have accurate and relevant date and time information. Additionally, it provides a mechanism to validate input dates and times, ensuring that you always have accurate information to work with.
 //!
-//! The [**`DateTime`**](./struct.DateTime.html) type to represent a
-//! date and a time in a defined timezone.
+//! ## Features ✨
 //!
-//! ## Features
+//! The `DateTime (DTT)` struct includes the following fields and methods:
 //!
-//! The library `DateTime` provides date and time types and methods to
-//! make it easier to manipulate dates and times. It uses the serde
-//! library to derive the Deserialize and Serialize traits to convert
-//! the `DateTime` struct to and from various data formats. It also uses
-//! the time and regex crates to deal with time conversions and regular
-//! expressions respectively.
-//!
-//! The `DateTime` struct includes fields such as:
+//! ### Fields
 //!
 //! | Feature | Description | Type |
 //! | --- | --- | --- |
-//! | `day` | Day of the month: (01-31) | `u8` |
-//! | `hour` | Hour of the day: (00-23) | `u8` |
+//! | `day` | Day of the month: (1-31) | `u8` |
+//! | `hour` | Hour of the day: (0-23) | `u8` |
 //! | `iso_8601` | ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00") | `String` |
 //! | `iso_week` | ISO week number: (1-53) | `u8` |
 //! | `microsecond` | Microsecond: (0-999999) | `u32` |
@@ -57,88 +47,37 @@
 //! | `weekday` | Weekday object: (e.g. "Monday") | `String` |
 //! | `year` | Year object: (e.g. "2023") | `i32` |
 //!
-//! Each of which represents different aspects of a date and time.
+//! ### Methods
 //!
-//! ## Usage
+//! - `new()`: Creates a new `DateTime` object with the current UTC time.
+//! - `new_with_tz(tz: &str)`: Creates a new `DateTime` object with the specified timezone.
+//! - `is_valid_day(input: &str)`: Checks if the input represents a valid day of the month.
+//! - `is_valid_hour(input: &str)`: Checks if the input represents a valid hour of the day.
+//! - `is_valid_second(input: &str)`: Checks if the input represents a valid second of the minute.
+//! - `is_valid_minute(input: &str)`: Checks if the input represents a valid minute of the hour.
+//! - `is_valid_month(input: &str)`: Checks if the input represents a valid month of the year.
+//! - `is_valid_ordinal(input: &str)`: Checks if the input represents a valid ordinal date.
+//! - `is_valid_time(input: &str)`: Checks if the input represents a valid time.
+//! - `is_valid_iso_week(input: &str)`: Checks if the input represents a valid ISO week number.
+//! - `is_valid_iso_8601(input: &str)`: Checks if the input represents a valid ISO 8601 date and time.
+//! - `is_valid_microsecond(input: &str)`: Checks if the input represents a valid microsecond.
+//! - `update(&mut self)`: Updates the `DateTime` object with the current date and time based on the timezone.
+//! - `add_days(&self, days: i32)`: Creates a new `DateTime` object with the specified number of days added.
+//! - `next_day(&self)`: Creates a new `DateTime` object representing the next day.
+//! - `previous_day(&self)`: Creates a new `DateTime` object representing the previous day.
+//! - `relative_delta(&self)`: Creates a new `DateTime` object with the relative delta based on the current date and time.
+//! - `format(&self, format_str: &str)`: Formats the `DateTime` object as a string using the specified format.
 //!
-//! - DateTime can be any `serde::Serialize` or `serde::Deserialize`
-//! types.
+//! The library also provides various getter methods to extract the individual components of the `DateTime` object, such as `year()`, `month()`, `day()`, `hour()`, `minute()`, `second()`, `microsecond()`, `weekday()`, `ordinal()`, `iso_8601()`, `iso_week()`, `time()`, `tz()`, and `offset()`.
 //!
-//! ## Examples
+//! Additionally, the `DateTime (DTT)` struct implements the `FromStr` trait, allowing for parsing a string into a `DateTime` object.
 //!
-//! ```rust
+//! ## License 📝
 //!
-//! // Import the DateTime library
-//! use dtt::DateTime;
+//! The project is licensed under the terms of both the MIT license and the Apache License (Version 2.0).
 //!
-//! // Create a new DateTime object.
-//!
-//! // - The default timezone is UTC.
-//! // - The default date is the current date.
-//! // - The default time is the current time.
-//! // - The default format is ISO 8601.
-//! let dt = DateTime::new();
-//!
-//! // Display the current date.
-//! println!("Date: {}", dt.now); // 2023-01-01
-//!
-//! // Display the current day.
-//! println!("Day: {}", dt.day); // 01
-//!
-//! // Display the current hour.
-//! println!("Hour: {}", dt.hour); // 00
-//!
-//! // Display the current ISO 8601 date and time.
-//! println!("ISO 8601: {}", dt.iso_8601); // 2023-01-01T00:00:00+00:00
-//!
-//! // Display the current ISO week number.
-//! println!("ISO Week Number: {}", dt.iso_week); // 1
-//!
-//! // Display the current microsecond.
-//! println!("Microsecond: {}", dt.microsecond); // 000000
-//!
-//! // Display the current minute.
-//! println!("Minute: {}", dt.minute); // 00
-//!
-//! // Display the current month.
-//! println!("Month: {}", dt.month); // January
-//!
-//! // Display the current offset.
-//! println!("Offset: {}", dt.offset); // +00:00
-//!
-//! // Display the current ordinal date.
-//! println!("Ordinal Date: {}", dt.ordinal); // 1
-//!
-//! // Display the current second.
-//! println!("Second: {}", dt.second); // 00
-//!
-//! // Display the current time.
-//! println!("Time: {}", dt.time); // 00:00:00
-//!
-//! // Display the current timezone.
-//! println!("Timezone: {}", dt.tz); // UTC
-//!
-//! // Display the current weekday.
-//! println!("Weekday: {}", dt.weekday); // Monday
-//!
-//! // Display the current year.
-//! println!("Year: {}", dt.year);
-//!
-//! ```
-//! ## License
-//!
-//! The project is licensed under the terms of both the MIT license and
-//! the Apache License (Version 2.0).
-//!
-//! - [Apache License, Version 2.0](https://opensource.org/licenses/Apache-2.0)
-//! - [MIT License](https://opensource.org/licenses/MIT)
-//!
-//! ## Contribution
-//!
-//! Unless you explicitly state otherwise, any contribution
-//! intentionally submitted for inclusion in the work by you, as
-//! defined in the Apache-2.0 license, shall be dual licensed as above,
-//! without any additional terms or conditions.
+//! - [Apache License, Version 2.0](https://opensource.org/license/apache-2-0/)
+//! - [MIT license](https://opensource.org/licenses/MIT)
 //!
 //! [`serde`]: https://github.com/serde-rs/serde
 //!
@@ -161,7 +100,17 @@ use time::{Duration, Month, OffsetDateTime, UtcOffset};
 pub mod macros;
 
 /// Custom error type for DateTime parsing.
-#[derive(Debug)]
+#[derive(
+    Clone,
+    Debug,
+    Deserialize,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd,
+    Serialize,
+)]
 pub enum DateTimeError {
     /// Invalid date format.
     InvalidFormat,
@@ -191,7 +140,18 @@ impl Error for DateTimeError {}
 /// date and time, and many more methods.
 ///
 ///
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(
+    Clone,
+    Debug,
+    Default,
+    Deserialize,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd,
+    Serialize,
+)]
 pub struct DateTime {
     /// Day of the month: (1-31)
     pub day: u8,
@@ -818,6 +778,28 @@ impl DateTime {
     /// Extract the offset from the DateTime object.
     pub fn offset(&self) -> String {
         self.offset.clone()
+    }
+
+    /// Format method to format the DateTime object as a string
+    pub fn format(&self, format_str: &str) -> String {
+        format!(
+            "{}",
+            format_str
+                .replace("%Y", &self.year.to_string())
+                .replace("%m", &self.month.to_string())
+                .replace("%d", &self.day.to_string())
+                .replace("%H", &self.hour.to_string())
+                .replace("%M", &self.minute.to_string())
+                .replace("%S", &self.second.to_string())
+                .replace("%f", &self.microsecond.to_string())
+                .replace("%j", &self.ordinal.to_string())
+                .replace("%W", &self.iso_week.to_string())
+                .replace("%a", &self.weekday.to_string())
+                .replace("%T", &self.time.to_string())
+                .replace("%z", &self.tz.to_string())
+                .replace("%Z", &self.offset.to_string())
+                .replace("%F", &self.now.to_string())
+        )
     }
 }
 

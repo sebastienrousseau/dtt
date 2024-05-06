@@ -66,7 +66,7 @@ The `DateTime (DTT)` struct has two methods to create instances: `new` and `new_
 It also includes a method `is_valid_day` which checks if the input string represents a valid day of the week. It also includes a method `is_valid_month` which checks if the input string represents a valid month of the year.
 
 [0]: https://minifunctions.com/ "MiniFunctions"
-[1]: https://dttlib.one "DateTime (DTT) Library Website"
+[1]: https://dttlib.com "DateTime (DTT) Library Website"
 [2]: https://opensource.org/license/apache-2-0/ "Apache License, Version 2.0"
 [4]: https://github.com/sebastienrousseau/dtt/issues "Issues"
 [5]: https://github.com/sebastienrousseau/dtt/blob/main/CONTRIBUTING.md "Contributing Instructions"

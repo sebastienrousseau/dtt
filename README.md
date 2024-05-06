@@ -35,31 +35,52 @@ The library supports the creation of new `DateTime` objects with either UTC or c
 
 ## Features ✨
 
-The `DateTime (DTT)` struct includes fields such as:
+The `DateTime (DTT)` struct includes the following fields and methods:
 
-| Feature | Description |
-| --- | --- |
-| `day` | Day of the month: (01-31) |
-| `hour` | Hour of the day: (00-23) |
-| `iso_8601` | ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00") |
-| `iso_week` | ISO week number: (1-53) |
-| `microsecond` | Microsecond: (0-999999) |
-| `minute` | Minute of the hour: (0-59) |
-| `month` | Month: (e.g. "January") |
-| `now` | Now object: (e.g. "2023-01-01") |
-| `offset` | Offset from UTC: (e.g. "+00:00") |
-| `ordinal` | Ordinal date: (1-366) |
-| `second` | Second of the minute: (0-59) |
-| `time` | Time object: (e.g. "00:00:00") |
-| `tz` | Time zone object: (e.g. "UTC") |
-| `weekday` | Weekday object: (e.g. "Monday") |
-| `year` | Year object: (e.g. "2023") |
+### Fields
 
-Each of which represents different aspects of a date and time.
+| Feature | Description | Type |
+| --- | --- | --- |
+| `day` | Day of the month: (1-31) | `u8` |
+| `hour` | Hour of the day: (0-23) | `u8` |
+| `iso_8601` | ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00") | `String` |
+| `iso_week` | ISO week number: (1-53) | `u8` |
+| `microsecond` | Microsecond: (0-999999) | `u32` |
+| `minute` | Minute of the hour: (0-59) | `u8` |
+| `month` | Month: (e.g. "January") | `String` |
+| `now` | Now object: (e.g. "2023-01-01") | `String` |
+| `offset` | Offset from UTC: (e.g. "+00:00") | `String` |
+| `ordinal` | Ordinal date: (1-366) | `u16` |
+| `second` | Second of the minute: (0-59) | `u8` |
+| `time` | Time object: (e.g. "00:00:00") | `String` |
+| `tz` | Time zone object: (e.g. "UTC") | `String` |
+| `weekday` | Weekday object: (e.g. "Monday") | `String` |
+| `year` | Year object: (e.g. "2023") | `i32` |
 
-The `DateTime (DTT)` struct has two methods to create instances: `new` and `new_with_tz`. `new` creates a new `DateTime (DTT)` object with UTC timezone, and `new_with_tz` creates a new `DateTime (DTT)` object with a custom timezone.
+### Methods
 
-It also includes methods to validate various date and time components, such as `is_valid_day`, `is_valid_month`, `is_valid_time`, `is_valid_iso_8601`, and more.
+- `new()`: Creates a new `DateTime` object with the current UTC time.
+- `new_with_tz(tz: &str)`: Creates a new `DateTime` object with the specified timezone.
+- `is_valid_day(input: &str)`: Checks if the input represents a valid day of the month.
+- `is_valid_hour(input: &str)`: Checks if the input represents a valid hour of the day.
+- `is_valid_second(input: &str)`: Checks if the input represents a valid second of the minute.
+- `is_valid_minute(input: &str)`: Checks if the input represents a valid minute of the hour.
+- `is_valid_month(input: &str)`: Checks if the input represents a valid month of the year.
+- `is_valid_ordinal(input: &str)`: Checks if the input represents a valid ordinal date.
+- `is_valid_time(input: &str)`: Checks if the input represents a valid time.
+- `is_valid_iso_week(input: &str)`: Checks if the input represents a valid ISO week number.
+- `is_valid_iso_8601(input: &str)`: Checks if the input represents a valid ISO 8601 date and time.
+- `is_valid_microsecond(input: &str)`: Checks if the input represents a valid microsecond.
+- `update(&mut self)`: Updates the `DateTime` object with the current date and time based on the timezone.
+- `add_days(&self, days: i32)`: Creates a new `DateTime` object with the specified number of days added.
+- `next_day(&self)`: Creates a new `DateTime` object representing the next day.
+- `previous_day(&self)`: Creates a new `DateTime` object representing the previous day.
+- `relative_delta(&self)`: Creates a new `DateTime` object with the relative delta based on the current date and time.
+- `format(&self, format_str: &str)`: Formats the `DateTime` object as a string using the specified format.
+
+The library also provides various getter methods to extract the individual components of the `DateTime` object, such as `year()`, `month()`, `day()`, `hour()`, `minute()`, `second()`, `microsecond()`, `weekday()`, `ordinal()`, `iso_8601()`, `iso_week()`, `time()`, `tz()`, and `offset()`.
+
+Additionally, the `DateTime (DTT)` struct implements the `FromStr` trait, allowing for parsing a string into a `DateTime` object.
 
 ## Getting Started 🚀
 
@@ -83,11 +104,11 @@ dtt --help
 
 ### Requirements
 
-The minimum supported Rust toolchain version is currently Rust **1.69.0** or later (stable). It is recommended that you install the latest stable version of Rust.
+The minimum supported Rust toolchain version is currently Rust **1.60** or later (stable). It is recommended that you install the latest stable version of Rust.
 
 ### Platform support
 
-`DateTime (DTT)` is supported and tested on a wide range of platforms, including various Linux distributions, macOS, and Windows. You can find the full list of supported platforms in the [Platform support](#platform-support-) section.
+`DateTime (DTT)` is supported and tested on a wide range of platforms, including various Linux distributions, macOS, and Windows.
 
 ### Documentation
 
@@ -112,181 +133,100 @@ use dtt::*;
 
 then you can use the functions in your application code.
 
-### Examples
+### Examples and Test Cases
 
-The library provides several examples to get you started, covering common use cases such as:
+The library provides several examples and test cases to help you get started.
+You can find these in the `examples` and `tests` directories of the project.
 
-#### Creating and Manipulating DateTime Objects
+#### Example 1: Creating a new DateTime object and printing it
 
-1. **Creating a new DateTime object**:
-   ```rust
-   use dtt::DateTime;
-   use dtt::dtt_print;
+```rust
+// Import the DateTime struct and the dtt_print macro
+use dtt::DateTime;
+use dtt::dtt_print;
 
-   fn main() {
-       // Create a new DateTime object with the current UTC time
-       let now = DateTime::new();
-       dtt_print!(now);
-   }
-   ```
+#[test]
+fn example_1() {
+    // Create a new DateTime object and print it
+    let now = DateTime::new();
+    dtt_print!(now);
+}
+```
 
-2. **Creating a new DateTime object with a custom timezone**:
-   ```rust
-   use dtt::DateTime;
-   use dtt::dtt_print;
+#### Example 2: Validate methods for various date and time components
 
-   fn main() {
-       // Create a new DateTime object with a custom timezone (e.g., CEST)
-       let paris_time = DateTime::new_with_tz("CEST");
-       dtt_print!(paris_time);
-   }
-   ```
+```rust
+// Import the DateTime struct and the validation macros
+use dtt::DateTime;
+use dtt::{
+    is_valid_day,
+    is_valid_hour,
+    is_valid_minute,
+    is_valid_month,
+    is_valid_second,
+    is_valid_microsecond,
+    is_valid_ordinal,
+    is_valid_time,
+    is_valid_iso_8601
+};
 
-3. **Formatting a DateTime object**:
-   ```rust
-   use dtt::DateTime;
-   use dtt::dtt_print;
+// Validate microsecond values
+assert!(DateTime::is_valid_microsecond("999999"));
+assert!(!DateTime::is_valid_microsecond("1000000"));
 
-   fn main() {
-       // Create a new DateTime object with the current UTC time
-       let now = DateTime::new();
+// Validate second values
+assert!(DateTime::is_valid_second("59"));
+assert!(!DateTime::is_valid_second("60"));
 
-       // Format the DateTime object as a string
-       let formatted_time = now.format("%Y-%m-%d %H:%M:%S");
-       dtt_print!("Formatted time: {}", formatted_time);
-   }
-   ```
+// Validate minute values
+assert!(DateTime::is_valid_minute("59"));
+assert!(!DateTime::is_valid_minute("60"));
 
-4. **Parsing a string into a DateTime object**:
-   ```rust
-   use dtt::DateTime;
-   use dtt::dtt_print;
+// Validate hour values
+assert!(DateTime::is_valid_hour("23"));
+assert!(!DateTime::is_valid_hour("24"));
 
-   fn main() {
-       // Parse a string into a DateTime object
-       let date_string = "2023-05-12T12:00:00+00:00";
-       match DateTime::parse(date_string) {
-           Ok(datetime) => dtt_print!("Parsed DateTime: {}", datetime),
-           Err(err) => dtt_print!("Error parsing DateTime: {}", err),
-       }
-   }
-   ```
+// Validate month values
+assert!(DateTime::is_valid_month("12"));
+assert!(!DateTime::is_valid_month("13"));
 
-#### Validating DateTime Components
+// Validate year values
+assert!(DateTime::is_valid_ordinal("366"));
+assert!(!DateTime::is_valid_ordinal("367"));
 
-5. **Validating a day**:
-   ```rust
-   println!(
-       "🦀 Valid day (32):    ❌ {}",
-       DateTime::is_valid_day("32")
-   );
-   println!(
-       "🦀 Valid day:         ✅ {}",
-       DateTime::is_valid_day(&date.day.to_string())
-   );
-   ```
+// Validate time values
+assert!(DateTime::is_valid_time("23:59:59"));
+assert!(!DateTime::is_valid_time("24:00:00"));
 
-6. **Validating an hour**:
-   ```rust
-   println!(
-       "🦀 Valid hour (24):   ❌ {}",
-       DateTime::is_valid_hour("24")
-   );
-   println!(
-       "🦀 Valid hour:        ✅ {}",
-       DateTime::is_valid_hour(&date.hour.to_string())
-   );
-   ```
+// Validate ISO 8601 values
+assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00Z"));
+assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00+01:00"));
+```
 
-7. **Validating a minute**:
-   ```rust
-   assert!(DateTime::is_valid_minute("59"));
-   assert!(!DateTime::is_valid_minute("60"));
-   ```
+#### Example 3: Validate string to `DateTime` conversion
 
-8. **Validating a month**:
-   ```rust
-   assert!(DateTime::is_valid_month("12"));
-   assert!(!DateTime::is_valid_month("13"));
-   ```
+```rust
+use dtt::DateTime;
+use std::str::FromStr;
 
-9. **Validating a second**:
-   ```rust
-   assert!(DateTime::is_valid_second("59"));
-   assert!(!DateTime::is_valid_second("60"));
-   ```
+let date_str = "2022-01-01T12:00:00+01:00";
+let mut result: Result<DateTime, dtt::DateTimeError> = DateTime::from_str(date_str);
 
-10. **Validating a microsecond**:
-    ```rust
-    assert!(DateTime::is_valid_microsecond("999999"));
-    assert!(!DateTime::is_valid_microsecond("1000000"));
-    ```
-
-11. **Validating an ordinal date**:
-    ```rust
-    assert!(DateTime::is_valid_ordinal("366"));
-    assert!(!DateTime::is_valid_ordinal("367"));
-    ```
-
-12. **Validating a time**:
-    ```rust
-    assert!(DateTime::is_valid_time("23:59:59"));
-    assert!(!DateTime::is_valid_time("24:00:00"));
-    ```
-
-13. **Validating an ISO 8601 date and time**:
-    ```rust
-    assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00Z"));
-    assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00+01:00"));
-    ```
-
-#### Other Examples
-
-14. **Getting the next day**:
-    ```rust
-    let nd = DateTime::next_day(&date);
-    println!("🦀 Next day:          ✅ {}", nd.day);
-    ```
-
-15. **Getting the previous day**:
-    ```rust
-    let pd = DateTime::previous_day(&date);
-    println!("🦀 Previous day:      ✅ {}", pd.day);
-    ```
-
-16. **Parsing a DateTime from a string**:
-    ```rust
-    let date_str = "2022-01-01T12:00:00+01:00";
-    let result: Result<DateTime, dtt::DateTimeError> =
-        DateTime::from_str(date_str);
-    println!("🦀 from_str():        ✅ {:?}", result);
-    println!("🦀 from_str(day):     ✅ {:?}", result.unwrap().day);
-    ```
-
-17. **Calculating a relative delta**:
-    ```rust
-    let mut dt = DateTime::new();
-    dt.day = 11;
-    dt.hour = 8;
-    dt.iso_week = 19;
-    dt.microsecond = 0;
-    dt.minute = 8;
-    dt.month = String::from("05");
-    dt.second = 0;
-    dt.year = 1975;
-
-    let new_dt = dt.relative_delta();
-    println!("🦀 Rd day:(11)        ✅ {}", new_dt.day);
-    println!("🦀 Rd hour:(08)       ✅ {}", new_dt.hour);
-    println!("🦀 Rd week:(19)       ✅ {}", new_dt.iso_week);
-    println!("🦀 Rd ms:(000000)     ✅ {}", new_dt.microsecond);
-    println!("🦀 Rd minute:(08)     ✅ {}", new_dt.minute);
-    println!("🦀 Rd month:(05)      ✅ {}", new_dt.month);
-    println!("🦀 Rd second:(00)     ✅ {}", new_dt.second);
-    println!("🦀 Rd year:(1975)     ✅ {}", new_dt.year);
-    ```
-
-You can find these examples in the `examples` directory of the project.
+assert_eq!(result.as_mut().unwrap().iso_8601, date_str);
+assert_eq!(result.as_mut().unwrap().year, 2022);
+assert_eq!(result.as_mut().unwrap().month, "01");
+assert_eq!(result.as_mut().unwrap().day, 1);
+assert_eq!(result.as_mut().unwrap().hour, 12);
+assert_eq!(result.as_mut().unwrap().minute, 0);
+assert_eq!(result.as_mut().unwrap().second, 0);
+assert_eq!(result.as_mut().unwrap().offset, "+01:00");
+assert_eq!(result.as_mut().unwrap().time, "12:00:00");
+assert_eq!(result.as_mut().unwrap().tz, "CET");
+assert_eq!(result.as_mut().unwrap().iso_week, 52);
+assert_eq!(result.as_mut().unwrap().weekday, "Saturday");
+assert_eq!(result.as_mut().unwrap().ordinal, 1);
+assert_eq!(result.as_mut().unwrap().microsecond, 0);
+```
 
 ## Semantic Versioning Policy 🚥
 
@@ -323,7 +263,7 @@ A big thank you to all the awesome contributors of the [DateTime (DTT) Library][
 A special thank you goes to the [Rust Reddit][13] community for providing a lot of useful suggestions on how to improve this project.
 
 [0]: https://minifunctions.com/ "MiniFunctions"
-[1]: https://dttlib.one "DateTime (DTT) Library Website"
+[1]: https://dttlib.com "DateTime (DTT) Library Website"
 [2]: https://opensource.org/license/apache-2-0/ "Apache License, Version 2.0"
 [3]: https://opensource.org/licenses/MIT "MIT license"
 [4]: https://github.com/sebastienrousseau/dtt/issues "Issues"
@@ -333,7 +273,6 @@ A special thank you goes to the [Rust Reddit][13] community for providing a lot 
 [8]: https://crates.io/crates/dtt "Crates.io"
 [9]: https://docs.rs/dtt "Docs.rs"
 [10]: https://lib.rs/crates/dtt "Lib.rs"
-[11]: https://github.com/sebastienrousseau/dtt/actions "GitHub Actions"
 [12]: https://www.rust-lang.org/policies/code-of-conduct "Rust's Code of Conduct"
 [13]: https://reddit.com/r/rust "Rust Reddit"
 [14]: https://www.rust-lang.org "The Rust Programming Language"

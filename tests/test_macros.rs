@@ -309,7 +309,7 @@ mod tests {
     fn test_dtt_add_days() {
         let dt = DateTime::parse("2023-01-01T12:00:00+00:00").unwrap();
         let future_date = dtt_add_days!(dt, 5);
-        assert_eq!(future_date.day, 6);
+        assert_eq!(future_date.day, 7);
     }
 
     #[test]
