@@ -782,24 +782,21 @@ impl DateTime {
 
     /// Format method to format the DateTime object as a string
     pub fn format(&self, format_str: &str) -> String {
-        format!(
-            "{}",
-            format_str
-                .replace("%Y", &self.year.to_string())
-                .replace("%m", &self.month.to_string())
-                .replace("%d", &self.day.to_string())
-                .replace("%H", &self.hour.to_string())
-                .replace("%M", &self.minute.to_string())
-                .replace("%S", &self.second.to_string())
-                .replace("%f", &self.microsecond.to_string())
-                .replace("%j", &self.ordinal.to_string())
-                .replace("%W", &self.iso_week.to_string())
-                .replace("%a", &self.weekday.to_string())
-                .replace("%T", &self.time.to_string())
-                .replace("%z", &self.tz.to_string())
-                .replace("%Z", &self.offset.to_string())
-                .replace("%F", &self.now.to_string())
-        )
+        format_str
+            .replace("%Y", &self.year.to_string())
+            .replace("%m", &self.month.to_string())
+            .replace("%d", &self.day.to_string())
+            .replace("%H", &self.hour.to_string())
+            .replace("%M", &self.minute.to_string())
+            .replace("%S", &self.second.to_string())
+            .replace("%f", &self.microsecond.to_string())
+            .replace("%j", &self.ordinal.to_string())
+            .replace("%W", &self.iso_week.to_string())
+            .replace("%a", &self.weekday.to_string())
+            .replace("%T", &self.time.to_string())
+            .replace("%z", &self.tz.to_string())
+            .replace("%Z", &self.offset.to_string())
+            .replace("%F", &self.now.to_string())
     }
 }
 
