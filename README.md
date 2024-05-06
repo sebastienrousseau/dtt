@@ -7,7 +7,8 @@ alt="DateTime (DTT) logo" height="261" width="261" align="right" />
 
 # DateTime (DTT)
 
-A Rust library for parsing, validating, manipulating, and formatting dates and times
+A Rust library for parsing, validating, manipulating, and formatting dates and
+times
 
 *Part of the [Mini Functions][0] family of libraries.*
 
@@ -29,9 +30,17 @@ A Rust library for parsing, validating, manipulating, and formatting dates and t
 
 ## Overview 📖
 
-The `DateTime (DTT)` library is a comprehensive and flexible tool that enables developers to manage dates and times with ease. It offers a range of functions and data structures that allow you to perform various date and time operations with ease, such as determining the day of the month, hour of the day, working with ISO 8601 date and time formats, and many others.
+The `DateTime (DTT)` library is a comprehensive and flexible tool that enables
+developers to manage dates and times with ease. It offers a range of functions
+and data structures that allow you to perform various date and time operations
+with ease, such as determining the day of the month, hour of the day, working
+with ISO 8601 date and time formats, and many others.
 
-The library supports the creation of new `DateTime` objects with either UTC or custom timezone specifications, ensuring that you always have accurate and relevant date and time information. Additionally, it provides a mechanism to validate input dates and times, ensuring that you always have accurate information to work with.
+The library supports the creation of new `DateTime` objects with either UTC or
+custom timezone specifications, ensuring that you always have accurate and
+relevant date and time information. Additionally, it provides a mechanism to
+validate input dates and times, ensuring that you always have accurate
+information to work with.
 
 ## Features ✨
 
@@ -60,27 +69,46 @@ The `DateTime (DTT)` struct includes the following fields and methods:
 ### Methods
 
 - `new()`: Creates a new `DateTime` object with the current UTC time.
-- `new_with_tz(tz: &str)`: Creates a new `DateTime` object with the specified timezone.
-- `is_valid_day(input: &str)`: Checks if the input represents a valid day of the month.
-- `is_valid_hour(input: &str)`: Checks if the input represents a valid hour of the day.
-- `is_valid_second(input: &str)`: Checks if the input represents a valid second of the minute.
-- `is_valid_minute(input: &str)`: Checks if the input represents a valid minute of the hour.
-- `is_valid_month(input: &str)`: Checks if the input represents a valid month of the year.
-- `is_valid_ordinal(input: &str)`: Checks if the input represents a valid ordinal date.
+- `new_with_tz(tz: &str)`: Creates a new `DateTime` object with the specified
+  timezone.
+- `is_valid_day(input: &str)`: Checks if the input represents a valid day of the
+  month.
+- `is_valid_hour(input: &str)`: Checks if the input represents a valid hour of
+  the day.
+- `is_valid_second(input: &str)`: Checks if the input represents a valid second
+  of the minute.
+- `is_valid_minute(input: &str)`: Checks if the input represents a valid minute
+  of the hour.
+- `is_valid_month(input: &str)`: Checks if the input represents a valid month of
+  the year.
+- `is_valid_ordinal(input: &str)`: Checks if the input represents a valid
+  ordinal date.
 - `is_valid_time(input: &str)`: Checks if the input represents a valid time.
-- `is_valid_iso_week(input: &str)`: Checks if the input represents a valid ISO week number.
-- `is_valid_iso_8601(input: &str)`: Checks if the input represents a valid ISO 8601 date and time.
-- `is_valid_microsecond(input: &str)`: Checks if the input represents a valid microsecond.
-- `update(&mut self)`: Updates the `DateTime` object with the current date and time based on the timezone.
-- `add_days(&self, days: i32)`: Creates a new `DateTime` object with the specified number of days added.
+- `is_valid_iso_week(input: &str)`: Checks if the input represents a valid ISO
+  week number.
+- `is_valid_iso_8601(input: &str)`: Checks if the input represents a valid ISO
+  8601 date and time.
+- `is_valid_microsecond(input: &str)`: Checks if the input represents a valid
+  microsecond.
+- `update(&mut self)`: Updates the `DateTime` object with the current date and
+  time based on the timezone.
+- `add_days(&self, days: i32)`: Creates a new `DateTime` object with the
+  specified number of days added.
 - `next_day(&self)`: Creates a new `DateTime` object representing the next day.
-- `previous_day(&self)`: Creates a new `DateTime` object representing the previous day.
-- `relative_delta(&self)`: Creates a new `DateTime` object with the relative delta based on the current date and time.
-- `format(&self, format_str: &str)`: Formats the `DateTime` object as a string using the specified format.
+- `previous_day(&self)`: Creates a new `DateTime` object representing the
+  previous day.
+- `relative_delta(&self)`: Creates a new `DateTime` object with the relative
+  delta based on the current date and time.
+- `format(&self, format_str: &str)`: Formats the `DateTime` object as a string
+  using the specified format.
 
-The library also provides various getter methods to extract the individual components of the `DateTime` object, such as `year()`, `month()`, `day()`, `hour()`, `minute()`, `second()`, `microsecond()`, `weekday()`, `ordinal()`, `iso_8601()`, `iso_week()`, `time()`, `tz()`, and `offset()`.
+The library also provides various getter methods to extract the individual
+components of the `DateTime` object, such as `year()`, `month()`, `day()`,
+`hour()`, `minute()`, `second()`, `microsecond()`, `weekday()`, `ordinal()`,
+`iso_8601()`, `iso_week()`, `time()`, `tz()`, and `offset()`.
 
-Additionally, the `DateTime (DTT)` struct implements the `FromStr` trait, allowing for parsing a string into a `DateTime` object.
+Additionally, the `DateTime (DTT)` struct implements the `FromStr` trait,
+allowing for parsing a string into a `DateTime` object.
 
 ## Getting Started 🚀
 
@@ -88,9 +116,12 @@ It takes just a few minutes to get up and running with `DateTime (DTT)`.
 
 ### Installation
 
-To install `DateTime (DTT)`, you need to have the Rust toolchain installed on your machine. You can install the Rust toolchain by following the instructions on the [Rust website][14].
+To install `DateTime (DTT)`, you need to have the Rust toolchain installed on
+your machine. You can install the Rust toolchain by following the instructions
+on the [Rust website][14].
 
-Once you have the Rust toolchain installed, you can install `DateTime (DTT)` using the following command:
+Once you have the Rust toolchain installed, you can install `DateTime (DTT)`
+using the following command:
 
 ```shell
 cargo install dtt
@@ -104,11 +135,13 @@ dtt --help
 
 ### Requirements
 
-The minimum supported Rust toolchain version is currently Rust **1.60** or later (stable). It is recommended that you install the latest stable version of Rust.
+The minimum supported Rust toolchain version is currently Rust **1.60** or later
+(stable). It is recommended that you install the latest stable version of Rust.
 
 ### Platform support
 
-`DateTime (DTT)` is supported and tested on a wide range of platforms, including various Linux distributions, macOS, and Windows.
+`DateTime (DTT)` is supported and tested on a wide range of platforms, including
+various Linux distributions, macOS, and Windows.
 
 ### Documentation
 
@@ -117,7 +150,8 @@ You can find our documentation on [docs.rs][9], [lib.rs][10] and [crates.io][8].
 
 ## Usage 📖
 
-To use the `DateTime (DTT)` library in your project, add the following to your `Cargo.toml` file:
+To use the `DateTime (DTT)` library in your project, add the following to your
+`Cargo.toml` file:
 
 ```toml
 [dependencies]
@@ -230,37 +264,50 @@ assert_eq!(result.as_mut().unwrap().microsecond, 0);
 
 ## Semantic Versioning Policy 🚥
 
-For transparency into our release cycle and in striving to maintain backward compatibility, `DateTime (DTT)` follows [semantic versioning][7].
+For transparency into our release cycle and in striving to maintain backward
+compatibility, `DateTime (DTT)` follows [semantic versioning][7].
 
 ## License 📝
 
-The project is licensed under the terms of both the MIT license and the Apache License (Version 2.0).
+The project is licensed under the terms of both the MIT license and the Apache
+License (Version 2.0).
 
 - [Apache License, Version 2.0][2]
 - [MIT license][3]
 
 ## Contribution 🤝
 
-We welcome all people who want to contribute. Please see the [contributing instructions][5] for more information.
+We welcome all people who want to contribute. Please see the
+[contributing instructions][5] for more information.
 
-Contributions in any form (issues, pull requests, etc.) to this project must adhere to the [Rust's Code of Conduct][12].
+Contributions in any form (issues, pull requests, etc.) to this project must
+adhere to the [Rust's Code of Conduct][12].
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
 
 ## Troubleshooting
 
-If you encounter any issues while using the `DateTime (DTT)` library, please check the following:
+If you encounter any issues while using the `DateTime (DTT)` library, please
+check the following:
 
-1. Ensure that you have the correct Rust toolchain installed and that it meets the minimum version requirement.
-2. Verify that you have correctly added the library to your project's dependencies.
-3. Check the documentation and examples for the specific functionality you're trying to use.
-4. If the issue persists, please [report a bug][4] so that the project maintainers can assist you.
+1. Ensure that you have the correct Rust toolchain installed and that it meets
+   the minimum version requirement.
+2. Verify that you have correctly added the library to your project's
+   dependencies.
+3. Check the documentation and examples for the specific functionality you're
+   trying to use.
+4. If the issue persists, please [report a bug][4] so that the project
+   maintainers can assist you.
 
 ## Acknowledgements 💙
 
-A big thank you to all the awesome contributors of the [DateTime (DTT) Library][6] for their help and support.
+A big thank you to all the awesome contributors of the
+[DateTime (DTT) Library][6] for their help and support.
 
-A special thank you goes to the [Rust Reddit][13] community for providing a lot of useful suggestions on how to improve this project.
+A special thank you goes to the [Rust Reddit][13] community for providing a lot
+of useful suggestions on how to improve this project.
 
 [0]: https://minifunctions.com/ "MiniFunctions"
 [1]: https://dttlib.com "DateTime (DTT) Library Website"
