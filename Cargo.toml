@@ -45,7 +45,7 @@ debug = true
 
 [dependencies]
 # Dependencies are only used for building.
-regex = "1.10.4"
+regex = "1.10.6"
 serde = { version = "1.0.200", features = ["derive"] }
 time = "0.3.36"
 
