@@ -27,6 +27,12 @@ pub enum DateTimeError {
     InvalidTimezone,
 }
 
+impl Default for DateTimeError {
+    fn default() -> Self {
+        DateTimeError::InvalidFormat
+    }
+}
+
 impl fmt::Display for DateTimeError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
