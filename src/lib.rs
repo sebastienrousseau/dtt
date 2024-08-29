@@ -81,7 +81,7 @@
 //!
 //! [`serde`]: https://github.com/serde-rs/serde
 //!
-#![cfg_attr(feature = "bench", feature(test))]
+
 #![doc(
     html_favicon_url = "https://kura.pro/dtt/images/favicon.ico",
     html_logo_url = "https://kura.pro/dtt/images/logos/dtt.svg",
@@ -101,6 +101,7 @@ pub mod macros;
 
 /// Custom error type for DateTime parsing.
 #[derive(
+    Copy,
     Clone,
     Debug,
     Deserialize,
@@ -200,8 +201,7 @@ impl DateTime {
     ///
     /// # Returns
     ///
-    /// * `Result<DateTime, DateTimeError>` - A result indicating either the successfully parsed `DateTime` object
-    /// or a `DateTimeError` if the input format is invalid.
+    /// * `Result<DateTime, DateTimeError>` - A result indicating either the successfully parsed `DateTime` object or a `DateTimeError` if the input format is invalid.
     ///
     pub fn parse(input: &str) -> Result<DateTime, DateTimeError> {
         let iso_8601_pattern = r"^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-]\d{2}:\d{2}$";

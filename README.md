@@ -135,7 +135,7 @@ dtt --help
 
 ### Requirements
 
-The minimum supported Rust toolchain version is currently Rust **1.60** or later
+The minimum supported Rust toolchain version is currently Rust **1.56.0** or later
 (stable). It is recommended that you install the latest stable version of Rust.
 
 ### Platform support
