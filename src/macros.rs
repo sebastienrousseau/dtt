@@ -249,7 +249,7 @@ macro_rules! dtt_min {
 /// # Examples
 ///
 /// ```rust
-/// use dtt::{DateTime, dtt_max, DateTimeError};
+/// use dtt::{DateTime, dtt_max, error::DateTimeError};
 ///
 /// let max_int = dtt_max!(10, 20);
 /// assert_eq!(max_int, 20);

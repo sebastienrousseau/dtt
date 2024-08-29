@@ -62,7 +62,7 @@ pub fn main() {
 
     // Example of how to use the `from_str` function
     let date_str = "2022-01-01T12:00:00+01:00";
-    let result: Result<DateTime, dtt::DateTimeError> =
+    let result: Result<DateTime, dtt::error::DateTimeError> =
         DateTime::from_str(date_str);
     // Print the result
     println!("🦀 from_str():        ✅ {:?}", result);

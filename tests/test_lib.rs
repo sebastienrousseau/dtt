@@ -455,7 +455,7 @@ mod tests {
             weekday: "".to_owned(),
             year: 2022,
         };
-        let result: Result<DateTime, dtt::DateTimeError> =
+        let result: Result<DateTime, dtt::error::DateTimeError> =
             date_str.parse::<DateTime>();
         match result {
             Ok(dt) => assert_eq!(dt, expected),
@@ -463,7 +463,7 @@ mod tests {
         }
 
         let date_str: &str = "invalid";
-        let result: Result<DateTime, dtt::DateTimeError> =
+        let result: Result<DateTime, dtt::error::DateTimeError> =
             date_str.parse::<DateTime>();
         assert!(result.is_err());
     }
@@ -643,7 +643,7 @@ mod tests {
     #[test]
     fn test_parse_iso_8601() {
         let valid_date = "2023-03-15T13:45:30+00:00";
-        let result: Result<DateTime, dtt::DateTimeError> =
+        let result: Result<DateTime, dtt::error::DateTimeError> =
             DateTime::parse(valid_date);
         assert!(result.is_ok());
     }
@@ -651,7 +651,7 @@ mod tests {
     #[test]
     fn test_valid_date_without_time() {
         let valid_date = "2023-03-15";
-        let result: Result<DateTime, dtt::DateTimeError> =
+        let result: Result<DateTime, dtt::error::DateTimeError> =
             DateTime::parse(valid_date);
         assert!(result.is_ok());
     }
@@ -659,7 +659,7 @@ mod tests {
     #[test]
     fn test_invalid_date_format() {
         let invalid_date = "15-03-2023";
-        let result: Result<DateTime, dtt::DateTimeError> =
+        let result: Result<DateTime, dtt::error::DateTimeError> =
             DateTime::parse(invalid_date);
         assert!(result.is_err());
     }
@@ -667,7 +667,7 @@ mod tests {
     #[test]
     fn test_invalid_iso8601_format() {
         let invalid_date = "2023-03-15T25:61:61+00:00"; // Invalid time
-        let result: Result<DateTime, dtt::DateTimeError> =
+        let result: Result<DateTime, dtt::error::DateTimeError> =
             DateTime::parse(invalid_date);
         assert!(result.is_err());
     }
@@ -675,7 +675,7 @@ mod tests {
     #[test]
     fn test_parse_date() {
         let input: &str = "2023-05-12";
-        let result: Result<DateTime, dtt::DateTimeError> =
+        let result: Result<DateTime, dtt::error::DateTimeError> =
             DateTime::parse(input);
 
         assert!(result.is_ok());
@@ -689,7 +689,7 @@ mod tests {
     #[test]
     fn test_parse_invalid_format() {
         let input: &str = "2023-05-12T16:23:45Z"; // Invalid format (missing offset)
-        let result: Result<DateTime, dtt::DateTimeError> =
+        let result: Result<DateTime, dtt::error::DateTimeError> =
             DateTime::parse(input);
 
         assert!(result.is_err());
@@ -698,7 +698,7 @@ mod tests {
     #[test]
     fn test_parse_invalid_input() {
         let input: &str = "2023/05/12"; // Invalid input format
-        let result: Result<DateTime, dtt::DateTimeError> =
+        let result: Result<DateTime, dtt::error::DateTimeError> =
             DateTime::parse(input);
 
         assert!(result.is_err());

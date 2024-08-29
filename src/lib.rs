@@ -90,49 +90,18 @@
 #![crate_name = "dtt"]
 #![crate_type = "lib"]
 
+/// The `macros` module contains functions for generating macros.
+pub mod macros;
+
+/// The `error` module contains custom error types for DateTime parsing.
+pub mod error;
+
+use crate::error::DateTimeError;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;
 use time::{Duration, Month, OffsetDateTime, UtcOffset};
-
-/// The `macros` module contains functions for generating macros.
-pub mod macros;
-
-/// Custom error type for DateTime parsing.
-#[derive(
-    Copy,
-    Clone,
-    Debug,
-    Deserialize,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd,
-    Serialize,
-)]
-pub enum DateTimeError {
-    /// Invalid date format.
-    InvalidFormat,
-    /// Invalid timezone.
-    InvalidTimezone,
-}
-
-impl fmt::Display for DateTimeError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            DateTimeError::InvalidFormat => {
-                write!(f, "Invalid date format")
-            }
-            DateTimeError::InvalidTimezone => {
-                write!(f, "Invalid timezone")
-            }
-        }
-    }
-}
-
-impl Error for DateTimeError {}
 
 ///
 /// DateTime struct to ease dates and times manipulation.
