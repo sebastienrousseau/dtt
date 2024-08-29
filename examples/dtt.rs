@@ -4,7 +4,7 @@
 
 #![allow(missing_docs)]
 
-use self::dtt::DateTime;
+use self::dtt::datetime::DateTime;
 use dtt;
 use std::str::FromStr;
 

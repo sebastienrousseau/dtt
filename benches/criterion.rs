@@ -6,7 +6,7 @@
 use criterion::{
     black_box, criterion_group, criterion_main, Criterion,
 };
-use dtt::DateTime;
+use dtt::datetime::DateTime;
 
 fn new_date(c: &mut Criterion) {
     c.bench_function("new", |b| b.iter(|| DateTime::new));

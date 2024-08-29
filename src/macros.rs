@@ -51,7 +51,7 @@
 #[macro_export]
 macro_rules! dtt_now {
     () => {{
-        dtt::DateTime::new()
+        dtt::datetime::DateTime::new()
     }};
 }
 
@@ -68,7 +68,7 @@ macro_rules! dtt_now {
 /// # Examples
 ///
 /// ```
-/// use dtt::DateTime;
+/// use dtt::datetime::DateTime;
 /// use dtt::dtt_parse;
 ///
 /// let input = "2022-01-01T12:00:00+01:00";
@@ -88,7 +88,7 @@ macro_rules! dtt_now {
 #[macro_export]
 macro_rules! dtt_parse {
     ($input:expr) => {{
-        dtt::DateTime::parse($input)
+        dtt::datetime::DateTime::parse($input)
     }};
 }
 
@@ -177,7 +177,7 @@ macro_rules! dtt_map {
 ///
 /// # Examples
 /// ```
-/// use dtt::DateTime;
+/// use dtt::datetime::DateTime;
 /// use dtt::dtt_assert;
 ///
 /// // Example date components
@@ -249,7 +249,7 @@ macro_rules! dtt_min {
 /// # Examples
 ///
 /// ```rust
-/// use dtt::{DateTime, dtt_max, error::DateTimeError};
+/// use dtt::{dtt_max, datetime::DateTime, error::DateTimeError};
 ///
 /// let max_int = dtt_max!(10, 20);
 /// assert_eq!(max_int, 20);
@@ -343,7 +343,7 @@ macro_rules! dtt_print_vec {
 /// # Examples
 /// ```
 /// use dtt::is_valid;
-/// use dtt::DateTime;
+/// use dtt::datetime::DateTime;
 ///
 /// // Validation of a day
 /// let input = "31".to_string();
@@ -405,35 +405,43 @@ macro_rules! is_valid {
         fn $name(input: &str) -> bool {
             match input.parse::<$type>() {
                 Ok(parsed_val) => match stringify!($name) {
-                    "day" => dtt::DateTime::is_valid_day(
+                    "day" => dtt::datetime::DateTime::is_valid_day(
                         &parsed_val.to_string(),
                     ),
-                    "hour" => dtt::DateTime::is_valid_hour(
+                    "hour" => dtt::datetime::DateTime::is_valid_hour(
                         &parsed_val.to_string(),
                     ),
-                    "minute" => dtt::DateTime::is_valid_minute(
-                        &parsed_val.to_string(),
-                    ),
-                    "month" => dtt::DateTime::is_valid_month(
-                        &parsed_val.to_string(),
-                    ),
-                    "second" => dtt::DateTime::is_valid_second(
-                        &parsed_val.to_string(),
-                    ),
-                    "microsecond" => {
-                        dtt::DateTime::is_valid_microsecond(
+                    "minute" => {
+                        dtt::datetime::DateTime::is_valid_minute(
                             &parsed_val.to_string(),
                         )
                     }
-                    "ordinal" => dtt::DateTime::is_valid_ordinal(
+                    "month" => dtt::datetime::DateTime::is_valid_month(
                         &parsed_val.to_string(),
                     ),
-                    "time" => dtt::DateTime::is_valid_time(
+                    "second" => {
+                        dtt::datetime::DateTime::is_valid_second(
+                            &parsed_val.to_string(),
+                        )
+                    }
+                    "microsecond" => {
+                        dtt::datetime::DateTime::is_valid_microsecond(
+                            &parsed_val.to_string(),
+                        )
+                    }
+                    "ordinal" => {
+                        dtt::datetime::DateTime::is_valid_ordinal(
+                            &parsed_val.to_string(),
+                        )
+                    }
+                    "time" => dtt::datetime::DateTime::is_valid_time(
                         &parsed_val.to_string(),
                     ),
-                    "iso_8601" => dtt::DateTime::is_valid_iso_8601(
-                        &parsed_val.to_string(),
-                    ),
+                    "iso_8601" => {
+                        dtt::datetime::DateTime::is_valid_iso_8601(
+                            &parsed_val.to_string(),
+                        )
+                    }
                     _ => false,
                 },
                 Err(_) => false,
@@ -456,7 +464,7 @@ macro_rules! is_valid {
 #[doc = "Creates a new DateTime instance with the specified timezone."]
 macro_rules! dtt_new_with_tz {
     ($tz:expr) => {{
-        dtt::DateTime::new_with_tz($tz).expect(
+        dtt::datetime::DateTime::new_with_tz($tz).expect(
             "Failed to create DateTime with the specified timezone",
         )
     }};
@@ -475,7 +483,7 @@ macro_rules! dtt_new_with_tz {
 ///
 /// # Examples
 /// ```
-/// use dtt::{DateTime, dtt_add_days};
+/// use dtt::{datetime::DateTime, dtt_add_days};
 ///
 /// let dt = DateTime::parse("2023-01-01T12:00:00+00:00").unwrap();
 /// let future_date = dtt_add_days!(dt, 5);
@@ -650,7 +658,7 @@ macro_rules! dtt_diff_days {
 /// # Examples
 ///
 /// ```rust
-/// use dtt::{DateTime, dtt_clone};
+/// use dtt::{datetime::DateTime, dtt_clone};
 ///
 /// let dt1 = DateTime::new();
 /// let dt2 = dtt_clone!(dt1.clone());
@@ -697,7 +705,7 @@ macro_rules! dtt_clone {
 /// # Examples
 ///
 /// ```rust
-/// use dtt::{DateTime, dtt_format};
+/// use dtt::{datetime::DateTime, dtt_format};
 ///
 /// let dt = DateTime {
 ///     day: 1,
@@ -758,7 +766,7 @@ macro_rules! dtt_format {
 ///
 /// # Examples
 /// ```
-/// use dtt::{DateTime, dtt_sub_days};
+/// use dtt::{datetime::DateTime, dtt_sub_days};
 ///
 /// let dt = DateTime::parse("2023-01-01T12:00:00+00:00").unwrap();
 /// let past_date = dtt_sub_days!(dt, 5);

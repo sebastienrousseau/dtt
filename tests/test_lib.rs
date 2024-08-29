@@ -5,7 +5,7 @@
 #[cfg(test)]
 
 mod tests {
-    use dtt::DateTime;
+    use dtt::datetime::DateTime;
     use regex::Regex;
     use std::str::FromStr;
     use time::UtcOffset;

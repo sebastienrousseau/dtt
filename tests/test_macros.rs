@@ -4,8 +4,8 @@
 
 #[cfg(test)]
 mod tests {
+    use dtt::datetime::DateTime;
     use dtt::is_valid;
-    use dtt::DateTime;
     use dtt::*;
 
     #[test]

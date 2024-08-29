@@ -176,7 +176,7 @@ You can find these in the `examples` and `tests` directories of the project.
 
 ```rust
 // Import the DateTime struct and the dtt_print macro
-use dtt::DateTime;
+use dtt::datetime::DateTime;
 use dtt::dtt_print;
 
 #[test]
@@ -191,7 +191,7 @@ fn example_1() {
 
 ```rust
 // Import the DateTime struct and the validation macros
-use dtt::DateTime;
+use dtt::datetime::DateTime;
 use dtt::{
     is_valid_day,
     is_valid_hour,
@@ -240,11 +240,11 @@ assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00+01:00"));
 #### Example 3: Validate string to `DateTime` conversion
 
 ```rust
-use dtt::DateTime;
+use dtt::datetime::DateTime;
 use std::str::FromStr;
 
 let date_str = "2022-01-01T12:00:00+01:00";
-let mut result: Result<DateTime, dtt::DateTimeError> = DateTime::from_str(date_str);
+let mut result: Result<DateTime, dtt::datetime::DateTimeError> = DateTime::from_str(date_str);
 
 assert_eq!(result.as_mut().unwrap().iso_8601, date_str);
 assert_eq!(result.as_mut().unwrap().year, 2022);
