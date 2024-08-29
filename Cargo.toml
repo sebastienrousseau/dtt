@@ -17,7 +17,7 @@ name = "dtt"
 readme = "README.md"
 repository = "https://github.com/sebastienrousseau/dtt.git"
 rust-version = "1.60.0"
-version = "0.0.6"
+version = "0.0.7"
 
 # Included and excluded files.
 include = [
