@@ -2,16 +2,17 @@
 //!
 //! This module provides a `DateTime` struct and associated methods for
 //! creating, manipulating, and formatting date and time information.
-//! It supports various timezones, custom time offsets, and offers a range
-//! of utility functions for date/time operations.
+//! It supports various timezones using fixed UTC offsets, but does not
+//! automatically adjust for daylight saving time (DST). Users must manually
+//! manage any necessary DST adjustments by selecting the correct timezone offset.
 
+use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fmt;
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Sub};
 use std::str::FromStr;
-use serde::{Serialize, Deserialize};
 use thiserror::Error;
 use time::{
     Date, Duration, Month, OffsetDateTime, PrimitiveDateTime, Time,
@@ -24,8 +25,8 @@ pub enum DateTimeError {
     /// The provided format is invalid.
     #[error("Invalid format")]
     InvalidFormat,
-    /// The provided timezone is invalid or not supported.
-    #[error("Invalid timezone")]
+    /// The provided timezone is invalid or does not support DST.
+    #[error("Invalid or unsupported timezone; DST not supported")]
     InvalidTimezone,
     /// The date is invalid (e.g., February 30).
     #[error("Invalid date")]
@@ -52,7 +53,44 @@ pub struct DateTime {
 lazy_static::lazy_static! {
     static ref TIMEZONE_OFFSETS: HashMap<&'static str, Result<UtcOffset, DateTimeError>> = {
         let mut m = HashMap::new();
-        // ... (existing timezone mappings)
+        m.insert("ACDT", UtcOffset::from_hms(10, 30, 0).map_err(DateTimeError::from));
+        m.insert("ACST", UtcOffset::from_hms(9, 30, 0).map_err(DateTimeError::from));
+        m.insert("ADT", UtcOffset::from_hms(-3, 0, 0).map_err(DateTimeError::from));
+        m.insert("AEDT", UtcOffset::from_hms(11, 0, 0).map_err(DateTimeError::from));
+        m.insert("AEST", UtcOffset::from_hms(10, 0, 0).map_err(DateTimeError::from));
+        m.insert("AKDT", UtcOffset::from_hms(-8, 0, 0).map_err(DateTimeError::from));
+        m.insert("AKST", UtcOffset::from_hms(-9, 0, 0).map_err(DateTimeError::from));
+        m.insert("AST", UtcOffset::from_hms(-4, 0, 0).map_err(DateTimeError::from));
+        m.insert("AWST", UtcOffset::from_hms(8, 0, 0).map_err(DateTimeError::from));
+        m.insert("BST", UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from));
+        m.insert("CDT", UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from));
+        m.insert("CEST", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
+        m.insert("CET", UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from));
+        m.insert("CST", UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from));
+        m.insert("ECT", UtcOffset::from_hms(-4, 0, 0).map_err(DateTimeError::from));
+        m.insert("EDT", UtcOffset::from_hms(-4, 0, 0).map_err(DateTimeError::from));
+        m.insert("EEST", UtcOffset::from_hms(3, 0, 0).map_err(DateTimeError::from));
+        m.insert("EET", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
+        m.insert("EST", UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from));
+        m.insert("GMT", Ok(UtcOffset::UTC));
+        m.insert("UTC", Ok(UtcOffset::UTC));
+        m.insert("HADT", UtcOffset::from_hms(-9, 0, 0).map_err(DateTimeError::from));
+        m.insert("HAST", UtcOffset::from_hms(-10, 0, 0).map_err(DateTimeError::from));
+        m.insert("HKT", UtcOffset::from_hms(8, 0, 0).map_err(DateTimeError::from));
+        m.insert("IST", UtcOffset::from_hms(5, 30, 0).map_err(DateTimeError::from));
+        m.insert("IDT", UtcOffset::from_hms(3, 0, 0).map_err(DateTimeError::from));
+        m.insert("JST", UtcOffset::from_hms(9, 0, 0).map_err(DateTimeError::from));
+        m.insert("KST", UtcOffset::from_hms(9, 0, 0).map_err(DateTimeError::from));
+        m.insert("MDT", UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from));
+        m.insert("MST", UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from));
+        m.insert("NZDT", UtcOffset::from_hms(13, 0, 0).map_err(DateTimeError::from));
+        m.insert("NZST", UtcOffset::from_hms(12, 0, 0).map_err(DateTimeError::from));
+        m.insert("PDT", UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from));
+        m.insert("PST", UtcOffset::from_hms(-8, 0, 0).map_err(DateTimeError::from));
+        m.insert("WADT", UtcOffset::from_hms(8, 45, 0).map_err(DateTimeError::from));
+        m.insert("WAST", UtcOffset::from_hms(7, 0, 0).map_err(DateTimeError::from));
+        m.insert("WEDT", UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from));
+        m.insert("WEST", UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from));
         m.insert("WET", Ok(UtcOffset::UTC));
         m
     };
@@ -64,7 +102,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// println!("Current UTC time: {}", dt);
@@ -83,19 +121,26 @@ impl DateTime {
     ///
     /// * `Result<Self, DateTimeError>` - The new `DateTime` instance or an error if the timezone is invalid.
     ///
+    /// # Note
+    ///
+    /// This function supports only fixed UTC offsets. Daylight Saving Time (DST) is not automatically
+    /// adjusted. If DST adjustments are needed, they must be handled manually by choosing the correct
+    /// timezone offset.
+    ///
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new_with_tz("EST").expect("EST is a valid timezone");
     /// println!("Current time in EST: {}", dt);
     /// ```
+
     pub fn new_with_tz(tz: &str) -> Result<Self, DateTimeError> {
         let offset = TIMEZONE_OFFSETS
             .get(tz)
             .ok_or(DateTimeError::InvalidTimezone)?
-            .clone()?; 
+            .clone()?;
 
         let now_utc = OffsetDateTime::now_utc();
         let now_with_offset = now_utc.to_offset(offset);
@@ -123,7 +168,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new_with_custom_offset(5, 30).expect("Valid custom offset");
     /// println!("Current time with custom offset: {}", dt);
@@ -165,7 +210,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     /// use time::UtcOffset;
     ///
     /// let dt = DateTime::from_components(2023, 5, 20, 15, 30, 0, UtcOffset::UTC).expect("Valid date components");
@@ -180,9 +225,15 @@ impl DateTime {
         second: u8,
         offset: UtcOffset,
     ) -> Result<Self, DateTimeError> {
-        let date = Date::from_calendar_date(year, Month::try_from(month).map_err(|_| DateTimeError::InvalidDate)?, day)
-            .map_err(|_| DateTimeError::InvalidDate)?;
-        let time = Time::from_hms(hour, minute, second).map_err(|_| DateTimeError::InvalidTime)?;
+        let date = Date::from_calendar_date(
+            year,
+            Month::try_from(month)
+                .map_err(|_| DateTimeError::InvalidDate)?,
+            day,
+        )
+        .map_err(|_| DateTimeError::InvalidDate)?;
+        let time = Time::from_hms(hour, minute, second)
+            .map_err(|_| DateTimeError::InvalidTime)?;
         Ok(Self {
             datetime: PrimitiveDateTime::new(date, time),
             offset,
@@ -204,7 +255,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::parse("2023-05-20T15:30:00Z").expect("Valid RFC 3339 date");
     /// println!("Parsed date: {}", dt);
@@ -245,17 +296,20 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::parse_custom_format("2023-05-20 15:30:00", "[year]-[month]-[day] [hour]:[minute]:[second]").expect("Valid custom format");
     /// println!("Parsed date: {}", dt);
     /// ```
-    pub fn parse_custom_format(input: &str, format: &str) -> Result<Self, DateTimeError> {
+    pub fn parse_custom_format(
+        input: &str,
+        format: &str,
+    ) -> Result<Self, DateTimeError> {
         let format = time::format_description::parse(format)
             .map_err(|_| DateTimeError::InvalidFormat)?;
         let datetime = PrimitiveDateTime::parse(input, &format)
             .map_err(|_| DateTimeError::InvalidFormat)?;
-        
+
         Ok(Self {
             datetime,
             offset: UtcOffset::UTC,
@@ -271,7 +325,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     /// use std::thread::sleep;
     /// use std::time::Duration;
     ///
@@ -298,10 +352,15 @@ impl DateTime {
     ///
     /// * `Result<Self, DateTimeError>` - A new `DateTime` instance in the target timezone or an error if the conversion fails.
     ///
+    /// # Note
+    ///
+    /// This function only supports fixed UTC offsets. If the target timezone observes DST, you will need
+    /// to handle the offset change manually.
+    ///
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new_with_tz("EST").expect("Valid timezone");
     /// let converted_dt = dt.convert_to_tz("PST").expect("Conversion to PST should succeed");
@@ -338,7 +397,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// let timestamp = dt.unix_timestamp();
@@ -361,7 +420,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// let future_dt = dt.add_days(7).expect("Adding 7 days should succeed");
@@ -387,7 +446,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// let tomorrow = dt.next_day().expect("Getting next day should succeed");
@@ -406,7 +465,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// let yesterday = dt.previous_day().expect("Getting previous day should succeed");
@@ -429,7 +488,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// let formatted = dt.format("[year]-[month]-[day]").expect("Format should be valid");
@@ -455,14 +514,18 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// let formatted = dt.format_rfc3339().expect("RFC 3339 format should succeed");
     /// println!("RFC 3339 date: {}", formatted);
     /// ```
     pub fn format_rfc3339(&self) -> Result<String, DateTimeError> {
-        self.format("[year]-[month]-[day]T[hour]:[minute]:[second][offset_hour sign:mandatory][offset_minute]")
+        Ok(self
+            .datetime
+            .assume_offset(self.offset)
+            .format(&time::format_description::well_known::Rfc3339)
+            .map_err(|_| DateTimeError::InvalidFormat)?)
     }
 
     /// Formats the `DateTime` instance as an ISO 8601 string.
@@ -474,7 +537,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// let formatted = dt.format_iso8601().expect("ISO 8601 format should succeed");
@@ -497,7 +560,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt1 = DateTime::new();
     /// let dt2 = dt1.add_days(1).expect("Adding 1 day should succeed");
@@ -526,7 +589,8 @@ impl DateTime {
     ///
     /// * `Result<Self, DateTimeError>` - A new `DateTime` instance at the start of the week.
     pub fn start_of_week(&self) -> Result<Self, DateTimeError> {
-        let days_to_subtract = self.weekday().number_days_from_monday() as i64;
+        let days_to_subtract =
+            self.weekday().number_days_from_monday() as i64;
         self.add_days(-days_to_subtract)
     }
 
@@ -536,7 +600,8 @@ impl DateTime {
     ///
     /// * `Result<Self, DateTimeError>` - A new `DateTime` instance at the end of the week.
     pub fn end_of_week(&self) -> Result<Self, DateTimeError> {
-        let days_to_add = 6 - self.weekday().number_days_from_monday() as i64;
+        let days_to_add =
+            6 - self.weekday().number_days_from_monday() as i64;
         self.add_days(days_to_add)
     }
 
@@ -561,7 +626,9 @@ impl DateTime {
             1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
             4 | 6 | 9 | 11 => 30,
             2 => {
-                if (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) {
+                if (year % 4 == 0 && year % 100 != 0)
+                    || (year % 400 == 0)
+                {
                     29 // Leap year
                 } else {
                     28
@@ -662,6 +729,11 @@ impl DateTime {
         self.offset
     }
 
+    /// Returns the local time zone offset of the `DateTime` instance.
+    pub fn now(&self) -> Self {
+        Self::new()
+    }
+
     /// Sets a new date for the `DateTime` instance.
     ///
     /// # Arguments
@@ -677,7 +749,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// let new_dt = dt.set_date(2024, 1, 1).expect("Setting date to 2024-01-01 should succeed");
@@ -720,7 +792,7 @@ impl DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// let new_dt = dt.set_time(12, 0, 0).expect("Setting time to 12:00:00 should succeed");
@@ -750,19 +822,13 @@ impl fmt::Display for DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
     /// println!("{}", dt);
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            self.datetime
-                .format(&time::format_description::well_known::Rfc3339)
-                .map_err(|_| fmt::Error)?
-        )
+        write!(f, "{}", self.format_rfc3339().map_err(|_| fmt::Error)?)
     }
 }
 
@@ -776,7 +842,7 @@ impl FromStr for DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     /// use std::str::FromStr;
     ///
     /// let dt = DateTime::from_str("2023-05-20T15:30:00Z").expect("Valid RFC 3339 date");
@@ -810,7 +876,7 @@ impl Add<Duration> for DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     /// use time::Duration;
     ///
     /// let dt = DateTime::new();
@@ -845,7 +911,7 @@ impl Sub<Duration> for DateTime {
     /// # Examples
     ///
     /// ```
-    /// use crate::datetime::DateTime;
+    /// use dtt::datetime::DateTime;
     /// use time::Duration;
     ///
     /// let dt = DateTime::new();

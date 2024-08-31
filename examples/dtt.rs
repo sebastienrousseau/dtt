@@ -4,88 +4,108 @@
 
 #![allow(missing_docs)]
 
-use self::dtt::datetime::DateTime;
-use dtt;
-use std::str::FromStr;
+use dtt::datetime::DateTime;
 
-/// This is the main function for the build script.
 pub fn main() {
-    // Create a new DateTime object with a custom timezone (e.g., CET)
-    let paris_time = DateTime::new_with_tz("CET").unwrap().now;
-    println!("🦀 Paris time:        ✅ {}", paris_time);
-
-    // Example of how to use the `new` function with the UTC timezone
+    // Creating DateTime objects
     let date = DateTime::new();
-    println!("🦀 Date:              ✅ {}", date.now);
-    println!("🦀 Day:               ✅ {}", date.day);
-    println!("🦀 Hour:              ✅ {}", date.hour);
-    println!("🦀 ISO 8601:          ✅ {}", date.iso_8601);
-    println!("🦀 ISO Week Number:   ✅ {}", date.iso_week);
-    println!("🦀 Microsecond:       ✅ {}", date.microsecond);
-    println!("🦀 Minute:            ✅ {}", date.minute);
-    println!("🦀 Month:             ✅ {}", date.month);
-    println!("🦀 Offset:            ✅ {}", date.offset);
-    println!("🦀 Ordinal Date:      ✅ {}", date.ordinal);
-    println!("🦀 Second:            ✅ {}", date.second);
-    println!("🦀 Time:              ✅ {}", date.time);
-    println!("🦀 Time zone:         ✅ {}", date.tz);
-    println!("🦀 Weekday:           ✅ {}", date.weekday);
-    println!("🦀 Year:              ✅ {}", date.year);
+    println!("🦀 UTC Date:          ✅ {:?}", date);
 
-    // Example of how to use the `is_valid_day` function
-    println!(
-        "🦀 Valid day (32):    ❌ {}",
-        DateTime::is_valid_day("32")
-    );
-    println!(
-        "🦀 Valid day:         ✅ {}",
-        DateTime::is_valid_day(&date.day.to_string())
-    );
+    // Creating DateTime with a specific timezone
+    let paris_time = DateTime::new_with_tz("CET")
+        .expect("Failed to create DateTime with CET timezone");
+    println!("🦀 Paris time:        ✅ {:?}", paris_time);
 
-    // Example of how to use the `is_valid_hour` function
-    println!(
-        "🦀 Valid hour (24):   ❌ {}",
-        DateTime::is_valid_hour("24")
-    );
-    println!(
-        "🦀 Valid hour:        ✅ {}",
-        DateTime::is_valid_hour(&date.hour.to_string())
-    );
+    // Creating DateTime with a custom offset
+    let custom_offset_time = DateTime::new_with_custom_offset(5, 30)
+        .expect("Failed to create DateTime with custom offset");
+    println!("🦀 Custom offset time: ✅ {:?}", custom_offset_time);
 
-    // Example of how to use the `next_day` function
-    let nd = DateTime::next_day(&date);
-    println!("🦀 Next day:          ✅ {}", nd.day);
+    // Parsing DateTime from a string (RFC3339 format)
+    let parsed_date = DateTime::parse("2023-05-20T15:30:00Z")
+        .expect("Failed to parse date");
+    println!("🦀 Parsed RFC3339 date: ✅ {:?}", parsed_date);
 
-    // Example of how to use the `previous_day` function
-    let pd = DateTime::previous_day(&date);
-    println!("🦀 Previous day:      ✅ {}", pd.day);
+    // Parsing DateTime from a string (Custom format)
+    let custom_parsed_date = DateTime::parse_custom_format(
+        "2023-05-20 15:30:00",
+        "[year]-[month]-[day] [hour]:[minute]:[second]",
+    )
+    .expect("Failed to parse custom format date");
+    println!("🦀 Parsed custom date: ✅ {:?}", custom_parsed_date);
 
-    // Example of how to use the `from_str` function
-    let date_str = "2022-01-01T12:00:00+01:00";
-    let result: Result<DateTime, dtt::error::DateTimeError> =
-        DateTime::from_str(date_str);
-    // Print the result
-    println!("🦀 from_str():        ✅ {:?}", result);
-    println!("🦀 from_str(day):     ✅ {:?}", result.unwrap().day);
+    // Displaying individual components of the DateTime
+    println!("🦀 Year:              ✅ {:?}", date.year());
+    println!("🦀 Month:             ✅ {:?}", date.month());
+    println!("🦀 Day:               ✅ {:?}", date.day());
+    println!("🦀 Hour:              ✅ {:?}", date.hour());
+    println!("🦀 Minute:            ✅ {:?}", date.minute());
+    println!("🦀 Second:            ✅ {:?}", date.second());
+    println!("🦀 Microsecond:       ✅ {:?}", date.microsecond());
+    println!("🦀 Weekday:           ✅ {:?}", date.weekday());
+    println!("🦀 Ordinal Date:      ✅ {:?}", date.ordinal());
+    println!("🦀 ISO Week Number:   ✅ {:?}", date.iso_week());
+    println!("🦀 Offset:            ✅ {:?}", date.offset());
 
-    // Example of how to use the `relative_delta` function
-    let mut dt = DateTime::new();
-    dt.day = 11;
-    dt.hour = 8;
-    dt.iso_week = 19;
-    dt.microsecond = 0;
-    dt.minute = 8;
-    dt.month = String::from("05");
-    dt.second = 0;
-    dt.year = 1975;
+    // Adding and subtracting days
+    let future_date = date.add_days(7).expect("Adding days failed");
+    println!("🦀 Date after 7 days: ✅ {:?}", future_date);
+    let previous_day =
+        date.previous_day().expect("Failed to get previous day");
+    println!("🦀 Previous day:      ✅ {:?}", previous_day);
+    let next_day = date.next_day().expect("Failed to get next day");
+    println!("🦀 Next day:          ✅ {:?}", next_day);
 
-    let new_dt = dt.relative_delta();
-    println!("🦀 Rd day:(11)        ✅ {}", new_dt.day);
-    println!("🦀 Rd hour:(08)       ✅ {}", new_dt.hour);
-    println!("🦀 Rd week:(19)       ✅ {}", new_dt.iso_week);
-    println!("🦀 Rd ms:(000000)     ✅ {}", new_dt.microsecond);
-    println!("🦀 Rd minute:(08)     ✅ {}", new_dt.minute);
-    println!("🦀 Rd month:(05)      ✅ {}", new_dt.month);
-    println!("🦀 Rd second:(00)     ✅ {}", new_dt.second);
-    println!("🦀 Rd year:(1975)     ✅ {}", new_dt.year);
+    // Start and end of week, month, and year
+    let start_of_week =
+        date.start_of_week().expect("Failed to get start of week");
+    println!("🦀 Start of the week: ✅ {:?}", start_of_week);
+    let end_of_week =
+        date.end_of_week().expect("Failed to get end of week");
+    println!("🦀 End of the week:   ✅ {:?}", end_of_week);
+
+    let start_of_month =
+        date.start_of_month().expect("Failed to get start of month");
+    println!("🦀 Start of the month: ✅ {:?}", start_of_month);
+    let end_of_month =
+        date.end_of_month().expect("Failed to get end of month");
+    println!("🦀 End of the month:   ✅ {:?}", end_of_month);
+
+    let start_of_year =
+        date.start_of_year().expect("Failed to get start of year");
+    println!("🦀 Start of the year: ✅ {:?}", start_of_year);
+    let end_of_year =
+        date.end_of_year().expect("Failed to get end of year");
+    println!("🦀 End of the year:   ✅ {:?}", end_of_year);
+
+    // Checking if a date is within a range
+    let range_end_date = date.add_days(10).expect("Adding days failed");
+    let is_within_range = date.is_within_range(&date, &range_end_date);
+    println!("🦀 Is within range:   ✅ {:?}", is_within_range);
+
+    // Duration between two dates
+    let duration = date.duration_since(&previous_day);
+    println!("🦀 Duration since:    ✅ {:?}", duration);
+
+    // Converting to different timezones
+    let converted_to_pst = date
+        .convert_to_tz("PST")
+        .expect("Failed to convert timezone");
+    println!("🦀 Converted to PST:  ✅ {:?}", converted_to_pst);
+
+    // Formatting DateTime
+    let custom_format = date
+        .format("[year]-[month]-[day] [hour]:[minute]:[second]")
+        .expect("Failed to format date");
+    println!("🦀 Custom formatted date: ✅ {}", custom_format);
+
+    let rfc3339_format = date
+        .format_rfc3339()
+        .expect("Failed to format RFC3339 date");
+    println!("🦀 RFC3339 formatted date: ✅ {}", rfc3339_format);
+
+    let iso8601_format = date
+        .format_iso8601()
+        .expect("Failed to format ISO8601 date");
+    println!("🦀 ISO8601 formatted date: ✅ {}", iso8601_format);
 }
