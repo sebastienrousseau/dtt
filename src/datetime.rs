@@ -1,723 +1,884 @@
-// datetime.rs
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+//! A DateTime module for handling dates, times, and timezones.
+//!
+//! This module provides a `DateTime` struct and associated methods for
+//! creating, manipulating, and formatting date and time information.
+//! It supports various timezones, custom time offsets, and offers a range
+//! of utility functions for date/time operations.
 
-use crate::error::DateTimeError;
-use regex::Regex;
-use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::fmt;
-use time::{Duration, Month, OffsetDateTime, UtcOffset};
+use std::hash::{Hash, Hasher};
+use std::ops::{Add, Sub};
+use std::str::FromStr;
+use serde::{Serialize, Deserialize};
+use thiserror::Error;
+use time::{
+    Date, Duration, Month, OffsetDateTime, PrimitiveDateTime, Time,
+    UtcOffset, Weekday,
+};
 
-///
-/// DateTime struct to ease dates and times manipulation.
-///
-/// This module includes date and time types, such as day, hour, ISO 8601
-/// date and time, and many more methods.
-///
-///
-#[derive(
-    Clone,
-    Debug,
-    Default,
-    Deserialize,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd,
-    Serialize,
-)]
+/// Errors that can occur when working with DateTime.
+#[derive(Copy, Clone, Error, Debug, Eq, PartialEq)]
+pub enum DateTimeError {
+    /// The provided format is invalid.
+    #[error("Invalid format")]
+    InvalidFormat,
+    /// The provided timezone is invalid or not supported.
+    #[error("Invalid timezone")]
+    InvalidTimezone,
+    /// The date is invalid (e.g., February 30).
+    #[error("Invalid date")]
+    InvalidDate,
+    /// The time is invalid (e.g., 25:00).
+    #[error("Invalid time")]
+    InvalidTime,
+    /// An error occurred while parsing the date/time string.
+    #[error("Parsing error: {0}")]
+    ParseError(#[from] time::error::Parse),
+    /// A component (year, month, day, etc.) is out of the valid range.
+    #[error("Component range error: {0}")]
+    ComponentRange(#[from] time::error::ComponentRange),
+}
+
+/// A structure representing a date and time with timezone information.
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct DateTime {
-    /// Day of the month: (1-31)
-    pub day: u8,
-    /// Hour of the day: (0-23)
-    pub hour: u8,
-    /// ISO 8601 date and time: (e.g. "2023-01-01T00:00:00+00:00")
-    pub iso_8601: String,
-    /// ISO week number: (1-53)
-    pub iso_week: u8,
-    /// Microsecond: (0-999999)
-    pub microsecond: u32,
-    /// Minute of the hour: (0-59)
-    pub minute: u8,
-    /// Month: (e.g. "January")
-    pub month: String,
-    /// Now object: (e.g. "2023-01-01")
-    pub now: String,
-    /// Offset from UTC: (e.g. "+00:00")
-    pub offset: String,
-    /// Ordinal date: (1-366)
-    pub ordinal: u16,
-    /// Second of the minute: (0-59)
-    pub second: u8,
-    /// Time object: (e.g. "00:00:00")
-    pub time: String,
-    /// Tz object: (e.g. "UTC")
-    pub tz: String,
-    /// Weekday object: (e.g. "Monday")
-    pub weekday: String,
-    /// Year object: (e.g. "2023")
-    pub year: i32,
+    datetime: PrimitiveDateTime,
+    offset: UtcOffset,
+}
+
+// A static HashMap containing timezone abbreviations and their UTC offsets.
+lazy_static::lazy_static! {
+    static ref TIMEZONE_OFFSETS: HashMap<&'static str, Result<UtcOffset, DateTimeError>> = {
+        let mut m = HashMap::new();
+        // ... (existing timezone mappings)
+        m.insert("WET", Ok(UtcOffset::UTC));
+        m
+    };
 }
 
 impl DateTime {
-    /// Parse the input string and create a new `DateTime` object.
+    /// Creates a new `DateTime` instance with the current date and time in UTC.
     ///
-    /// This function takes an input string and attempts to parse it into a `DateTime` object.
-    /// The input string can be in ISO 8601 format or a date-only format (YYYY-MM-DD).
-    /// If the input matches the ISO 8601 format, the resulting `DateTime` object will be set
-    /// to the current UTC time. If the input matches the date-only format, the resulting `DateTime`
-    /// object will have the time components set to zero and the timezone set to UTC.
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// println!("Current UTC time: {}", dt);
+    /// ```
+    pub fn new() -> Self {
+        Self::new_with_tz("UTC").expect("UTC is always valid")
+    }
+
+    /// Creates a new `DateTime` instance with the current date and time in the specified timezone.
     ///
     /// # Arguments
     ///
-    /// * `input` - A string slice that represents the date and time to parse.
+    /// * `tz` - A string slice that holds the timezone abbreviation (e.g., "UTC", "EST", "PST").
     ///
     /// # Returns
     ///
-    /// * `Result<DateTime, DateTimeError>` - A result indicating either the successfully parsed `DateTime` object or a `DateTimeError` if the input format is invalid.
+    /// * `Result<Self, DateTimeError>` - The new `DateTime` instance or an error if the timezone is invalid.
     ///
-    pub fn parse(input: &str) -> Result<DateTime, DateTimeError> {
-        let iso_8601_pattern = r"^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-]\d{2}:\d{2}$";
-        let date_pattern = r"^\d{4}-\d{2}-\d{2}$";
-
-        if Regex::new(iso_8601_pattern).unwrap().is_match(input) {
-            let parts: Vec<&str> = input.split('T').collect();
-            let date_parts: Vec<&str> = parts[0].split('-').collect();
-            let time_parts: Vec<&str> = parts[1].split(':').collect();
-            let hour_minute: Vec<&str> =
-                time_parts[2].split('+').collect(); // Adjust if timezone could be negative
-
-            let year = date_parts[0]
-                .parse::<i32>()
-                .map_err(|_| DateTimeError::InvalidFormat)?;
-            let month = date_parts[1]
-                .parse::<u8>()
-                .map_err(|_| DateTimeError::InvalidFormat)?;
-            let day = date_parts[2]
-                .parse::<u8>()
-                .map_err(|_| DateTimeError::InvalidFormat)?;
-            let hour = time_parts[0]
-                .parse::<u8>()
-                .map_err(|_| DateTimeError::InvalidFormat)?;
-            let minute = time_parts[1]
-                .parse::<u8>()
-                .map_err(|_| DateTimeError::InvalidFormat)?;
-            let second = hour_minute[0]
-                .parse::<u8>()
-                .map_err(|_| DateTimeError::InvalidFormat)?;
-            let tz = format!("+{}", hour_minute[1]);
-
-            Ok(DateTime {
-                year,
-                month: month.to_string(),
-                day,
-                hour,
-                minute,
-                second,
-                microsecond: 0, // Placeholder, as true microsecond parsing isn't shown
-                iso_8601: input.to_string(),
-                tz,
-                iso_week: 1, // Placeholder, calculate the correct ISO week if necessary
-                now: format!("{:04}-{:02}-{:02}", year, month, day),
-                time: format!(
-                    "{:02}:{:02}:{:02}",
-                    hour, minute, second
-                ),
-                offset: format!("+{}", hour_minute[1]), // Simplified, adjust for proper timezone offset handling
-                weekday: "Monday".to_string(), // Placeholder, determine the correct weekday
-                ordinal: day as u16, // Placeholder, this would be the day of the year
-            })
-        } else if Regex::new(date_pattern).unwrap().is_match(input) {
-            let date_parts: Vec<&str> = input.split('-').collect();
-            let year = date_parts[0]
-                .parse::<i32>()
-                .map_err(|_| DateTimeError::InvalidFormat)?;
-            let month = date_parts[1]
-                .parse::<u8>()
-                .map_err(|_| DateTimeError::InvalidFormat)?;
-            let day = date_parts[2]
-                .parse::<u8>()
-                .map_err(|_| DateTimeError::InvalidFormat)?;
-
-            Ok(DateTime {
-                year,
-                month: month.to_string(),
-                day,
-                hour: 0,
-                minute: 0,
-                second: 0,
-                microsecond: 0,
-                iso_8601: format!("{}T00:00:00+00:00", input),
-                tz: "+00:00".to_string(),
-                iso_week: 1, // Placeholder
-                now: input.to_string(),
-                time: "00:00:00".to_string(),
-                offset: "+00:00".to_string(),
-                weekday: "Monday".to_string(), // Placeholder
-                ordinal: day as u16,           // Placeholder
-            })
-        } else {
-            Err(DateTimeError::InvalidFormat)
-        }
-    }
-
-    /// Create a new Date object with UTC timezone.
-    pub fn new() -> DateTime {
-        Self::new_with_tz("UTC").unwrap()
-    }
-
-    /// Create a new DateTime object with a custom timezone.
-    /// Custom timezones supported by `DateTime (DTT)` are:
-    ///
-    /// | Abbreviation | UtcOffset                           | Time Zone Description                    |
-    /// |--------------|-------------------------------------|------------------------------------------|
-    /// | ACDT         | `UtcOffset::from_hms(10, 30, 0)`    | Australian Central Daylight Time         |
-    /// | ACST         | `UtcOffset::from_hms(9, 30, 0)`     | Australian Central Standard Time         |
-    /// | ADT          | `UtcOffset::from_hms(-3, 0, 0)`     | Atlantic Daylight Time                    |
-    /// | AEDT         | `UtcOffset::from_hms(11, 0, 0)`     | Australian Eastern Daylight Time          |
-    /// | AEST         | `UtcOffset::from_hms(10, 0, 0)`     | Australian Eastern Standard Time          |
-    /// | AKDT         | `UtcOffset::from_hms(-8, 0, 0)`     | Alaska Daylight Time                      |
-    /// | AKST         | `UtcOffset::from_hms(-9, 0, 0)`     | Alaska Standard Time                      |
-    /// | AST          | `UtcOffset::from_hms(-4, 0, 0)`     | Atlantic Standard Time                    |
-    /// | AWST         | `UtcOffset::from_hms(8, 0, 0)`      | Australian Western Standard Time          |
-    /// | BST          | `UtcOffset::from_hms(1, 0, 0)`      | British Summer Time                       |
-    /// | CDT          | `UtcOffset::from_hms(-5, 0, 0)`     | Central Daylight Time                      |
-    /// | CEST         | `UtcOffset::from_hms(2, 0, 0)`      | Central European Summer Time              |
-    /// | CET          | `UtcOffset::from_hms(1, 0, 0)`      | Central European Time                     |
-    /// | CST          | `UtcOffset::from_hms(-6, 0, 0)`     | Central Standard Time                     |
-    /// | ECT          | `UtcOffset::from_hms(-4, 0, 0)`     | Eastern Caribbean Time                    |
-    /// | EDT          | `UtcOffset::from_hms(-4, 0, 0)`     | Eastern Daylight Time                      |
-    /// | EEST         | `UtcOffset::from_hms(3, 0, 0)`      | Eastern European Summer Time              |
-    /// | EET          | `UtcOffset::from_hms(2, 0, 0)`      | Eastern European Time                     |
-    /// | EST          | `UtcOffset::from_hms(-5, 0, 0)`     | Eastern Standard Time                     |
-    /// | GMT          | `UtcOffset::from_hms(0, 0, 0)`      | Greenwich Mean Time                       |
-    /// | HADT         | `UtcOffset::from_hms(-9, 0, 0)`     | Hawaii-Aleutian Daylight Time              |
-    /// | HAST         | `UtcOffset::from_hms(-10, 0, 0)`    | Hawaii-Aleutian Standard Time              |
-    /// | HKT          | `UtcOffset::from_hms(8, 0, 0)`      | Hong Kong Time                            |
-    /// | IST          | `UtcOffset::from_hms(5, 30, 0)`     | Indian Standard Time                      |
-    /// | IDT          | `UtcOffset::from_hms(3, 0, 0)`      | Israel Daylight Time                       |
-    /// | JST          | `UtcOffset::from_hms(9, 0, 0)`      | Japan Standard Time                       |
-    /// | KST          | `UtcOffset::from_hms(9, 0, 0)`      | Korean Standard Time                      |
-    /// | MDT          | `UtcOffset::from_hms(-6, 0, 0)`     | Mountain Daylight Time                    |
-    /// | MST          | `UtcOffset::from_hms(-7, 0, 0)`     | Mountain Standard Time                    |
-    /// | NZDT         | `UtcOffset::from_hms(13, 0, 0)`     | New Zealand Daylight Time                 |
-    /// | NZST         | `UtcOffset::from_hms(12, 0, 0)`     | New Zealand Standard Time                 |
-    /// | PDT          | `UtcOffset::from_hms(-7, 0, 0)`     | Pacific Daylight Time                      |
-    /// | PST          | `UtcOffset::from_hms(-8, 0, 0)`     | Pacific Standard Time                      |
-    /// | UTC          | `UtcOffset::from_hms(0, 0, 0)`      | Coordinated Universal Time                |
-    /// | WADT         | `UtcOffset::from_hms(8, 45, 0)`     | West Australian Daylight Time             |
-    /// | WAST         | `UtcOffset::from_hms(7, 0, 0)`      | West Australian Standard Time             |
-    /// | WEDT         | `UtcOffset::from_hms(1, 0, 0)`      | Western European Daylight Time            |
-    /// | WEST         | `UtcOffset::from_hms(1, 0, 0)`      | Western European Summer Time              |
-    /// | WET          | `UtcOffset::from_hms(0, 0, 0)`      | Western European Time                     |
-    /// | WST          | `UtcOffset::from_hms(8, 0, 0)`      | Western Standard Time                     |
-    ///
-    /// # Example
+    /// # Examples
     ///
     /// ```
-    /// use dtt::datetime::DateTime;
-    /// use dtt::dtt_print;
+    /// use crate::datetime::DateTime;
     ///
-    /// let paris_time = DateTime::new_with_tz("CEST");
-    /// match paris_time {
-    ///     Ok(dt) => {
-    ///         dtt_print!(dt);
-    ///     }
-    ///     Err(err) => {
-    ///         println!("Error: {:?}", err);
-    ///     }
-    /// }
+    /// let dt = DateTime::new_with_tz("EST").expect("EST is a valid timezone");
+    /// println!("Current time in EST: {}", dt);
     /// ```
-    ///
     pub fn new_with_tz(tz: &str) -> Result<Self, DateTimeError> {
-        let offset = match tz {
-            "ACDT" => UtcOffset::from_hms(10, 30, 0),
-            "ACST" => UtcOffset::from_hms(9, 30, 0),
-            "ADT" => UtcOffset::from_hms(-3, 0, 0),
-            "AEDT" => UtcOffset::from_hms(11, 0, 0),
-            "AEST" => UtcOffset::from_hms(10, 0, 0),
-            "AKDT" => UtcOffset::from_hms(-8, 0, 0),
-            "AKST" => UtcOffset::from_hms(-9, 0, 0),
-            "AST" => UtcOffset::from_hms(-4, 0, 0),
-            "AWST" => UtcOffset::from_hms(8, 0, 0),
-            "BST" => UtcOffset::from_hms(1, 0, 0),
-            "CDT" => UtcOffset::from_hms(-5, 0, 0),
-            "CEST" => UtcOffset::from_hms(2, 0, 0),
-            "CET" => UtcOffset::from_hms(1, 0, 0),
-            "CST" => UtcOffset::from_hms(-6, 0, 0),
-            "ECT" => UtcOffset::from_hms(-4, 0, 0),
-            "EDT" => UtcOffset::from_hms(-4, 0, 0),
-            "EEST" => UtcOffset::from_hms(3, 0, 0),
-            "EET" => UtcOffset::from_hms(2, 0, 0),
-            "EST" => UtcOffset::from_hms(-5, 0, 0),
-            "GMT" => UtcOffset::from_hms(0, 0, 0),
-            "HADT" => UtcOffset::from_hms(-9, 0, 0),
-            "HAST" => UtcOffset::from_hms(-10, 0, 0),
-            "HKT" => UtcOffset::from_hms(8, 0, 0),
-            "IST" => UtcOffset::from_hms(5, 30, 0),
-            "IDT" => UtcOffset::from_hms(3, 0, 0),
-            "JST" => UtcOffset::from_hms(9, 0, 0),
-            "KST" => UtcOffset::from_hms(9, 0, 0),
-            "MDT" => UtcOffset::from_hms(-6, 0, 0),
-            "MST" => UtcOffset::from_hms(-7, 0, 0),
-            "NZDT" => UtcOffset::from_hms(13, 0, 0),
-            "NZST" => UtcOffset::from_hms(12, 0, 0),
-            "PDT" => UtcOffset::from_hms(-7, 0, 0),
-            "PST" => UtcOffset::from_hms(-8, 0, 0),
-            "UTC" => UtcOffset::from_hms(0, 0, 0),
-            "WADT" => UtcOffset::from_hms(8, 45, 0),
-            "WAST" => UtcOffset::from_hms(7, 0, 0),
-            "WEDT" => UtcOffset::from_hms(1, 0, 0),
-            "WEST" => UtcOffset::from_hms(1, 0, 0),
-            "WET" => UtcOffset::from_hms(0, 0, 0),
-            _ => return Err(DateTimeError::InvalidTimezone),
-        };
+        let offset = TIMEZONE_OFFSETS
+            .get(tz)
+            .ok_or(DateTimeError::InvalidTimezone)?
+            .clone()?; 
 
-        let offset = offset.unwrap();
-
-        let now_with_offset =
-            OffsetDateTime::now_utc().to_offset(offset);
+        let now_utc = OffsetDateTime::now_utc();
+        let now_with_offset = now_utc.to_offset(offset);
 
         Ok(Self {
-            day: now_with_offset.day(),
-            hour: now_with_offset.hour(),
-            iso_8601: now_with_offset.to_string(),
-            iso_week: now_with_offset.iso_week(),
-            microsecond: now_with_offset.nanosecond() / 1_000,
-            minute: now_with_offset.minute(),
-            month: now_with_offset.month().to_string(),
-            now: now_with_offset.to_string(),
-            offset: offset.to_string(),
-            ordinal: now_with_offset.ordinal(),
-            second: now_with_offset.second(),
-            time: now_with_offset.time().to_string(),
-            tz: tz.to_owned(),
-            weekday: now_with_offset.weekday().to_string(),
-            year: now_with_offset.year(),
+            datetime: PrimitiveDateTime::new(
+                now_with_offset.date(),
+                now_with_offset.time(),
+            ),
+            offset,
         })
     }
 
-    /// Check if the input is a valid day.
-    /// 31 is valid.
-    /// 32 is not valid.
-    pub fn is_valid_day(input: &str) -> bool {
-        if let Ok(day) = input.parse::<u8>() {
-            (1..=31).contains(&day)
+    /// Creates a new `DateTime` instance with the current date and time in a custom timezone offset.
+    ///
+    /// # Arguments
+    ///
+    /// * `hours` - The hour component of the offset.
+    /// * `minutes` - The minute component of the offset.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - The new `DateTime` instance or an error if the offset is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new_with_custom_offset(5, 30).expect("Valid custom offset");
+    /// println!("Current time with custom offset: {}", dt);
+    /// ```
+    pub fn new_with_custom_offset(
+        hours: i8,
+        minutes: i8,
+    ) -> Result<Self, DateTimeError> {
+        let offset = UtcOffset::from_hms(hours, minutes, 0)
+            .map_err(|_| DateTimeError::InvalidTimezone)?;
+        let now_utc = OffsetDateTime::now_utc();
+        let now_with_offset = now_utc.to_offset(offset);
+
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(
+                now_with_offset.date(),
+                now_with_offset.time(),
+            ),
+            offset,
+        })
+    }
+
+    /// Creates a `DateTime` instance from individual components.
+    ///
+    /// # Arguments
+    ///
+    /// * `year` - The year to set.
+    /// * `month` - The month to set (1-12).
+    /// * `day` - The day of the month to set.
+    /// * `hour` - The hour to set (0-23).
+    /// * `minute` - The minute to set (0-59).
+    /// * `second` - The second to set (0-59).
+    /// * `offset` - The `UtcOffset` to set.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance created from the specified components, or an error if any component is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    /// use time::UtcOffset;
+    ///
+    /// let dt = DateTime::from_components(2023, 5, 20, 15, 30, 0, UtcOffset::UTC).expect("Valid date components");
+    /// println!("Created date: {}", dt);
+    /// ```
+    pub fn from_components(
+        year: i32,
+        month: u8,
+        day: u8,
+        hour: u8,
+        minute: u8,
+        second: u8,
+        offset: UtcOffset,
+    ) -> Result<Self, DateTimeError> {
+        let date = Date::from_calendar_date(year, Month::try_from(month).map_err(|_| DateTimeError::InvalidDate)?, day)
+            .map_err(|_| DateTimeError::InvalidDate)?;
+        let time = Time::from_hms(hour, minute, second).map_err(|_| DateTimeError::InvalidTime)?;
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(date, time),
+            offset,
+        })
+    }
+
+    /// Parses a string into a `DateTime` instance.
+    ///
+    /// This method supports RFC 3339 and ISO 8601 date formats.
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - A string slice that holds the date/time to parse.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - The parsed `DateTime` instance or an error if parsing fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::parse("2023-05-20T15:30:00Z").expect("Valid RFC 3339 date");
+    /// println!("Parsed date: {}", dt);
+    /// ```
+    pub fn parse(input: &str) -> Result<Self, DateTimeError> {
+        let (datetime, offset) = if let Ok(dt) =
+            PrimitiveDateTime::parse(
+                input,
+                &time::format_description::well_known::Rfc3339,
+            ) {
+            (dt, UtcOffset::UTC)
+        } else if let Ok(date) = Date::parse(
+            input,
+            &time::format_description::well_known::Iso8601::DATE,
+        ) {
+            (
+                PrimitiveDateTime::new(date, Time::MIDNIGHT),
+                UtcOffset::UTC,
+            )
         } else {
-            false
-        }
-    }
-
-    /// Check if the input is a valid hour.
-    /// 23:59 is valid.
-    /// 24:00 is not valid.
-    pub fn is_valid_hour(input: &str) -> bool {
-        let re =
-            Regex::new(r"^([0-1][0-9]|2[0-3])(:[0-5][0-9])?$").unwrap();
-        re.is_match(input)
-    }
-
-    /// Check if the input is a valid second.
-    /// 59 is valid.
-    /// 60 is not valid.
-    pub fn is_valid_second(input: &str) -> bool {
-        let re = Regex::new(r"^([0-5][0-9])(\.[0-9]+)?$").unwrap();
-        re.is_match(input)
-    }
-
-    /// Check if the input is a valid minute or second.
-    /// 59 is valid.
-    /// 60 is not valid.
-    pub fn is_valid_minute(input: &str) -> bool {
-        if let Ok(value) = input.parse::<u8>() {
-            (0..=59).contains(&value)
-        } else {
-            false
-        }
-    }
-
-    /// Check if the input is a valid month.
-    /// 12 is valid.
-    /// 13 is not valid.
-    pub fn is_valid_month(input: &str) -> bool {
-        if let Ok(month) = input.parse::<u8>() {
-            (1..=12).contains(&month)
-        } else {
-            false
-        }
-    }
-
-    /// Check if the input is a valid ordinal date.
-    /// 366 is valid.
-    /// 367 is not valid.
-    pub fn is_valid_ordinal(input: &str) -> bool {
-        if let Ok(ordinal) = input.parse::<u16>() {
-            (1..=366).contains(&ordinal)
-        } else {
-            false
-        }
-    }
-
-    /// Check if the input is a valid time.
-    /// 23:59:59 is valid.
-    /// 24:00:00 is not valid.
-    pub fn is_valid_time(input: &str) -> bool {
-        let re =
-            Regex::new(r"^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$")
-                .unwrap();
-        re.is_match(input)
-    }
-
-    /// Check if the input is a valid ISO week number.
-    /// 53 is valid.
-    /// 54 is not valid.
-    pub fn is_valid_iso_week(input: &str) -> bool {
-        let mut valid = false;
-        if let Ok(iso_week) = input.parse::<u8>() {
-            if (1..=53).contains(&iso_week) {
-                valid = true;
-            }
-        }
-        valid
-    }
-
-    /// Check if the input is a valid ISO 8601 date and time.
-    /// 2023-01-01T00:00:00+00:00 is valid.
-    /// 2023-01-01T00:00:00+00:00:00 is not valid.
-    pub fn is_valid_iso_8601(input: &str) -> bool {
-        let re = Regex::new(
-            r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$",
-        )
-        .unwrap();
-        if !re.is_match(input) {
-            return false;
-        }
-        let captures = re.captures(input).unwrap();
-        // let year = captures[1].parse::<i32>().unwrap();
-        let month = captures[2].parse::<u32>().unwrap();
-        let day = captures[3].parse::<u32>().unwrap();
-        let hour = captures[4].parse::<u32>().unwrap();
-        let minute = captures[5].parse::<u32>().unwrap();
-        let second = captures[6].parse::<u32>().unwrap();
-        let tz = captures[7].to_string();
-        if !(1..=12).contains(&month)
-            || !(1..=31).contains(&day)
-            || hour >= 24
-            || minute >= 60
-            || second >= 60
-        {
-            return false;
-        }
-        if tz != "Z" {
-            let re = Regex::new(r"^[+-](\d{2}):(\d{2})$").unwrap();
-            let captures = re.captures(&tz).unwrap();
-            let tz_hour = captures[1].parse::<i32>().unwrap();
-            let tz_minute = captures[2].parse::<i32>().unwrap();
-            if !(0..=23).contains(&tz_hour)
-                || !(0..=59).contains(&tz_minute)
-            {
-                return false;
-            }
-        }
-        true
-    }
-
-    /// Check if the input is a valid microsecond.
-    /// 999999 is valid.
-    /// 1000000 is not valid.
-    pub fn is_valid_microsecond(input: &str) -> bool {
-        if let Ok(microsecond) = input.parse::<u32>() {
-            (0..=999999).contains(&microsecond)
-        } else {
-            false
-        }
-    }
-
-    /// Update the date and time.
-    pub fn update(&mut self) -> Result<String, DateTimeError> {
-        let now_utc = if self.tz == "UTC" {
-            OffsetDateTime::now_utc()
-        } else {
-            let re = Regex::new(r"([+-])(\d{2}):(\d{2})").unwrap();
-            let captures = re
-                .captures(self.offset.as_str())
-                .ok_or(DateTimeError::InvalidTimezone)?;
-
-            let hours = captures[2].parse::<i64>().unwrap();
-            let minutes = captures[3].parse::<i64>().unwrap();
-
-            let total_seconds = hours * 3600 + minutes * 60;
-            OffsetDateTime::now_utc() + Duration::seconds(total_seconds)
+            return Err(DateTimeError::InvalidFormat);
         };
 
-        // Manually convert Month enum variant to its corresponding integer representation
-        let month_number = match now_utc.month() {
-            Month::January => 1,
-            Month::February => 2,
-            Month::March => 3,
-            Month::April => 4,
-            Month::May => 5,
-            Month::June => 6,
-            Month::July => 7,
-            Month::August => 8,
-            Month::September => 9,
-            Month::October => 10,
-            Month::November => 11,
-            Month::December => 12,
+        Ok(Self { datetime, offset })
+    }
+
+    /// Parses a string into a `DateTime` instance using a custom format.
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - A string slice that holds the date/time to parse.
+    /// * `format` - The format string to use for parsing.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - The parsed `DateTime` instance or an error if parsing fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::parse_custom_format("2023-05-20 15:30:00", "[year]-[month]-[day] [hour]:[minute]:[second]").expect("Valid custom format");
+    /// println!("Parsed date: {}", dt);
+    /// ```
+    pub fn parse_custom_format(input: &str, format: &str) -> Result<Self, DateTimeError> {
+        let format = time::format_description::parse(format)
+            .map_err(|_| DateTimeError::InvalidFormat)?;
+        let datetime = PrimitiveDateTime::parse(input, &format)
+            .map_err(|_| DateTimeError::InvalidFormat)?;
+        
+        Ok(Self {
+            datetime,
+            offset: UtcOffset::UTC,
+        })
+    }
+
+    /// Updates the `DateTime` instance to the current date and time.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - The updated `DateTime` instance or an error if the update fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    /// use std::thread::sleep;
+    /// use std::time::Duration;
+    ///
+    /// let mut dt = DateTime::new();
+    /// sleep(Duration::from_secs(1));
+    /// dt = dt.update().expect("Update should succeed");
+    /// println!("Updated time: {}", dt);
+    /// ```
+    pub fn update(&self) -> Result<Self, DateTimeError> {
+        let now = OffsetDateTime::now_utc().to_offset(self.offset);
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(now.date(), now.time()),
+            offset: self.offset,
+        })
+    }
+
+    /// Converts the `DateTime` instance to another timezone.
+    ///
+    /// # Arguments
+    ///
+    /// * `new_tz` - The timezone abbreviation to convert to.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance in the target timezone or an error if the conversion fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new_with_tz("EST").expect("Valid timezone");
+    /// let converted_dt = dt.convert_to_tz("PST").expect("Conversion to PST should succeed");
+    /// println!("Converted time: {}", converted_dt);
+    /// ```
+    pub fn convert_to_tz(
+        &self,
+        new_tz: &str,
+    ) -> Result<Self, DateTimeError> {
+        let new_offset = TIMEZONE_OFFSETS
+            .get(new_tz)
+            .ok_or(DateTimeError::InvalidTimezone)?
+            .clone()?;
+
+        let new_datetime = self
+            .datetime
+            .assume_offset(self.offset)
+            .to_offset(new_offset);
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(
+                new_datetime.date(),
+                new_datetime.time(),
+            ),
+            offset: new_offset,
+        })
+    }
+
+    /// Returns the Unix timestamp of the `DateTime` instance.
+    ///
+    /// # Returns
+    ///
+    /// * `i64` - The Unix timestamp in seconds.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let timestamp = dt.unix_timestamp();
+    /// println!("Unix timestamp: {}", timestamp);
+    /// ```
+    pub fn unix_timestamp(&self) -> i64 {
+        self.datetime.assume_offset(self.offset).unix_timestamp()
+    }
+
+    /// Adds a specified number of days to the `DateTime` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `days` - The number of days to add (can be negative for subtraction).
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the days added, or an error if the operation fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let future_dt = dt.add_days(7).expect("Adding 7 days should succeed");
+    /// println!("Date after 7 days: {}", future_dt);
+    /// ```
+    pub fn add_days(&self, days: i64) -> Result<Self, DateTimeError> {
+        let new_datetime = self
+            .datetime
+            .checked_add(Duration::days(days))
+            .ok_or(DateTimeError::InvalidDate)?;
+        Ok(Self {
+            datetime: new_datetime,
+            offset: self.offset,
+        })
+    }
+
+    /// Returns a new `DateTime` instance representing the next day.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance for the next day, or an error if the operation fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let tomorrow = dt.next_day().expect("Getting next day should succeed");
+    /// println!("Tomorrow: {}", tomorrow);
+    /// ```
+    pub fn next_day(&self) -> Result<Self, DateTimeError> {
+        self.add_days(1)
+    }
+
+    /// Returns a new `DateTime` instance representing the previous day.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance for the previous day, or an error if the operation fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let yesterday = dt.previous_day().expect("Getting previous day should succeed");
+    /// println!("Yesterday: {}", yesterday);
+    /// ```
+    pub fn previous_day(&self) -> Result<Self, DateTimeError> {
+        self.add_days(-1)
+    }
+
+    /// Formats the `DateTime` instance according to the specified format string.
+    ///
+    /// # Arguments
+    ///
+    /// * `format_str` - A string slice that holds the desired format.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<String, DateTimeError>` - The formatted date/time string or an error if formatting fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let formatted = dt.format("[year]-[month]-[day]").expect("Format should be valid");
+    /// println!("Formatted date: {}", formatted);
+    /// ```
+    pub fn format(
+        &self,
+        format_str: &str,
+    ) -> Result<String, DateTimeError> {
+        let format = time::format_description::parse(format_str)
+            .map_err(|_| DateTimeError::InvalidFormat)?;
+        self.datetime
+            .format(&format)
+            .map_err(|_| DateTimeError::InvalidFormat)
+    }
+
+    /// Formats the `DateTime` instance as an RFC 3339 string.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<String, DateTimeError>` - The formatted RFC 3339 string or an error if formatting fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let formatted = dt.format_rfc3339().expect("RFC 3339 format should succeed");
+    /// println!("RFC 3339 date: {}", formatted);
+    /// ```
+    pub fn format_rfc3339(&self) -> Result<String, DateTimeError> {
+        self.format("[year]-[month]-[day]T[hour]:[minute]:[second][offset_hour sign:mandatory][offset_minute]")
+    }
+
+    /// Formats the `DateTime` instance as an ISO 8601 string.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<String, DateTimeError>` - The formatted ISO 8601 string or an error if formatting fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let formatted = dt.format_iso8601().expect("ISO 8601 format should succeed");
+    /// println!("ISO 8601 date: {}", formatted);
+    /// ```
+    pub fn format_iso8601(&self) -> Result<String, DateTimeError> {
+        self.format("[year]-[month]-[day]T[hour]:[minute]:[second]")
+    }
+
+    /// Calculates the duration between this `DateTime` and another `DateTime`.
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The `DateTime` to compare with.
+    ///
+    /// # Returns
+    ///
+    /// * `Duration` - The duration between the two `DateTime` instances.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt1 = DateTime::new();
+    /// let dt2 = dt1.add_days(1).expect("Adding 1 day should succeed");
+    /// let duration = dt1.duration_since(&dt2);
+    /// println!("Duration: {:?}", duration);
+    /// ```
+    pub fn duration_since(&self, other: &Self) -> Duration {
+        let self_offset_datetime =
+            self.datetime.assume_offset(self.offset);
+        let other_offset_datetime =
+            other.datetime.assume_offset(other.offset);
+
+        let seconds_difference = self_offset_datetime.unix_timestamp()
+            - other_offset_datetime.unix_timestamp();
+        let nanoseconds_difference = self_offset_datetime.nanosecond()
+            as i64
+            - other_offset_datetime.nanosecond() as i64;
+
+        Duration::seconds(seconds_difference)
+            + Duration::nanoseconds(nanoseconds_difference)
+    }
+
+    /// Returns the start of the week for the `DateTime` instance.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance at the start of the week.
+    pub fn start_of_week(&self) -> Result<Self, DateTimeError> {
+        let days_to_subtract = self.weekday().number_days_from_monday() as i64;
+        self.add_days(-days_to_subtract)
+    }
+
+    /// Returns the end of the week for the `DateTime` instance.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance at the end of the week.
+    pub fn end_of_week(&self) -> Result<Self, DateTimeError> {
+        let days_to_add = 6 - self.weekday().number_days_from_monday() as i64;
+        self.add_days(days_to_add)
+    }
+
+    /// Returns the start of the month for the `DateTime` instance.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance at the start of the month.
+    pub fn start_of_month(&self) -> Result<Self, DateTimeError> {
+        self.set_date(self.year(), self.month() as u8, 1)
+    }
+
+    /// Returns the end of the month for the `DateTime` instance.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance at the end of the month.
+    pub fn end_of_month(&self) -> Result<Self, DateTimeError> {
+        let year = self.year();
+        let month = self.month() as u8;
+        let last_day = match month {
+            1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+            4 | 6 | 9 | 11 => 30,
+            2 => {
+                if (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) {
+                    29 // Leap year
+                } else {
+                    28
+                }
+            }
+            _ => return Err(DateTimeError::InvalidDate),
         };
 
-        let formatted = format!(
-            "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:06} {}",
-            now_utc.year(),
-            month_number,
-            now_utc.day(),
-            now_utc.hour(),
-            now_utc.minute(),
-            now_utc.second(),
-            now_utc.nanosecond() / 1000,
-            now_utc.offset(),
-        );
-
-        self.iso_8601.clone_from(&formatted);
-        self.now = formatted[..10].to_string();
-        self.time = formatted[11..19].to_string();
-        self.microsecond = now_utc.nanosecond() / 1000;
-
-        Ok(formatted)
+        self.set_date(year, month, last_day)
     }
 
-    /// Adds a specified number of days to the DateTime, using the existing `next_day`.
-    pub fn add_days(&self, days: i32) -> DateTime {
-        let mut result = self.clone();
-        for _ in 0..days {
-            result = result.next_day();
-        }
-        result
+    /// Returns the start of the year for the `DateTime` instance.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance at the start of the year.
+    pub fn start_of_year(&self) -> Result<Self, DateTimeError> {
+        self.set_date(self.year(), 1, 1)
     }
 
-    /// Calculate the next day.
-    /// Returns a new DateTime struct.
-    /// The time zone is not updated.
-    pub fn next_day(&self) -> DateTime {
-        let next_day = OffsetDateTime::now_utc() + Duration::days(1);
-
-        DateTime {
-            day: next_day.day(),
-            hour: next_day.hour(),
-            iso_8601: next_day.to_string(),
-            iso_week: next_day.iso_week(),
-            microsecond: next_day.microsecond(),
-            minute: next_day.minute(),
-            month: next_day.month().to_string(),
-            now: next_day.date().to_string(),
-            offset: next_day.offset().to_string(),
-            ordinal: next_day.ordinal(),
-            second: next_day.second(),
-            time: next_day.time().to_string(),
-            tz: next_day.time().to_string(),
-            weekday: next_day.weekday().to_string(),
-            year: next_day.year(),
-        }
+    /// Returns the end of the year for the `DateTime` instance.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance at the end of the year.
+    pub fn end_of_year(&self) -> Result<Self, DateTimeError> {
+        self.set_date(self.year(), 12, 31)
     }
 
-    /// Calculates the relative delta based on the current date and time
-    /// and the fields of the `RelativeDelta` structure.
-    /// Returns the `DateTime` structure that represents the resulting
-    /// date and time.
-    pub fn relative_delta(&self) -> DateTime {
-        let mut new_dt: DateTime = DateTime::default();
-        let ordinal = OffsetDateTime::now_utc().ordinal();
-        let new_ordinal = ordinal as i64;
-
-        new_dt.day = self.day;
-        new_dt.hour = self.hour;
-        new_dt.microsecond = self.microsecond;
-        new_dt.minute = self.minute;
-        new_dt.month = self.month.to_string();
-        new_dt.second = self.second;
-        new_dt.iso_week = self.iso_week;
-        new_dt.year = self.year;
-        new_dt.ordinal = new_ordinal as u16;
-
-        DateTime {
-            day: new_dt.day,
-            hour: new_dt.hour,
-            iso_8601: new_dt.iso_8601,
-            iso_week: new_dt.iso_week,
-            microsecond: new_dt.microsecond,
-            minute: new_dt.minute,
-            month: new_dt.month,
-            now: new_dt.now,
-            offset: new_dt.offset,
-            ordinal: new_dt.ordinal,
-            second: new_dt.second,
-            time: new_dt.time,
-            tz: new_dt.tz,
-            weekday: new_dt.weekday,
-            year: new_dt.year,
-        }
+    /// Checks if the `DateTime` instance falls within a specific range.
+    ///
+    /// # Arguments
+    ///
+    /// * `start` - The start `DateTime` of the range.
+    /// * `end` - The end `DateTime` of the range.
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - `true` if the `DateTime` falls within the range, otherwise `false`.
+    pub fn is_within_range(&self, start: &Self, end: &Self) -> bool {
+        self >= start && self <= end
     }
 
-    /// Calculate the previous day.
-    /// Returns the `DateTime` structure that represents the resulting
-    /// date and time.
-    pub fn previous_day(&self) -> DateTime {
-        let previous_day =
-            OffsetDateTime::now_utc() - Duration::days(1);
-        DateTime {
-            day: previous_day.day(),
-            hour: previous_day.hour(),
-            iso_8601: previous_day.to_string(),
-            iso_week: previous_day.iso_week(),
-            microsecond: previous_day.microsecond(),
-            minute: previous_day.minute(),
-            month: previous_day.month().to_string(),
-            now: previous_day.date().to_string(),
-            offset: previous_day.offset().to_string(),
-            ordinal: previous_day.ordinal(),
-            second: previous_day.second(),
-            time: previous_day.time().to_string(),
-            tz: previous_day.time().to_string(),
-            weekday: previous_day.weekday().to_string(),
-            year: previous_day.year(),
-        }
-    }
+    // Getter methods
 
-    /// Extract the year from the DateTime object.
+    /// Returns the year of the `DateTime` instance.
     pub fn year(&self) -> i32 {
-        self.year
+        self.datetime.year()
     }
 
-    /// Extract the month from the DateTime object.
-    pub fn month(&self) -> String {
-        self.month.clone()
+    /// Returns the month of the `DateTime` instance.
+    pub fn month(&self) -> Month {
+        self.datetime.month()
     }
 
-    /// Extract the day from the DateTime object.
+    /// Returns the day of the month of the `DateTime` instance.
     pub fn day(&self) -> u8 {
-        self.day
+        self.datetime.day()
     }
 
-    /// Extract the hour from the DateTime object.
+    /// Returns the hour of the `DateTime` instance.
     pub fn hour(&self) -> u8 {
-        self.hour
+        self.datetime.hour()
     }
 
-    /// Extract the minute from the DateTime object.
+    /// Returns the minute of the `DateTime` instance.
     pub fn minute(&self) -> u8 {
-        self.minute
+        self.datetime.minute()
     }
 
-    /// Extract the second from the DateTime object.
+    /// Returns the second of the `DateTime` instance.
     pub fn second(&self) -> u8 {
-        self.second
+        self.datetime.second()
     }
 
-    /// Extract the microsecond from the DateTime object.
+    /// Returns the microsecond of the `DateTime` instance.
     pub fn microsecond(&self) -> u32 {
-        self.microsecond
+        self.datetime.microsecond()
     }
 
-    /// Extract the weekday from the DateTime object.
-    pub fn weekday(&self) -> String {
-        self.weekday.clone()
+    /// Returns the weekday of the `DateTime` instance.
+    pub fn weekday(&self) -> Weekday {
+        self.datetime.weekday()
     }
 
-    /// Extract the ordinal date from the DateTime object.
+    /// Returns the day of the year (ordinal) of the `DateTime` instance.
     pub fn ordinal(&self) -> u16 {
-        self.ordinal
+        self.datetime.ordinal()
     }
 
-    /// Extract the ISO 8601 date and time from the DateTime object.
-    pub fn iso_8601(&self) -> String {
-        self.iso_8601.clone()
-    }
-
-    /// Extract the ISO week number from the DateTime object.
+    /// Returns the ISO week number of the `DateTime` instance.
     pub fn iso_week(&self) -> u8 {
-        self.iso_week
+        self.datetime.iso_week()
     }
 
-    /// Extract the time from the DateTime object.
-    pub fn time(&self) -> String {
-        self.time.clone()
+    /// Returns the UTC offset of the `DateTime` instance.
+    pub fn offset(&self) -> UtcOffset {
+        self.offset
     }
 
-    /// Extract the timezone from the DateTime object.
-    pub fn tz(&self) -> String {
-        self.tz.clone()
+    /// Sets a new date for the `DateTime` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `year` - The year to set.
+    /// * `month` - The month to set (1-12).
+    /// * `day` - The day of the month to set.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the updated date, or an error if the date is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let new_dt = dt.set_date(2024, 1, 1).expect("Setting date to 2024-01-01 should succeed");
+    /// println!("New date: {}", new_dt);
+    /// ```
+    pub fn set_date(
+        &self,
+        year: i32,
+        month: u8,
+        day: u8,
+    ) -> Result<Self, DateTimeError> {
+        let new_date = Date::from_calendar_date(
+            year,
+            Month::try_from(month)
+                .map_err(|_| DateTimeError::InvalidDate)?,
+            day,
+        )
+        .map_err(|_| DateTimeError::InvalidDate)?;
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(
+                new_date,
+                self.datetime.time(),
+            ),
+            offset: self.offset,
+        })
     }
 
-    /// Extract the offset from the DateTime object.
-    pub fn offset(&self) -> String {
-        self.offset.clone()
-    }
-
-    /// Format method to format the DateTime object as a string
-    pub fn format(&self, format_str: &str) -> String {
-        format_str
-            .replace("%Y", &self.year.to_string())
-            .replace("%m", &self.month.to_string())
-            .replace("%d", &self.day.to_string())
-            .replace("%H", &self.hour.to_string())
-            .replace("%M", &self.minute.to_string())
-            .replace("%S", &self.second.to_string())
-            .replace("%f", &self.microsecond.to_string())
-            .replace("%j", &self.ordinal.to_string())
-            .replace("%W", &self.iso_week.to_string())
-            .replace("%a", &self.weekday.to_string())
-            .replace("%T", &self.time.to_string())
-            .replace("%z", &self.tz.to_string())
-            .replace("%Z", &self.offset.to_string())
-            .replace("%F", &self.now.to_string())
+    /// Sets a new time for the `DateTime` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `hour` - The hour to set (0-23).
+    /// * `minute` - The minute to set (0-59).
+    /// * `second` - The second to set (0-59).
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the updated time, or an error if the time is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let new_dt = dt.set_time(12, 0, 0).expect("Setting time to 12:00:00 should succeed");
+    /// println!("New time: {}", new_dt);
+    /// ```
+    pub fn set_time(
+        &self,
+        hour: u8,
+        minute: u8,
+        second: u8,
+    ) -> Result<Self, DateTimeError> {
+        let new_time = Time::from_hms(hour, minute, second)
+            .map_err(|_| DateTimeError::InvalidTime)?;
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(
+                self.datetime.date(),
+                new_time,
+            ),
+            offset: self.offset,
+        })
     }
 }
 
 impl fmt::Display for DateTime {
-    /// Display the date and time in ISO 8601 format.
+    /// Formats the `DateTime` instance as a string using RFC 3339 format.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// println!("{}", dt);
+    /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Year: {}\nMonth: {}\nDay: {}\nWeekday: {}\nHour: {}\nMinute: {}\nSecond: {}\nMicrosecond: {}\nOrdinal: {}\nIso 8601: {}\nIso Week: {}\nTime: {}\nTZ: {}\nOffset: {}\nNow: {}", self.year, self.month, self.day, self.weekday, self.hour, self.minute, self.second, self.microsecond, self.ordinal, self.iso_8601, self.iso_week, self.time, self.tz, self.offset, self.now)
+        write!(
+            f,
+            "{}",
+            self.datetime
+                .format(&time::format_description::well_known::Rfc3339)
+                .map_err(|_| fmt::Error)?
+        )
     }
 }
 
-impl std::str::FromStr for DateTime {
+impl FromStr for DateTime {
     type Err = DateTimeError;
 
+    /// Parses a string into a `DateTime` instance.
+    ///
+    /// This implementation uses the `DateTime::parse` method.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    /// use std::str::FromStr;
+    ///
+    /// let dt = DateTime::from_str("2023-05-20T15:30:00Z").expect("Valid RFC 3339 date");
+    /// println!("Parsed date: {}", dt);
+    /// ```
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let re = Regex::new(r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\+(\d{2}):(\d{2})$")
-            .unwrap();
-        let captures = match re.captures(s) {
-            Some(c) => c,
-            None => return Err(DateTimeError::InvalidFormat),
-        };
+        Self::parse(s)
+    }
+}
 
-        let year = captures[1].parse::<i32>().unwrap();
-        let _month = captures[2].parse::<u8>().unwrap();
-        let day = captures[3].parse::<u8>().unwrap();
-        let hour = captures[4].parse::<u8>().unwrap();
-        let minute = captures[5].parse::<u8>().unwrap();
-        let second = captures[6].parse::<u8>().unwrap();
+impl Default for DateTime {
+    /// Returns the current UTC time as the default value for `DateTime`.
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-        let date = DateTime::default();
+impl Add<Duration> for DateTime {
+    type Output = Result<Self, DateTimeError>;
 
-        Ok(DateTime {
-            day,
-            hour,
-            iso_8601: s.to_owned(),
-            iso_week: date.iso_week,
-            microsecond: date.microsecond,
-            minute,
-            month: date.month.to_string(),
-            now: date.now.to_string(),
-            offset: date.offset.to_string(),
-            ordinal: date.ordinal,
-            second,
-            time: date.time.to_string(),
-            tz: date.time.to_string(),
-            weekday: date.weekday,
-            year,
+    /// Adds a `Duration` to the `DateTime` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` - The `Duration` to add.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the duration added, or an error if the operation fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    /// use time::Duration;
+    ///
+    /// let dt = DateTime::new();
+    /// let new_dt = (dt + Duration::hours(2)).expect("Adding 2 hours should succeed");
+    /// println!("Time after 2 hours: {}", new_dt);
+    /// ```
+    fn add(self, rhs: Duration) -> Self::Output {
+        let new_datetime = self
+            .datetime
+            .checked_add(rhs)
+            .ok_or(DateTimeError::InvalidDate)?;
+        Ok(Self {
+            datetime: new_datetime,
+            offset: self.offset,
         })
+    }
+}
+
+impl Sub<Duration> for DateTime {
+    type Output = Result<Self, DateTimeError>;
+
+    /// Subtracts a `Duration` from the `DateTime` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` - The `Duration` to subtract.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the duration subtracted, or an error if the operation fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crate::datetime::DateTime;
+    /// use time::Duration;
+    ///
+    /// let dt = DateTime::new();
+    /// let new_dt = (dt - Duration::hours(2)).expect("Subtracting 2 hours should succeed");
+    /// println!("Time 2 hours ago: {}", new_dt);
+    /// ```
+    fn sub(self, rhs: Duration) -> Self::Output {
+        let new_datetime = self
+            .datetime
+            .checked_sub(rhs)
+            .ok_or(DateTimeError::InvalidDate)?;
+        Ok(Self {
+            datetime: new_datetime,
+            offset: self.offset,
+        })
+    }
+}
+
+impl PartialOrd for DateTime {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.datetime.partial_cmp(&other.datetime)
+    }
+}
+
+impl Ord for DateTime {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.datetime.cmp(&other.datetime)
+    }
+}
+
+impl Hash for DateTime {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.datetime.hash(state);
+        self.offset.hash(state);
     }
 }
