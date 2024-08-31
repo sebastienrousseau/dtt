@@ -33,15 +33,15 @@ include = [
     "/tests/**",
 ]
 
-[[bench]]
-# [[bench]] sections define benchmarks.
-name = "benchmark"
-harness = false
-path = "benches/criterion.rs"
+# [[bench]]
+# # [[bench]] sections define benchmarks.
+# name = "benchmark"
+# harness = false
+# path = "benches/criterion.rs"
 
-[profile.bench]
-# Profile for benchmarks.
-debug = true
+# [profile.bench]
+# # Profile for benchmarks.
+# debug = true
 
 [dependencies]
 # Dependencies are only used for building.

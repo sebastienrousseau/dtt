@@ -1,3 +1,8 @@
+// datetime.rs
+// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+
 //! A DateTime module for handling dates, times, and timezones.
 //!
 //! This module provides a `DateTime` struct and associated methods for
