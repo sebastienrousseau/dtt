@@ -6,7 +6,7 @@
 //! Unit tests for the `DateTime` module.
 
 use dtt::datetime::{DateTime, DateTimeError};
-use std::hash::{Hash, Hasher};
+use std::hash::{DefaultHasher, Hash, Hasher};
 use time::{Duration, UtcOffset, Weekday};
 
 #[cfg(test)]
@@ -1043,6 +1043,586 @@ mod tests {
             .unwrap();
             let display_string = format!("{}", dt);
             assert!(display_string.starts_with("2024-01-01T00:00:00"));
+        }
+    }
+
+    /// Tests for `DateTimeError` enum.
+    mod datetime_error_tests {
+        use super::*;
+
+        #[test]
+        fn test_invalid_format_error() {
+            let err = DateTimeError::InvalidFormat;
+            assert_eq!(format!("{}", err), "Invalid format");
+        }
+
+        #[test]
+        fn test_invalid_timezone_error() {
+            let err = DateTimeError::InvalidTimezone;
+            assert_eq!(
+                format!("{}", err),
+                "Invalid or unsupported timezone; DST not supported"
+            );
+        }
+
+        #[test]
+        fn test_invalid_date_error() {
+            let err = DateTimeError::InvalidDate;
+            assert_eq!(format!("{}", err), "Invalid date");
+        }
+
+        #[test]
+        fn test_invalid_time_error() {
+            let err = DateTimeError::InvalidTime;
+            assert_eq!(format!("{}", err), "Invalid time");
+        }
+    }
+
+    /// Tests for `DateTime` creation methods.
+    mod datetime_creation_tests {
+        use super::*;
+
+        #[test]
+        fn test_new() {
+            let dt = DateTime::new();
+            assert_eq!(dt.offset(), UtcOffset::UTC);
+        }
+
+        #[test]
+        fn test_new_with_tz() {
+            let dt = DateTime::new_with_tz("EST").unwrap();
+            assert_eq!(
+                dt.offset(),
+                UtcOffset::from_hms(-5, 0, 0).unwrap()
+            );
+        }
+
+        #[test]
+        fn test_new_with_custom_offset() {
+            let dt = DateTime::new_with_custom_offset(5, 30).unwrap();
+            assert_eq!(
+                dt.offset(),
+                UtcOffset::from_hms(5, 30, 0).unwrap()
+            );
+        }
+
+        #[test]
+        fn test_from_components() {
+            let dt = DateTime::from_components(
+                2024,
+                8,
+                31,
+                15,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert_eq!(dt.year(), 2024);
+            assert_eq!(dt.month() as u8, 8);
+            assert_eq!(dt.day(), 31);
+            assert_eq!(dt.hour(), 15);
+            assert_eq!(dt.minute(), 0);
+            assert_eq!(dt.second(), 0);
+            assert_eq!(dt.offset(), UtcOffset::UTC);
+        }
+
+        #[test]
+        fn test_parse() {
+            let dt = DateTime::parse("2024-08-31T15:00:00Z").unwrap();
+            assert_eq!(dt.year(), 2024);
+            assert_eq!(dt.month() as u8, 8);
+            assert_eq!(dt.day(), 31);
+            assert_eq!(dt.hour(), 15);
+            assert_eq!(dt.minute(), 0);
+            assert_eq!(dt.second(), 0);
+            assert_eq!(dt.offset(), UtcOffset::UTC);
+        }
+
+        #[test]
+        fn test_parse_custom_format() {
+            let dt = DateTime::parse_custom_format(
+                "2024-08-31 15:00:00",
+                "[year]-[month]-[day] [hour]:[minute]:[second]",
+            )
+            .unwrap();
+            assert_eq!(dt.year(), 2024);
+            assert_eq!(dt.month() as u8, 8);
+            assert_eq!(dt.day(), 31);
+            assert_eq!(dt.hour(), 15);
+            assert_eq!(dt.minute(), 0);
+            assert_eq!(dt.second(), 0);
+        }
+    }
+
+    /// Tests for `DateTime` manipulation methods.
+    mod datetime_manipulation_tests {
+        use super::*;
+
+        #[test]
+        fn test_update() {
+            let dt = DateTime::new();
+            std::thread::sleep(std::time::Duration::from_secs(2));
+            let updated_dt = dt.update().unwrap();
+            assert!(updated_dt > dt);
+        }
+
+        #[test]
+        fn test_convert_to_tz() {
+            let dt = DateTime::new_with_tz("EST").unwrap();
+            let paris_time = dt.convert_to_tz("CET").unwrap();
+            assert_eq!(
+                paris_time.offset(),
+                UtcOffset::from_hms(1, 0, 0).unwrap()
+            );
+        }
+
+        #[test]
+        fn test_unix_timestamp() {
+            let dt = DateTime::new();
+            let timestamp = dt.unix_timestamp();
+            assert!(timestamp > 0);
+        }
+
+        #[test]
+        fn test_add_days() {
+            let dt = DateTime::new();
+            let future_dt = dt.add_days(7).unwrap();
+            assert_eq!(future_dt.day(), (dt.day() + 7) % 31);
+        }
+
+        #[test]
+        fn test_next_day() {
+            let dt = DateTime::new();
+            let next_day = dt.next_day().unwrap();
+            assert_eq!(next_day.day(), (dt.day() + 1) % 31);
+        }
+
+        #[test]
+        fn test_previous_day() {
+            let dt = DateTime::new();
+            let previous_day = dt.previous_day().unwrap();
+            assert_eq!(
+                previous_day.day(),
+                if dt.day() == 1 { 31 } else { dt.day() - 1 }
+            );
+        }
+    }
+
+    /// Tests for `DateTime` formatting methods.
+    mod datetime_formatting_tests {
+        use super::*;
+
+        #[test]
+        fn test_format() {
+            let dt = DateTime::new();
+            let formatted = dt.format("[year]-[month]-[day]").unwrap();
+            assert!(formatted.starts_with(&dt.year().to_string()));
+        }
+
+        #[test]
+        fn test_format_rfc3339() {
+            let dt = DateTime::new();
+            let rfc3339_format = dt.format_rfc3339().unwrap();
+            assert!(rfc3339_format.contains("T"));
+        }
+
+        #[test]
+        fn test_format_iso8601() {
+            let dt = DateTime::new();
+            let iso8601_format = dt.format_iso8601().unwrap();
+            assert!(iso8601_format.contains("T"));
+        }
+    }
+
+    /// Tests for `DateTime` boundary methods (start/end of week, month, year).
+    mod datetime_boundary_tests {
+        use super::*;
+
+        #[test]
+        fn test_start_of_week() {
+            let dt = DateTime::new_with_tz("UTC").unwrap();
+            let start_of_week = dt.start_of_week().unwrap();
+            assert_eq!(start_of_week.weekday(), Weekday::Monday);
+        }
+
+        #[test]
+        fn test_end_of_week() {
+            let dt = DateTime::new_with_tz("UTC").unwrap();
+            let end_of_week = dt.end_of_week().unwrap();
+            assert_eq!(end_of_week.weekday(), Weekday::Sunday);
+        }
+
+        #[test]
+        fn test_start_of_month() {
+            let dt = DateTime::new_with_tz("UTC").unwrap();
+            let start_of_month = dt.start_of_month().unwrap();
+            assert_eq!(start_of_month.day(), 1);
+        }
+
+        #[test]
+        fn test_end_of_month() {
+            let dt = DateTime::new_with_tz("UTC").unwrap();
+            let end_of_month = dt.end_of_month().unwrap();
+            assert!(
+                end_of_month.day() == 28
+                    || end_of_month.day() == 29
+                    || end_of_month.day() == 30
+                    || end_of_month.day() == 31
+            );
+        }
+
+        #[test]
+        fn test_start_of_year() {
+            let dt = DateTime::new_with_tz("UTC").unwrap();
+            let start_of_year = dt.start_of_year().unwrap();
+            assert_eq!(start_of_year.month() as u8, 1);
+            assert_eq!(start_of_year.day(), 1);
+        }
+
+        #[test]
+        fn test_end_of_year() {
+            let dt = DateTime::new_with_tz("UTC").unwrap();
+            let end_of_year = dt.end_of_year().unwrap();
+            assert_eq!(end_of_year.month() as u8, 12);
+            assert_eq!(end_of_year.day(), 31);
+        }
+    }
+
+    /// Tests for `DateTime` range checking and comparisons.
+    mod datetime_comparison_tests {
+        use super::*;
+
+        #[test]
+        fn test_is_within_range() {
+            let dt1 = DateTime::new();
+            let dt2 = dt1.add_days(1).unwrap();
+            let dt3 = dt1.add_days(2).unwrap();
+            assert!(dt2.is_within_range(&dt1, &dt3));
+            assert!(!dt1.is_within_range(&dt2, &dt3));
+        }
+
+        #[test]
+        fn test_partial_ord() {
+            let dt1 = DateTime::new();
+            let dt2 = dt1.add_days(1).unwrap();
+            assert!(dt1 < dt2);
+        }
+
+        #[test]
+        fn test_ord() {
+            let dt1 = DateTime::new();
+            let dt2 = dt1.add_days(1).unwrap();
+            assert!(dt1.cmp(&dt2) == std::cmp::Ordering::Less);
+        }
+
+        #[test]
+        fn test_hash() {
+            let dt = DateTime::new();
+            let mut hasher = DefaultHasher::new();
+            dt.hash(&mut hasher);
+            let hash1 = hasher.finish();
+
+            let mut hasher = DefaultHasher::new();
+            dt.hash(&mut hasher);
+            let hash2 = hasher.finish();
+
+            assert_eq!(hash1, hash2);
+        }
+    }
+
+    /// Tests for `DateTime` custom implementations (Add, Sub, etc.).
+    mod datetime_custom_impl_tests {
+        use super::*;
+
+        #[test]
+        fn test_add_duration() {
+            let dt = DateTime::from_components(
+                2024,
+                8,
+                31,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let future_dt = (dt + Duration::days(1)).unwrap();
+            assert_eq!(future_dt.day(), 1);
+            assert_eq!(future_dt.month() as u8, 9);
+        }
+
+        #[test]
+        fn test_sub_duration() {
+            let dt = DateTime::new();
+            let past_dt = (dt - Duration::days(1)).unwrap();
+            assert_eq!(
+                past_dt.day(),
+                if dt.day() == 1 { 31 } else { dt.day() - 1 }
+            );
+        }
+
+        #[test]
+        fn test_default() {
+            let dt: DateTime = Default::default();
+            assert_eq!(dt.offset(), UtcOffset::UTC);
+        }
+
+        #[test]
+        fn test_add_duration_invalid() {
+            let dt = DateTime::from_components(
+                9999,
+                12,
+                31,
+                23,
+                59,
+                59,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt + Duration::days(1);
+            assert!(matches!(result, Err(DateTimeError::InvalidDate)));
+        }
+
+        #[test]
+        fn test_add_negative_days() {
+            let dt = DateTime::new();
+            let result = dt.add_days(-1);
+            assert!(result.is_ok());
+            assert_eq!(
+                result.unwrap().day(),
+                if dt.day() == 1 { 31 } else { dt.day() - 1 }
+            );
+        }
+
+        #[test]
+        fn test_set_invalid_date() {
+            let dt = DateTime::new();
+            let result = dt.set_date(2024, 2, 30);
+            assert!(matches!(result, Err(DateTimeError::InvalidDate)));
+        }
+
+        #[test]
+        fn test_set_invalid_time() {
+            let dt = DateTime::new();
+            let result = dt.set_time(24, 0, 0);
+            assert!(matches!(result, Err(DateTimeError::InvalidTime)));
+        }
+
+        #[test]
+        fn test_display() {
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let display_string = format!("{}", dt);
+            assert!(display_string.starts_with("2024-01-01T00:00:00"));
+        }
+
+        #[test]
+        fn test_end_of_month_scenarios() {
+            // Test for February in a leap year
+            let dt = DateTime::from_components(
+                2024,
+                2,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert_eq!(dt.end_of_month().unwrap().day(), 29);
+
+            // Test for February in a non-leap year
+            let dt = DateTime::from_components(
+                2023,
+                2,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert_eq!(dt.end_of_month().unwrap().day(), 28);
+
+            // Test for a 30-day month
+            let dt = DateTime::from_components(
+                2024,
+                4,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert_eq!(dt.end_of_month().unwrap().day(), 30);
+
+            // Test for a 31-day month
+            let dt = DateTime::from_components(
+                2024,
+                5,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert_eq!(dt.end_of_month().unwrap().day(), 31);
+        }
+
+        #[test]
+        fn test_microsecond_precision() {
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert_eq!(dt.microsecond(), 0);
+        }
+
+        #[test]
+        fn test_ordinal_day() {
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert_eq!(dt.ordinal(), 1);
+        }
+
+        #[test]
+        fn test_iso_week() {
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert!(dt.iso_week() > 0 && dt.iso_week() <= 53);
+        }
+    }
+
+    /// Tests for error cases.
+    mod error_case_tests {
+        use super::*;
+
+        #[test]
+        fn test_new_with_invalid_tz() {
+            let result = DateTime::new_with_tz("INVALID");
+            assert!(matches!(
+                result,
+                Err(DateTimeError::InvalidTimezone)
+            ));
+        }
+
+        #[test]
+        fn test_new_with_invalid_custom_offset() {
+            let result = DateTime::new_with_custom_offset(25, 0); // Invalid hour offset
+            assert!(matches!(
+                result,
+                Err(DateTimeError::InvalidTimezone)
+            ));
+
+            let result = DateTime::new_with_custom_offset(23, 61); // Invalid minute offset
+            assert!(matches!(
+                result,
+                Err(DateTimeError::InvalidTimezone)
+            ));
+
+            let result = DateTime::new_with_custom_offset(-25, 0); // Negative invalid hour offset
+            assert!(matches!(
+                result,
+                Err(DateTimeError::InvalidTimezone)
+            ));
+
+            let result = DateTime::new_with_custom_offset(0, -61); // Negative invalid minute offset
+            assert!(matches!(
+                result,
+                Err(DateTimeError::InvalidTimezone)
+            ));
+        }
+
+        #[test]
+        fn test_from_components_invalid_date() {
+            let result = DateTime::from_components(
+                2024,
+                13,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            );
+            assert!(matches!(result, Err(DateTimeError::InvalidDate)));
+        }
+
+        #[test]
+        fn test_from_components_invalid_time() {
+            let result = DateTime::from_components(
+                2024,
+                1,
+                1,
+                24,
+                0,
+                0,
+                UtcOffset::UTC,
+            );
+            assert!(matches!(result, Err(DateTimeError::InvalidTime)));
+        }
+
+        #[test]
+        fn test_parse_invalid_format() {
+            let result = DateTime::parse("invalid-date-format");
+            assert!(matches!(
+                result,
+                Err(DateTimeError::InvalidFormat)
+            ));
+        }
+
+        #[test]
+        fn test_parse_custom_format_invalid() {
+            let result = DateTime::parse_custom_format(
+                "2024-01-01",
+                "[invalid]",
+            );
+            assert!(matches!(
+                result,
+                Err(DateTimeError::InvalidFormat)
+            ));
+        }
+
+        #[test]
+        fn test_convert_to_invalid_tz() {
+            let dt = DateTime::new();
+            let result = dt.convert_to_tz("INVALID");
+            assert!(matches!(
+                result,
+                Err(DateTimeError::InvalidTimezone)
+            ));
         }
     }
 }
