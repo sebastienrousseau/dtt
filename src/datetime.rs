@@ -177,6 +177,10 @@ impl DateTime {
         hours: i8,
         minutes: i8,
     ) -> Result<Self, DateTimeError> {
+        if hours.abs() > 23 || minutes.abs() > 59 {
+            return Err(DateTimeError::InvalidTimezone);
+        }
+
         let offset = UtcOffset::from_hms(hours, minutes, 0)
             .map_err(|_| DateTimeError::InvalidTimezone)?;
         let now_utc = OffsetDateTime::now_utc();
@@ -919,14 +923,22 @@ impl Sub<Duration> for DateTime {
     /// println!("Time 2 hours ago: {}", new_dt);
     /// ```
     fn sub(self, rhs: Duration) -> Self::Output {
-        let new_datetime = self
-            .datetime
-            .checked_sub(rhs)
-            .ok_or(DateTimeError::InvalidDate)?;
-        Ok(Self {
-            datetime: new_datetime,
-            offset: self.offset,
-        })
+        match self.datetime.checked_sub(rhs) {
+            Some(new_datetime) => {
+                // Additional manual validation can be placed here if needed.
+                Ok(Self {
+                    datetime: new_datetime,
+                    offset: self.offset,
+                })
+            }
+            None => {
+                // Debug output to understand why it failed, if needed.
+                eprintln!(
+                    "Subtraction resulted in an invalid date/time."
+                );
+                Err(DateTimeError::InvalidDate)
+            }
+        }
     }
 }
 
