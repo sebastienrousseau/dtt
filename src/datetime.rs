@@ -142,20 +142,19 @@ impl DateTime {
     /// ```
 
     pub fn new_with_tz(tz: &str) -> Result<Self, DateTimeError> {
-        let offset = TIMEZONE_OFFSETS
+        let offset = *TIMEZONE_OFFSETS
             .get(tz)
-            .ok_or(DateTimeError::InvalidTimezone)?
-            .clone()?;
+            .ok_or(DateTimeError::InvalidTimezone)?;
 
         let now_utc = OffsetDateTime::now_utc();
-        let now_with_offset = now_utc.to_offset(offset);
+        let now_with_offset = now_utc.to_offset(offset?);
 
         Ok(Self {
             datetime: PrimitiveDateTime::new(
                 now_with_offset.date(),
                 now_with_offset.time(),
             ),
-            offset,
+            offset: offset?,
         })
     }
 
@@ -379,21 +378,20 @@ impl DateTime {
         &self,
         new_tz: &str,
     ) -> Result<Self, DateTimeError> {
-        let new_offset = TIMEZONE_OFFSETS
+        let new_offset = *TIMEZONE_OFFSETS
             .get(new_tz)
-            .ok_or(DateTimeError::InvalidTimezone)?
-            .clone()?;
+            .ok_or(DateTimeError::InvalidTimezone)?;
 
         let new_datetime = self
             .datetime
             .assume_offset(self.offset)
-            .to_offset(new_offset);
+            .to_offset(new_offset?);
         Ok(Self {
             datetime: PrimitiveDateTime::new(
                 new_datetime.date(),
                 new_datetime.time(),
             ),
-            offset: new_offset,
+            offset: new_offset?,
         })
     }
 
@@ -530,11 +528,10 @@ impl DateTime {
     /// println!("RFC 3339 date: {}", formatted);
     /// ```
     pub fn format_rfc3339(&self) -> Result<String, DateTimeError> {
-        Ok(self
-            .datetime
+        self.datetime
             .assume_offset(self.offset)
             .format(&time::format_description::well_known::Rfc3339)
-            .map_err(|_| DateTimeError::InvalidFormat)?)
+            .map_err(|_| DateTimeError::InvalidFormat)
     }
 
     /// Formats the `DateTime` instance as an ISO 8601 string.
@@ -949,7 +946,7 @@ impl Sub<Duration> for DateTime {
 
 impl PartialOrd for DateTime {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.datetime.partial_cmp(&other.datetime)
+        Some(self.cmp(other))
     }
 }
 
