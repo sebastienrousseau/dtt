@@ -1625,4 +1625,191 @@ mod tests {
             ));
         }
     }
+
+    mod constructors {
+        use super::*;
+
+        #[test]
+        fn test_new_with_unique_timezone_offset() {
+            let dt = DateTime::new_with_tz("WADT").unwrap();
+            assert_eq!(
+                dt.offset(),
+                UtcOffset::from_hms(8, 45, 0).unwrap()
+            );
+        }
+
+        #[test]
+        fn test_new_with_custom_offset_edge_cases() {
+            let dt = DateTime::new_with_custom_offset(23, 59).unwrap();
+            assert_eq!(
+                dt.offset(),
+                UtcOffset::from_hms(23, 59, 0).unwrap()
+            );
+
+            let dt =
+                DateTime::new_with_custom_offset(-23, -59).unwrap();
+            assert_eq!(
+                dt.offset(),
+                UtcOffset::from_hms(-23, -59, 0).unwrap()
+            );
+        }
+
+        #[test]
+        fn test_from_components_edge_cases() {
+            let dt = DateTime::from_components(
+                2024,
+                2,
+                29,
+                23,
+                59,
+                59,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert_eq!(dt.year(), 2024);
+            assert_eq!(dt.month() as u8, 2);
+            assert_eq!(dt.day(), 29);
+            assert_eq!(dt.hour(), 23);
+            assert_eq!(dt.minute(), 59);
+            assert_eq!(dt.second(), 59);
+        }
+    }
+
+    mod update_and_conversion {
+        use super::*;
+
+        #[test]
+        fn test_convert_to_dst_timezone() {
+            let dt = DateTime::new_with_tz("EST").unwrap();
+            let dst_time = dt.convert_to_tz("EDT").unwrap();
+            assert_eq!(
+                dst_time.offset(),
+                UtcOffset::from_hms(-4, 0, 0).unwrap()
+            );
+        }
+
+        #[test]
+        fn test_convert_multiple_timezones() {
+            let dt = DateTime::new_with_tz("EST").unwrap();
+            let dt_pst = dt.convert_to_tz("PST").unwrap();
+            let dt_gmt = dt_pst.convert_to_tz("GMT").unwrap();
+            assert_eq!(dt_gmt.offset(), UtcOffset::UTC);
+        }
+    }
+
+    mod arithmetic_operations {
+        use super::*;
+
+        #[test]
+        fn test_add_duration_across_year_end() {
+            let dt = DateTime::from_components(
+                2024,
+                12,
+                31,
+                23,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let future_dt = (dt + Duration::hours(2)).unwrap();
+            assert_eq!(future_dt.year(), 2025);
+            assert_eq!(future_dt.month() as u8, 1);
+            assert_eq!(future_dt.day(), 1);
+            assert_eq!(future_dt.hour(), 1);
+        }
+
+        #[test]
+        fn test_sub_duration_across_year_start() {
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                1,
+                1,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let past_dt = (dt - Duration::hours(2)).unwrap();
+            assert_eq!(past_dt.year(), 2023);
+            assert_eq!(past_dt.month() as u8, 12);
+            assert_eq!(past_dt.day(), 31);
+            assert_eq!(past_dt.hour(), 23);
+        }
+    }
+
+    mod comparative_and_hashing {
+        use super::*;
+
+        #[test]
+        fn test_hash_uniqueness() {
+            let dt1 = DateTime::from_components(
+                2024,
+                1,
+                1,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let dt2 = DateTime::from_components(
+                2024,
+                1,
+                1,
+                12,
+                0,
+                0,
+                UtcOffset::from_hms(1, 0, 0).unwrap(),
+            )
+            .unwrap();
+
+            let mut hasher1 = DefaultHasher::new();
+            dt1.hash(&mut hasher1);
+            let hash1 = hasher1.finish();
+
+            let mut hasher2 = DefaultHasher::new();
+            dt2.hash(&mut hasher2);
+            let hash2 = hasher2.finish();
+
+            assert_ne!(hash1, hash2);
+        }
+    }
+
+    mod start_end_functions {
+        use super::*;
+
+        #[test]
+        fn test_end_of_february_leap_year() {
+            let dt = DateTime::from_components(
+                2024,
+                2,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let end_of_feb = dt.end_of_month().unwrap();
+            assert_eq!(end_of_feb.day(), 29);
+        }
+
+        #[test]
+        fn test_end_of_february_non_leap_year() {
+            let dt = DateTime::from_components(
+                2023,
+                2,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let end_of_feb = dt.end_of_month().unwrap();
+            assert_eq!(end_of_feb.day(), 28);
+        }
+    }
 }
