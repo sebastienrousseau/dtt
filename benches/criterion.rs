@@ -8,7 +8,9 @@
 //! This module contains benchmarks for various operations provided by the DTT library,
 //! including creation of DateTime instances and accessing different components of a DateTime.
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{
+    black_box, criterion_group, criterion_main, Criterion,
+};
 use dtt::datetime::DateTime;
 
 /// Benchmark the creation of a new DateTime instance.
@@ -39,7 +41,9 @@ fn bench_format_iso_8601(c: &mut Criterion) {
 /// Benchmark accessing the ISO week of a DateTime instance.
 fn bench_get_iso_week(c: &mut Criterion) {
     let date = black_box(DateTime::new());
-    c.bench_function("get ISO week", move |b| b.iter(|| date.iso_week()));
+    c.bench_function("get ISO week", move |b| {
+        b.iter(|| date.iso_week())
+    });
 }
 
 /// Benchmark accessing the minute of a DateTime instance.
