@@ -184,7 +184,6 @@ macro_rules! dtt_create_vec {
     }};
 }
 
-
 /// Returns the maximum of the given values.
 ///
 /// # Parameters
