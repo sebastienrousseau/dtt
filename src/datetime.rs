@@ -121,7 +121,6 @@ impl DateTime {
     /// let dt = DateTime::new_with_tz("EST").expect("EST is a valid timezone");
     /// println!("Current time in EST: {}", dt);
     /// ```
-
     pub fn new_with_tz(tz: &str) -> Result<Self, DateTimeError> {
         let offset = *TIMEZONE_OFFSETS
             .get(tz)
