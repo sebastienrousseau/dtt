@@ -1069,6 +1069,152 @@ impl DateTime {
     pub fn is_valid_iso_8601(date: &str) -> bool {
         DateTime::parse(date).is_ok()
     }
+
+    /// Adds a specified number of months to the `DateTime` instance.
+    ///
+    /// This method handles edge cases such as month-end dates and leap years.
+    /// It also correctly handles negative month additions (subtractions).
+    ///
+    /// # Arguments
+    ///
+    /// * `months` - The number of months to add (can be negative for subtraction).
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the months added, or an error if the operation fails.
+    ///   Adds a specified number of months to the `DateTime` instance.
+    ///
+    /// This method handles edge cases such as month-end dates and leap years.
+    /// It also correctly handles negative month additions (subtractions).
+    ///
+    /// # Arguments
+    ///
+    /// * `months` - The number of months to add (can be negative for subtraction).
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the months added, or an error if the operation fails.
+    pub fn add_months(
+        &self,
+        months: i32,
+    ) -> Result<Self, DateTimeError> {
+        let current_date = self.datetime.date();
+        let total_months =
+            current_date.year() * 12 + current_date.month() as i32 - 1
+                + months;
+        let target_year = total_months / 12;
+        let target_month = (total_months % 12 + 1) as u8;
+
+        let days_in_target_month =
+            days_in_month(target_year, target_month)?;
+        let target_day = current_date.day().min(days_in_target_month);
+
+        let new_date = Date::from_calendar_date(
+            target_year,
+            Month::try_from(target_month)
+                .map_err(|_| DateTimeError::InvalidDate)?,
+            target_day,
+        )
+        .map_err(|_| DateTimeError::InvalidDate)?;
+
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(
+                new_date,
+                self.datetime.time(),
+            ),
+            offset: self.offset,
+        })
+    }
+
+    /// Subtracts a specified number of months from the `DateTime` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `months` - The number of months to subtract.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the months subtracted, or an error if the operation fails.
+    pub fn sub_months(
+        &self,
+        months: i32,
+    ) -> Result<Self, DateTimeError> {
+        self.add_months(-months)
+    }
+
+    /// Adds a specified number of years to the `DateTime` instance.
+    ///
+    /// This method handles leap years correctly.
+    ///
+    /// # Arguments
+    ///
+    /// * `years` - The number of years to add.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the years added, or an error if the operation fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let future_dt = dt.add_years(5).expect("Adding 5 years should succeed");
+    /// println!("Date after 5 years: {}", future_dt);
+    /// ```
+    pub fn add_years(&self, years: i32) -> Result<Self, DateTimeError> {
+        let current_date = self.datetime.date();
+        let target_year = current_date.year() + years;
+
+        // Handle February 29th in leap years
+        let new_day = if current_date.month() == Month::February
+            && current_date.day() == 29
+            && !is_leap_year(target_year)
+        {
+            28
+        } else {
+            current_date.day()
+        };
+
+        let new_date = Date::from_calendar_date(
+            target_year,
+            current_date.month(),
+            new_day,
+        )
+        .map_err(|_| DateTimeError::InvalidDate)?;
+
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(
+                new_date,
+                self.datetime.time(),
+            ),
+            offset: self.offset,
+        })
+    }
+
+    /// Subtracts a specified number of years from the `DateTime` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `years` - The number of years to subtract.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the years subtracted, or an error if the operation fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let past_dt = dt.sub_years(5).expect("Subtracting 5 years should succeed");
+    /// println!("Date 5 years ago: {}", past_dt);
+    /// ```
+    pub fn sub_years(&self, years: i32) -> Result<Self, DateTimeError> {
+        self.add_years(-years)
+    }
 }
 
 impl fmt::Display for DateTime {
@@ -1210,4 +1356,19 @@ impl Hash for DateTime {
         self.datetime.hash(state);
         self.offset.hash(state);
     }
+}
+
+/// Helper function to determine the number of days in a given month and year
+fn days_in_month(year: i32, month: u8) -> Result<u8, DateTimeError> {
+    match month {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => Ok(31),
+        4 | 6 | 9 | 11 => Ok(30),
+        2 => Ok(if is_leap_year(year) { 29 } else { 28 }),
+        _ => Err(DateTimeError::InvalidDate),
+    }
+}
+
+/// Helper function to determine if a year is a leap year
+fn is_leap_year(year: i32) -> bool {
+    (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
 }

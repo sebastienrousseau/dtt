@@ -2002,4 +2002,315 @@ mod tests {
             assert!(!DateTime::is_valid_day("-1"));
         }
     }
+
+    /// Tests for DateTime arithmetic operations (months and years)
+    mod datetime_arithmetic_tests {
+        use super::*;
+
+        #[test]
+        fn test_add_months_basic() {
+            let dt = DateTime::from_components(
+                2023,
+                1,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_months(1).unwrap();
+            assert_eq!(result.year(), 2023);
+            assert_eq!(result.month() as u8, 2);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_add_months_cross_year() {
+            let dt = DateTime::from_components(
+                2023,
+                12,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_months(2).unwrap();
+            assert_eq!(result.year(), 2024);
+            assert_eq!(result.month() as u8, 2);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_add_months_last_day_of_month() {
+            let dt = DateTime::from_components(
+                2023,
+                1,
+                31,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_months(1).unwrap();
+            assert_eq!(result.year(), 2023);
+            assert_eq!(result.month() as u8, 2);
+            assert_eq!(result.day(), 28); // February has 28 days in 2023
+        }
+
+        #[test]
+        fn test_add_months_leap_year() {
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                31,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_months(1).unwrap();
+            assert_eq!(result.year(), 2024);
+            assert_eq!(result.month() as u8, 2);
+            assert_eq!(result.day(), 29); // February has 29 days in 2024 (leap year)
+        }
+
+        #[test]
+        fn test_sub_months_basic() {
+            let dt = DateTime::from_components(
+                2023,
+                3,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.sub_months(1).unwrap();
+            assert_eq!(result.year(), 2023);
+            assert_eq!(result.month() as u8, 2);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_sub_months_cross_year() {
+            let dt = DateTime::from_components(
+                2023,
+                1,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.sub_months(2).unwrap();
+            assert_eq!(result.year(), 2022);
+            assert_eq!(result.month() as u8, 11);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_sub_months_last_day_of_month() {
+            let dt = DateTime::from_components(
+                2023,
+                3,
+                31,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.sub_months(1).unwrap();
+            assert_eq!(result.year(), 2023);
+            assert_eq!(result.month() as u8, 2);
+            assert_eq!(result.day(), 28); // February has 28 days in 2023
+        }
+
+        #[test]
+        fn test_add_years_basic() {
+            let dt = DateTime::from_components(
+                2023,
+                5,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_years(1).unwrap();
+            assert_eq!(result.year(), 2024);
+            assert_eq!(result.month() as u8, 5);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_add_years_leap_year() {
+            let dt = DateTime::from_components(
+                2024,
+                2,
+                29,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_years(1).unwrap();
+            assert_eq!(result.year(), 2025);
+            assert_eq!(result.month() as u8, 2);
+            assert_eq!(result.day(), 28); // February 28 in non-leap year
+        }
+
+        #[test]
+        fn test_sub_years_basic() {
+            let dt = DateTime::from_components(
+                2023,
+                5,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.sub_years(1).unwrap();
+            assert_eq!(result.year(), 2022);
+            assert_eq!(result.month() as u8, 5);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_sub_years_leap_year() {
+            let dt = DateTime::from_components(
+                2024,
+                2,
+                29,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.sub_years(1).unwrap();
+            assert_eq!(result.year(), 2023);
+            assert_eq!(result.month() as u8, 2);
+            assert_eq!(result.day(), 28); // February 28 in non-leap year
+        }
+
+        #[test]
+        fn test_add_months_large_number() {
+            let dt = DateTime::from_components(
+                2023,
+                1,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_months(25).unwrap();
+            assert_eq!(result.year(), 2025);
+            assert_eq!(result.month() as u8, 2);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_sub_months_large_number() {
+            let dt = DateTime::from_components(
+                2023,
+                1,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.sub_months(25).unwrap();
+            assert_eq!(result.year(), 2020);
+            assert_eq!(result.month() as u8, 12);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_add_years_large_number() {
+            let dt = DateTime::from_components(
+                2023,
+                5,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_years(100).unwrap();
+            assert_eq!(result.year(), 2123);
+            assert_eq!(result.month() as u8, 5);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_sub_years_large_number() {
+            let dt = DateTime::from_components(
+                2023,
+                5,
+                15,
+                12,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.sub_years(100).unwrap();
+            assert_eq!(result.year(), 1923);
+            assert_eq!(result.month() as u8, 5);
+            assert_eq!(result.day(), 15);
+        }
+
+        #[test]
+        fn test_add_months_preserve_time() {
+            let dt = DateTime::from_components(
+                2023,
+                1,
+                15,
+                23,
+                59,
+                59,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_months(1).unwrap();
+            assert_eq!(result.hour(), 23);
+            assert_eq!(result.minute(), 59);
+            assert_eq!(result.second(), 59);
+        }
+
+        #[test]
+        fn test_add_years_preserve_time() {
+            let dt = DateTime::from_components(
+                2023,
+                1,
+                15,
+                23,
+                59,
+                59,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            let result = dt.add_years(1).unwrap();
+            assert_eq!(result.hour(), 23);
+            assert_eq!(result.minute(), 59);
+            assert_eq!(result.second(), 59);
+        }
+    }
 }
