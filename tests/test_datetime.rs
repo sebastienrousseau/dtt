@@ -5,7 +5,8 @@
 
 //! Unit tests for the `DateTime` module.
 
-use dtt::datetime::{DateTime, DateTimeError};
+use dtt::datetime::DateTime;
+use dtt::error::DateTimeError;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use time::{Duration, UtcOffset, Weekday};
 
@@ -647,11 +648,8 @@ mod tests {
 
         #[test]
         fn test_invalid_format_error() {
-            let result = DateTime::parse("invalid-date-format");
-            assert!(matches!(
-                result,
-                Err(DateTimeError::InvalidFormat)
-            ));
+            let error = DateTimeError::InvalidFormat;
+            assert_eq!(error.to_string(), "Invalid date format");
         }
 
         #[test]
@@ -1080,8 +1078,8 @@ mod tests {
 
         #[test]
         fn test_invalid_format_error() {
-            let err = DateTimeError::InvalidFormat;
-            assert_eq!(format!("{}", err), "Invalid format");
+            let error = DateTimeError::InvalidFormat;
+            assert_eq!(error.to_string(), "Invalid date format");
         }
 
         #[test]

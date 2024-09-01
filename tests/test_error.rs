@@ -57,7 +57,7 @@ mod tests {
 
     mod trait_implementations {
         use dtt::error::DateTimeError;
-        use std::{cmp::Ordering, collections::HashSet};
+        use std::collections::HashSet;
 
         /// Tests the `Debug` implementation for `DateTimeError`.
         ///
@@ -87,27 +87,6 @@ mod tests {
 
             assert_eq!(original, cloned);
             assert_eq!(original, copied);
-        }
-
-        /// Tests the `Ord` and `PartialOrd` traits for `DateTimeError`.
-        ///
-        /// This test ensures that `DateTimeError` can be compared using ordering
-        /// operations, and that these operations work as expected.
-        #[test]
-        fn test_ord_and_partial_ord() {
-            let format_error = DateTimeError::InvalidFormat;
-            let timezone_error = DateTimeError::InvalidTimezone;
-
-            assert!(format_error < timezone_error);
-            assert!(timezone_error > format_error);
-            assert_eq!(
-                format_error.cmp(&format_error),
-                Ordering::Equal
-            );
-            assert_eq!(
-                format_error.partial_cmp(&timezone_error),
-                Some(Ordering::Less)
-            );
         }
 
         /// Tests the hashing functionality of `DateTimeError`.
@@ -260,6 +239,8 @@ mod tests {
 
     mod future_proofing {
         use dtt::error::DateTimeError;
+        // We can't directly use Parse and ComponentRange variants due to privacy
+        // So, focus on the variants that are testable.
 
         /// Tests the behavior of `DateTimeError` under potential future expansions.
         ///
@@ -267,14 +248,22 @@ mod tests {
         /// added to `DateTimeError` do not cause existing code to break unexpectedly.
         #[test]
         fn test_non_exhaustive() {
-            // If new variants are added, this test should catch any issues.
-            // Note: This test will need to be updated if new variants are added.
-            let _all_variants = [
+            // Handle public and testable variants
+            let parse_error_mock = DateTimeError::InvalidFormat; // Replace with another testable variant or skip
+
+            // Mock or skip ComponentRange since it cannot be instantiated directly.
+            let component_range_mock = DateTimeError::InvalidTimezone; // Replace with another testable variant or skip
+
+            let all_variants = [
                 DateTimeError::InvalidFormat,
                 DateTimeError::InvalidTimezone,
+                DateTimeError::InvalidDate,
+                DateTimeError::InvalidTime,
+                parse_error_mock, // Placeholder for ParseError
+                component_range_mock, // Placeholder for ComponentRange
             ];
 
-            for variant in _all_variants.iter() {
+            for variant in all_variants.iter() {
                 match variant {
                     DateTimeError::InvalidFormat => {
                         assert_eq!(
@@ -287,7 +276,23 @@ mod tests {
                             variant.to_string(),
                             "Invalid timezone"
                         )
-                    } // Add more match arms here if new variants are added.
+                    }
+                    DateTimeError::InvalidDate => {
+                        assert_eq!(variant.to_string(), "Invalid date")
+                    }
+                    DateTimeError::InvalidTime => {
+                        assert_eq!(variant.to_string(), "Invalid time")
+                    }
+                    DateTimeError::ParseError(_) => {
+                        assert!(variant
+                            .to_string()
+                            .contains("Parsing error"))
+                    }
+                    DateTimeError::ComponentRange(_) => {
+                        assert!(variant
+                            .to_string()
+                            .contains("Component range error"))
+                    }
                 }
             }
         }

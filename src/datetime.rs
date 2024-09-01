@@ -11,41 +11,20 @@
 //! automatically adjust for daylight saving time (DST). Users must manually
 //! manage any necessary DST adjustments by selecting the correct timezone offset.
 
+use crate::error::DateTimeError;
 use serde::{Deserialize, Serialize};
-use std::cmp::Ordering;
-use std::collections::HashMap;
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::ops::{Add, Sub};
-use std::str::FromStr;
-use thiserror::Error;
+use std::{
+    cmp::Ordering,
+    collections::HashMap,
+    fmt,
+    hash::{Hash, Hasher},
+    ops::{Add, Sub},
+    str::FromStr,
+};
 use time::{
     Date, Duration, Month, OffsetDateTime, PrimitiveDateTime, Time,
     UtcOffset, Weekday,
 };
-
-/// Errors that can occur when working with DateTime.
-#[derive(Copy, Clone, Error, Debug, Eq, PartialEq)]
-pub enum DateTimeError {
-    /// The provided format is invalid.
-    #[error("Invalid format")]
-    InvalidFormat,
-    /// The provided timezone is invalid or does not support DST.
-    #[error("Invalid or unsupported timezone; DST not supported")]
-    InvalidTimezone,
-    /// The date is invalid (e.g., February 30).
-    #[error("Invalid date")]
-    InvalidDate,
-    /// The time is invalid (e.g., 25:00).
-    #[error("Invalid time")]
-    InvalidTime,
-    /// An error occurred while parsing the date/time string.
-    #[error("Parsing error: {0}")]
-    ParseError(#[from] time::error::Parse),
-    /// A component (year, month, day, etc.) is out of the valid range.
-    #[error("Component range error: {0}")]
-    ComponentRange(#[from] time::error::ComponentRange),
-}
 
 /// A structure representing a date and time with timezone information.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]

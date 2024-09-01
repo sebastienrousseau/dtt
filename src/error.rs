@@ -1,49 +1,142 @@
-// error.rs
-//
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::hash::{Hash, Hasher};
+use thiserror::Error;
+use time::error::{ComponentRange, Parse};
 
-use serde::{Deserialize, Serialize};
-use std::{error::Error, fmt};
-
-/// Custom error type for DateTime parsing.
-#[derive(
-    Copy,
-    Clone,
-    Debug,
-    Deserialize,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd,
-    Serialize,
-)]
+/// Custom error type for the DateTime library.
+///
+/// This enum represents various errors that can occur when working with
+/// DateTime objects, such as invalid formats, timezones, and component ranges.
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Error)]
 pub enum DateTimeError {
-    /// Invalid date format.
+    /// The provided date format is invalid.
+    #[error("Invalid date format")]
     InvalidFormat,
-    /// Invalid timezone.
+
+    /// The provided timezone is invalid or not supported. DST is not supported.
+    #[error("Invalid or unsupported timezone; DST not supported")]
     InvalidTimezone,
+
+    /// The date is invalid (e.g., February 30).
+    #[error("Invalid date")]
+    InvalidDate,
+
+    /// The time is invalid (e.g., 25:00).
+    #[error("Invalid time")]
+    InvalidTime,
+
+    /// An error occurred while parsing the date/time string.
+    #[error("Parsing error")]
+    ParseError(#[from] Parse),
+
+    /// A component (year, month, day, etc.) is out of the valid range.
+    #[error("Component range error")]
+    ComponentRange(#[from] ComponentRange),
 }
 
-impl Default for DateTimeError {
-    fn default() -> Self {
-        DateTimeError::InvalidFormat
+impl Hash for DateTimeError {
+    /// Custom implementation of the `Hash` trait for `DateTimeError`.
+    ///
+    /// This allows `DateTimeError` to be used in hashed collections like `HashSet` and `HashMap`.
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        // Use the discriminant of the enum as a simple hash value
+        std::mem::discriminant(self).hash(state);
     }
 }
 
-impl fmt::Display for DateTimeError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl Serialize for DateTimeError {
+    /// Serializes the `DateTimeError` into a string representation.
+    ///
+    /// This is a custom implementation to handle serialization for variants
+    /// that contain types (`Parse` and `ComponentRange`) which do not implement
+    /// `Serialize`.
+    ///
+    /// # Errors
+    ///
+    /// This function will return a serialization error if the process fails.
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
         match self {
             DateTimeError::InvalidFormat => {
-                write!(f, "Invalid date format")
+                serializer.serialize_str("InvalidFormat")
             }
             DateTimeError::InvalidTimezone => {
-                write!(f, "Invalid timezone")
+                serializer.serialize_str("InvalidTimezone")
+            }
+            DateTimeError::InvalidDate => {
+                serializer.serialize_str("InvalidDate")
+            }
+            DateTimeError::InvalidTime => {
+                serializer.serialize_str("InvalidTime")
+            }
+            DateTimeError::ParseError(_) => {
+                serializer.serialize_str("ParseError")
+            }
+            DateTimeError::ComponentRange(_) => {
+                serializer.serialize_str("ComponentRange")
             }
         }
     }
 }
 
-impl Error for DateTimeError {}
+impl<'de> Deserialize<'de> for DateTimeError {
+    /// Deserializes a string into a `DateTimeError`.
+    ///
+    /// This is a custom implementation to handle deserialization for variants
+    /// that contain types (`Parse` and `ComponentRange`) which do not implement
+    /// `Deserialize`.
+    ///
+    /// # Errors
+    ///
+    /// This function will return a deserialization error if the input string
+    /// does not match any of the known variants.
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s: &str = Deserialize::deserialize(deserializer)?;
+        match s {
+            "InvalidFormat" => Ok(DateTimeError::InvalidFormat),
+            "InvalidTimezone" => Ok(DateTimeError::InvalidTimezone),
+            "InvalidDate" => Ok(DateTimeError::InvalidDate),
+            "InvalidTime" => Ok(DateTimeError::InvalidTime),
+            "ParseError" => Err(serde::de::Error::custom(
+                "Cannot deserialize ParseError directly",
+            )),
+            "ComponentRange" => Err(serde::de::Error::custom(
+                "Cannot deserialize ComponentRange directly",
+            )),
+            _ => Err(serde::de::Error::unknown_variant(
+                s,
+                &[
+                    "InvalidFormat",
+                    "InvalidTimezone",
+                    "InvalidDate",
+                    "InvalidTime",
+                    "ParseError",
+                    "ComponentRange",
+                ],
+            )),
+        }
+    }
+}
+
+impl Default for DateTimeError {
+    /// Provides a default value for `DateTimeError`.
+    ///
+    /// By default, the error is set to `InvalidFormat`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::error::DateTimeError;
+    ///
+    /// let error = DateTimeError::default();
+    /// assert_eq!(error, DateTimeError::InvalidFormat);
+    /// ```
+    fn default() -> Self {
+        DateTimeError::InvalidFormat
+    }
+}
