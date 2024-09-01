@@ -288,7 +288,6 @@ macro_rules! dtt_new_with_tz {
 ///
 /// A new `DateTime` instance with the specified number of days added.
 ///
-/// ```
 #[macro_export]
 macro_rules! dtt_add_days {
     ($date:expr, $days:expr) => {
@@ -314,6 +313,31 @@ macro_rules! dtt_sub_days {
     };
 }
 
+/// A helper macro to calculate the difference between two `DateTime` instances.
+///
+/// # Parameters
+///
+/// - `$dt1:expr`: The first `DateTime` instance.
+/// - `$dt2:expr`: The second `DateTime` instance.
+/// - `$unit:expr`: The unit for the difference (seconds, days, etc.).
+///
+/// # Returns
+///
+/// The difference in the specified unit between the two `DateTime` instances.
+#[macro_export]
+macro_rules! dtt_diff {
+    ($dt1:expr, $dt2:expr, $unit:expr) => {{
+        match ($dt1.parse::<i64>(), $dt2.parse::<i64>()) {
+            (Ok(dt1), Ok(dt2)) => {
+                let difference =
+                    if dt1 <= dt2 { dt2 - dt1 } else { dt1 - dt2 };
+                (difference / $unit).abs()
+            }
+            _ => panic!("Error: Invalid input"),
+        }
+    }};
+}
+
 /// Calculates the difference in seconds between two `DateTime` instances.
 ///
 /// # Parameters
@@ -324,19 +348,11 @@ macro_rules! dtt_sub_days {
 /// # Returns
 ///
 /// The difference in seconds between the two `DateTime` instances.
-///
 #[macro_export]
 macro_rules! dtt_diff_seconds {
-    ($dt1:expr, $dt2:expr) => {{
-        match ($dt1.parse::<i64>(), $dt2.parse::<i64>()) {
-            (Ok(dt1), Ok(dt2)) => {
-                let seconds_difference =
-                    if dt1 <= dt2 { dt2 - dt1 } else { dt1 - dt2 };
-                seconds_difference.to_string()
-            }
-            _ => String::from("Error: Invalid input"),
-        }
-    }};
+    ($dt1:expr, $dt2:expr) => {
+        dtt_diff!($dt1, $dt2, 1)
+    };
 }
 
 /// Calculates the difference in days between two `DateTime` instances.
@@ -349,24 +365,11 @@ macro_rules! dtt_diff_seconds {
 /// # Returns
 ///
 /// The difference in days between the two `DateTime` instances.
-///
 #[macro_export]
 macro_rules! dtt_diff_days {
-    ($dt1:expr, $dt2:expr) => {{
-        match ($dt1.parse::<i64>(), $dt2.parse::<i64>()) {
-            (Ok(dt1), Ok(dt2)) => {
-                let seconds_difference = if dt1 <= dt2 {
-                    dt2 - dt1
-                } else {
-                    dt1 - dt2
-                };
-                (seconds_difference / 86400).abs() // 86400 seconds in a day
-            }
-            _ => {
-                panic!("Error: Invalid input")
-            }
-        }
-    }};
+    ($dt1:expr, $dt2:expr) => {
+        dtt_diff!($dt1, $dt2, 86400) // 86400 seconds in a day
+    };
 }
 
 /// Creates a deep copy of the provided `DateTime` object.

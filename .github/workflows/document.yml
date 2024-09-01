@@ -45,7 +45,7 @@ jobs:
           retention-days: 1
 
       - name: Write CNAME file
-        run: echo 'docs.dttlib.one' > ./target/doc/CNAME
+        run: echo 'docs.dttlib.com' > ./target/doc/CNAME
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
