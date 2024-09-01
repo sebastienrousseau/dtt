@@ -2,110 +2,326 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
+//! # DTT Library Usage Examples
+//!
+//! This program demonstrates the comprehensive usage of the DateTime (DTT) library, covering basic
+//! and advanced DateTime operations, macro usage, date component handling, and error handling
+//! scenarios. Each function provides examples with explanatory output.
+
 #![allow(missing_docs)]
 
 use dtt::datetime::DateTime;
+use dtt::{
+    dtt_add_days, dtt_assert, dtt_join, dtt_map, dtt_max, dtt_min,
+    dtt_now, dtt_parse, dtt_print_vec, dtt_sub_days, dtt_vec,
+};
+use std::error::Error;
 
-pub fn main() {
-    // Creating DateTime objects
+/// Entry point for the DTT library usage examples.
+///
+/// This function orchestrates the execution of various example functions that demonstrate
+/// the capabilities of the DTT library.
+///
+/// # Errors
+///
+/// Returns a boxed `dyn Error` in case any of the example functions fail.
+fn main() -> Result<(), Box<dyn Error>> {
+    println!("🦀 Comprehensive DTT Library Usage Examples 🦀\n");
+
+    basic_datetime_examples()?;
+    advanced_datetime_operations()?;
+    macro_usage_examples()?;
+    date_component_examples()?;
+    error_handling_examples()?;
+
+    Ok(())
+}
+
+/// Demonstrates basic usage of the `DateTime` struct and associated methods.
+///
+/// This function covers creating DateTime objects, parsing dates, and formatting.
+///
+/// # Errors
+///
+/// Returns a boxed `dyn Error` if any DateTime parsing or creation fails.
+fn basic_datetime_examples() -> Result<(), Box<dyn Error>> {
+    println!("🦀 Basic DateTime Examples 🦀");
+
+    let now = dtt_now!();
+    println!("Current time (using macro): ✅ {:?}", now);
+
+    let parsed_date = dtt_parse!("2023-05-20T15:30:00Z")?;
+    println!("Parsed date (using macro): ✅ {:?}", parsed_date);
+
+    let utc_date = DateTime::new();
+    println!("UTC Date: ✅ {:?}", utc_date);
+
+    let paris_time = DateTime::new_with_tz("CET")?;
+    let tokyo_time = DateTime::new_with_tz("JST")?;
+    println!("Paris time: ✅ {:?}", paris_time);
+    println!("Tokyo time: ✅ {:?}", tokyo_time);
+
+    let custom_offset_time = DateTime::new_with_custom_offset(5, 30)?;
+    println!(
+        "Custom offset time (UTC+5:30): ✅ {:?}",
+        custom_offset_time
+    );
+
+    let rfc3339_date = DateTime::parse("2023-05-20T15:30:00Z")?;
+    println!("Parsed RFC3339 date: ✅ {:?}", rfc3339_date);
+
+    let custom_format_date = DateTime::parse_custom_format(
+        "20/05/2023 15:30:00",
+        "[day]/[month]/[year] [hour]:[minute]:[second]",
+    )?;
+    println!("Parsed custom format date: ✅ {:?}", custom_format_date);
+
+    Ok(())
+}
+
+/// Demonstrates advanced operations using the `DateTime` struct.
+///
+/// This function includes examples of adding and subtracting days, working with durations,
+/// and formatting dates in various formats.
+///
+/// # Errors
+///
+/// Returns a boxed `dyn Error` if any advanced operation fails.
+fn advanced_datetime_operations() -> Result<(), Box<dyn Error>> {
+    println!("\n🦀 Advanced DateTime Operations 🦀");
+
+    let utc_date = DateTime::new();
+
+    let future_date = dtt_add_days!(utc_date, 30)?;
+    println!("Date after 30 days: ✅ {:?}", future_date);
+
+    let past_date = dtt_sub_days!(utc_date, 15)?;
+    println!("Date 15 days ago: ✅ {:?}", past_date);
+
+    let duration = future_date.duration_since(&utc_date);
+    let days_between = duration.whole_days();
+    println!("Days between dates: ✅ {} days", days_between);
+
+    let start_date = DateTime::from_components(
+        2023,
+        1,
+        1,
+        0,
+        0,
+        0,
+        utc_date.offset(),
+    )?;
+    let end_date = DateTime::from_components(
+        2023,
+        12,
+        31,
+        23,
+        59,
+        59,
+        utc_date.offset(),
+    )?;
+    let check_date = DateTime::from_components(
+        2023,
+        6,
+        15,
+        12,
+        0,
+        0,
+        utc_date.offset(),
+    )?;
+    let is_in_range =
+        check_date.is_within_range(&start_date, &end_date);
+    println!("Is 2023-06-15 within 2023? ✅ {}", is_in_range);
+
+    let nyc_time = utc_date.convert_to_tz("EST")?;
+    println!("Current time in New York: ✅ {:?}", nyc_time);
+
+    let formatted_date = utc_date.format_rfc3339()?;
+    println!("RFC3339 formatted date: ✅ {}", formatted_date);
+
+    let iso8601_date = utc_date.format_iso8601()?;
+    println!("ISO8601 formatted date: ✅ {}", iso8601_date);
+
+    println!("\nDate ranges:");
+    println!("Start of week: ✅ {:?}", utc_date.start_of_week()?);
+    println!("End of week: ✅ {:?}", utc_date.end_of_week()?);
+    println!("Start of month: ✅ {:?}", utc_date.start_of_month()?);
+    println!("End of month: ✅ {:?}", utc_date.end_of_month()?);
+    println!("Start of year: ✅ {:?}", utc_date.start_of_year()?);
+    println!("End of year: ✅ {:?}", utc_date.end_of_year()?);
+
+    Ok(())
+}
+
+/// Demonstrates the usage of custom macros provided by the DTT library.
+///
+/// This function includes examples of creating vectors, maps, assertions, and joining strings.
+///
+/// # Errors
+///
+/// Returns a boxed `dyn Error` if any macro operation fails.
+#[allow(clippy::eq_op)]
+fn macro_usage_examples() -> Result<(), Box<dyn Error>> {
+    println!("\n🦀 Macro Usage Examples 🦀");
+
+    let vec = dtt_vec![1, 2, 3, 4, 5];
+    println!("Vector created with dtt_vec!: ✅ {:?}", vec);
+
+    let map = dtt_map! {"a" => 1, "b" => 2, "c" => 3};
+    println!("Map created with dtt_map!: ✅ {:?}", map);
+
+    dtt_assert!(2 + 2 == 4, "Basic arithmetic assertion");
+    println!("dtt_assert! passed");
+
+    let min_value = dtt_min!(5, 3, 7, 1, 9);
+    println!("Minimum value using dtt_min!: ✅ {}", min_value);
+
+    let max_value = dtt_max!(5, 3, 7, 1, 9);
+    println!("Maximum value using dtt_max!: ✅ {}", max_value);
+
+    let joined_string = dtt_join!("Hello", " ", "World", "!");
+    println!("Joined string using dtt_join!: ✅ {}", joined_string);
+
+    println!("Printing vector using dtt_print_vec!:");
+    dtt_print_vec!([1, 2, 3, 4, 5]);
+
+    Ok(())
+}
+
+/// Demonstrates accessing and validating various components of a `DateTime` object.
+///
+/// This function covers retrieving date and time components and validating them.
+///
+/// # Errors
+///
+/// Returns a boxed `dyn Error` if any date component retrieval fails.
+fn date_component_examples() -> Result<(), Box<dyn Error>> {
+    println!("\n🦀 Date Component Examples 🦀");
+
     let date = DateTime::new();
-    println!("🦀 UTC Date:          ✅ {:?}", date);
+    println!("Year: {}", date.year());
+    println!("Month: {:?}", date.month());
+    println!("Day: {}", date.day());
+    println!("Hour: {}", date.hour());
+    println!("Minute: {}", date.minute());
+    println!("Second: {}", date.second());
+    println!("Microsecond: {}", date.microsecond());
+    println!("Weekday: {:?}", date.weekday());
+    println!("Day of Year: {}", date.ordinal());
+    println!("Week of Year: {}", date.iso_week());
+    println!("Offset: {:?}", date.offset());
 
-    // Creating DateTime with a specific timezone
-    let paris_time = DateTime::new_with_tz("CET")
-        .expect("Failed to create DateTime with CET timezone");
-    println!("🦀 Paris time:        ✅ {:?}", paris_time);
+    println!("\nDate Validation Examples:");
+    println!("Is 31 a valid day? {}", DateTime::is_valid_day("31"));
+    println!("Is 13 a valid month? {}", DateTime::is_valid_month("13"));
+    println!("Is 25 a valid hour? {}", DateTime::is_valid_hour("25"));
+    println!(
+        "Is 2023-13-32 a valid ISO8601 date? {}",
+        DateTime::is_valid_iso_8601("2023-13-32")
+    );
+    println!(
+        "Is 61 a valid minute? {}",
+        DateTime::is_valid_minute("61")
+    );
+    println!(
+        "Is 60 a valid second? {}",
+        DateTime::is_valid_second("60")
+    );
+    println!(
+        "Is 2023 a valid year? {}",
+        DateTime::is_valid_year("2023")
+    );
+    println!(
+        "Is 1000000 a valid microsecond? {}",
+        DateTime::is_valid_microsecond("1000000")
+    );
+    println!(
+        "Is 366 a valid ordinal day? {}",
+        DateTime::is_valid_ordinal("366")
+    );
+    println!(
+        "Is 53 a valid ISO week? {}",
+        DateTime::is_valid_iso_week("53")
+    );
+    println!(
+        "Is 12:34:56 a valid time? {}",
+        DateTime::is_valid_time("12:34:56")
+    );
 
-    // Creating DateTime with a custom offset
-    let custom_offset_time = DateTime::new_with_custom_offset(5, 30)
-        .expect("Failed to create DateTime with custom offset");
-    println!("🦀 Custom offset time: ✅ {:?}", custom_offset_time);
+    Ok(())
+}
 
-    // Parsing DateTime from a string (RFC3339 format)
-    let parsed_date = DateTime::parse("2023-05-20T15:30:00Z")
-        .expect("Failed to parse date");
-    println!("🦀 Parsed RFC3339 date: ✅ {:?}", parsed_date);
+/// Demonstrates error handling using the `DateTime` struct and associated methods.
+///
+/// This function covers scenarios where errors are expected and how they can be handled gracefully.
+///
+/// # Errors
+///
+/// Returns a boxed `dyn Error` if any unexpected behavior occurs during error handling examples.
+fn error_handling_examples() -> Result<(), Box<dyn Error>> {
+    println!("\n🦀 Error Handling Examples 🦀");
 
-    // Parsing DateTime from a string (Custom format)
-    let custom_parsed_date = DateTime::parse_custom_format(
-        "2023-05-20 15:30:00",
-        "[year]-[month]-[day] [hour]:[minute]:[second]",
-    )
-    .expect("Failed to parse custom format date");
-    println!("🦀 Parsed custom date: ✅ {:?}", custom_parsed_date);
+    // Invalid timezone
+    match DateTime::new_with_tz("InvalidTZ") {
+        Ok(_) => println!("Unexpected: InvalidTZ was accepted"),
+        Err(e) => {
+            println!("Expected error with invalid timezone: {}", e)
+        }
+    }
 
-    // Displaying individual components of the DateTime
-    println!("🦀 Year:              ✅ {:?}", date.year());
-    println!("🦀 Month:             ✅ {:?}", date.month());
-    println!("🦀 Day:               ✅ {:?}", date.day());
-    println!("🦀 Hour:              ✅ {:?}", date.hour());
-    println!("🦀 Minute:            ✅ {:?}", date.minute());
-    println!("🦀 Second:            ✅ {:?}", date.second());
-    println!("🦀 Microsecond:       ✅ {:?}", date.microsecond());
-    println!("🦀 Weekday:           ✅ {:?}", date.weekday());
-    println!("🦀 Ordinal Date:      ✅ {:?}", date.ordinal());
-    println!("🦀 ISO Week Number:   ✅ {:?}", date.iso_week());
-    println!("🦀 Offset:            ✅ {:?}", date.offset());
+    // Invalid custom offset
+    match DateTime::new_with_custom_offset(25, 0) {
+        Ok(_) => println!("Unexpected: Invalid offset was accepted"),
+        Err(e) => println!("Expected error with invalid offset: {}", e),
+    }
 
-    // Adding and subtracting days
-    let future_date = date.add_days(7).expect("Adding days failed");
-    println!("🦀 Date after 7 days: ✅ {:?}", future_date);
-    let previous_day =
-        date.previous_day().expect("Failed to get previous day");
-    println!("🦀 Previous day:      ✅ {:?}", previous_day);
-    let next_day = date.next_day().expect("Failed to get next day");
-    println!("🦀 Next day:          ✅ {:?}", next_day);
+    // Invalid date parsing
+    match DateTime::parse("not-a-date") {
+        Ok(_) => println!("Unexpected: Invalid date string was parsed"),
+        Err(e) => {
+            println!("Expected error parsing invalid date: {}", e)
+        }
+    }
 
-    // Start and end of week, month, and year
-    let start_of_week =
-        date.start_of_week().expect("Failed to get start of week");
-    println!("🦀 Start of the week: ✅ {:?}", start_of_week);
-    let end_of_week =
-        date.end_of_week().expect("Failed to get end of week");
-    println!("🦀 End of the week:   ✅ {:?}", end_of_week);
+    // Date overflow
+    let max_date = DateTime::from_components(
+        9999,
+        12,
+        31,
+        23,
+        59,
+        59,
+        DateTime::new().offset(),
+    )?;
+    match dtt_add_days!(max_date, 1) {
+        Ok(_) => println!("Unexpected: Date overflow was allowed"),
+        Err(e) => println!("Expected error with date overflow: {}", e),
+    }
 
-    let start_of_month =
-        date.start_of_month().expect("Failed to get start of month");
-    println!("🦀 Start of the month: ✅ {:?}", start_of_month);
-    let end_of_month =
-        date.end_of_month().expect("Failed to get end of month");
-    println!("🦀 End of the month:   ✅ {:?}", end_of_month);
+    // ISO 8601 Parsing Example
+    println!("\n🦀 ISO 8601 Self-Parsing Example 🦀");
 
-    let start_of_year =
-        date.start_of_year().expect("Failed to get start of year");
-    println!("🦀 Start of the year: ✅ {:?}", start_of_year);
-    let end_of_year =
-        date.end_of_year().expect("Failed to get end of year");
-    println!("🦀 End of the year:   ✅ {:?}", end_of_year);
+    let dt1 = dtt_now!();
+    println!("Original dt1: {:?}", dt1);
 
-    // Checking if a date is within a range
-    let range_end_date = date.add_days(10).expect("Adding days failed");
-    let is_within_range = date.is_within_range(&date, &range_end_date);
-    println!("🦀 Is within range:   ✅ {:?}", is_within_range);
+    let iso8601_string = dt1.format_iso8601()?;
+    println!("dt1 ISO 8601 string: {}", iso8601_string);
 
-    // Duration between two dates
-    let duration = date.duration_since(&previous_day);
-    println!("🦀 Duration since:    ✅ {:?}", duration);
+    match DateTime::parse(&iso8601_string) {
+        Ok(dt2) => {
+            println!("Parsed dt2: {:?}", dt2);
+            println!(
+                "Successfully parsed dt2 ISO 8601: {}",
+                dt2.format_iso8601()?
+            );
+            println!("dt1 and dt2 are equal: {}", dt1 == dt2);
+            println!(
+                "Due to a difference in seconds of: {}",
+                dt1.duration_since(&dt2).whole_seconds()
+            );
+        }
+        Err(e) => println!("Error parsing ISO 8601 string: {}", e),
+    }
 
-    // Converting to different timezones
-    let converted_to_pst = date
-        .convert_to_tz("PST")
-        .expect("Failed to convert timezone");
-    println!("🦀 Converted to PST:  ✅ {:?}", converted_to_pst);
-
-    // Formatting DateTime
-    let custom_format = date
-        .format("[year]-[month]-[day] [hour]:[minute]:[second]")
-        .expect("Failed to format date");
-    println!("🦀 Custom formatted date: ✅ {}", custom_format);
-
-    let rfc3339_format = date
-        .format_rfc3339()
-        .expect("Failed to format RFC3339 date");
-    println!("🦀 RFC3339 formatted date: ✅ {}", rfc3339_format);
-
-    let iso8601_format = date
-        .format_iso8601()
-        .expect("Failed to format ISO8601 date");
-    println!("🦀 ISO8601 formatted date: ✅ {}", iso8601_format);
+    Ok(())
 }

@@ -1955,5 +1955,51 @@ mod tests {
             assert!(debug_output.contains("datetime"));
             assert!(debug_output.contains("offset"));
         }
+
+        #[test]
+        fn test_new_with_invalid_timezone() {
+            assert!(DateTime::new_with_tz("InvalidTZ").is_err());
+        }
+
+        #[test]
+        fn test_new_with_custom_offset_invalid() {
+            assert!(DateTime::new_with_custom_offset(25, 0).is_err());
+            assert!(DateTime::new_with_custom_offset(0, 60).is_err());
+        }
+
+        #[test]
+        fn test_parse_invalid_format() {
+            assert!(DateTime::parse("not a date").is_err());
+        }
+
+        #[test]
+        fn test_add_days_overflow() {
+            let dt = DateTime::from_components(
+                9999,
+                12,
+                31,
+                23,
+                59,
+                59,
+                UtcOffset::UTC,
+            )
+            .unwrap();
+            assert!(dt.add_days(1).is_err());
+        }
+
+        #[test]
+        fn test_convert_to_invalid_timezone() {
+            let dt = DateTime::new();
+            assert!(dt.convert_to_tz("InvalidTZ").is_err());
+        }
+
+        #[test]
+        fn test_is_valid_day_edge_cases() {
+            assert!(DateTime::is_valid_day("1"));
+            assert!(DateTime::is_valid_day("31"));
+            assert!(!DateTime::is_valid_day("0"));
+            assert!(!DateTime::is_valid_day("32"));
+            assert!(!DateTime::is_valid_day("-1"));
+        }
     }
 }

@@ -329,5 +329,19 @@ mod tests {
                 DateTimeError::InvalidFormat
             );
         }
+
+        #[test]
+        fn test_error_serialization() {
+            let error = DateTimeError::InvalidTimezone;
+            let serialized = serde_json::to_string(&error).unwrap();
+            assert_eq!(serialized, "\"InvalidTimezone\"");
+        }
+
+        #[test]
+        fn test_error_deserialization() {
+            let deserialized: DateTimeError =
+                serde_json::from_str("\"InvalidDate\"").unwrap();
+            assert_eq!(deserialized, DateTimeError::InvalidDate);
+        }
     }
 }

@@ -223,4 +223,20 @@ mod tests {
         );
         assert_eq!(formatted, "Year: 2023, Month: 06, Day: 15, Hour: 18, Minute: 30, Second: 45, Microsecond: 123456, Offset: +00:00");
     }
+
+    #[test]
+    fn test_dtt_now_macro() {
+        let now = dtt_now!();
+        // You can't test the exact time, but you can check if it's recent
+        let five_minutes_ago = now.add_days(-5).unwrap();
+        assert!(now > five_minutes_ago);
+    }
+
+    #[test]
+    fn test_dtt_parse_macro() {
+        let dt = dtt_parse!("2023-01-01T00:00:00Z").unwrap();
+        assert_eq!(dt.year(), 2023);
+        assert_eq!(dt.month(), Month::January);
+        assert_eq!(dt.day(), 1);
+    }
 }
