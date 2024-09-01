@@ -801,6 +801,275 @@ impl DateTime {
             offset: self.offset,
         })
     }
+
+    /// Validates whether the provided string represents a valid day of the month.
+    ///
+    /// # Arguments
+    ///
+    /// * `day` - A string slice representing the day (expected in "1" to "31").
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the day is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_day("15"));
+    /// assert!(!DateTime::is_valid_day("32"));
+    /// ```
+    pub fn is_valid_day(day: &str) -> bool {
+        if let Ok(d) = day.parse::<u8>() {
+            (1..=31).contains(&d)
+        } else {
+            false
+        }
+    }
+
+    /// Validates whether the provided string represents a valid hour of the day.
+    ///
+    /// # Arguments
+    ///
+    /// * `hour` - A string slice representing the hour (expected in "0" to "23").
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the hour is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_hour("23"));
+    /// assert!(!DateTime::is_valid_hour("24"));
+    /// ```
+    pub fn is_valid_hour(hour: &str) -> bool {
+        if let Ok(h) = hour.parse::<u8>() {
+            h < 24
+        } else {
+            false
+        }
+    }
+
+    /// Validates whether the provided string represents a valid minute of the hour.
+    ///
+    /// # Arguments
+    ///
+    /// * `minute` - A string slice representing the minute (expected in "0" to "59").
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the minute is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_minute("59"));
+    /// assert!(!DateTime::is_valid_minute("60"));
+    /// ```
+    pub fn is_valid_minute(minute: &str) -> bool {
+        if let Ok(m) = minute.parse::<u8>() {
+            m < 60
+        } else {
+            false
+        }
+    }
+
+    /// Validates whether the provided string represents a valid second of the minute.
+    ///
+    /// # Arguments
+    ///
+    /// * `second` - A string slice representing the second (expected in "0" to "59").
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the second is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_second("59"));
+    /// assert!(!DateTime::is_valid_second("60"));
+    /// ```
+    pub fn is_valid_second(second: &str) -> bool {
+        if let Ok(s) = second.parse::<u8>() {
+            s < 60
+        } else {
+            false
+        }
+    }
+
+    /// Validates whether the provided string represents a valid month of the year.
+    ///
+    /// # Arguments
+    ///
+    /// * `month` - A string slice representing the month (expected in "1" to "12").
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the month is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_month("12"));
+    /// assert!(!DateTime::is_valid_month("13"));
+    /// ```
+    pub fn is_valid_month(month: &str) -> bool {
+        if let Ok(m) = month.parse::<u8>() {
+            (1..=12).contains(&m)
+        } else {
+            false
+        }
+    }
+
+    /// Validates whether the provided string represents a valid year.
+    ///
+    /// # Arguments
+    ///
+    /// * `year` - A string slice representing the year.
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the year is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_year("2023"));
+    /// assert!(!DateTime::is_valid_year("abcd"));
+    /// ```
+    pub fn is_valid_year(year: &str) -> bool {
+        year.parse::<i32>().is_ok()
+    }
+
+    /// Validates whether the provided string represents a valid microsecond.
+    ///
+    /// # Arguments
+    ///
+    /// * `microsecond` - A string slice representing the microsecond (expected in "0" to "999999").
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the microsecond is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_microsecond("123456"));
+    /// assert!(!DateTime::is_valid_microsecond("1000000"));
+    /// ```
+    pub fn is_valid_microsecond(microsecond: &str) -> bool {
+        if let Ok(ms) = microsecond.parse::<u32>() {
+            ms < 1_000_000
+        } else {
+            false
+        }
+    }
+
+    /// Validates whether the provided string represents a valid ordinal day of the year.
+    ///
+    /// # Arguments
+    ///
+    /// * `ordinal` - A string slice representing the ordinal day (expected in "1" to "366").
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the ordinal is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_ordinal("200"));
+    /// assert!(!DateTime::is_valid_ordinal("400"));
+    /// ```
+    pub fn is_valid_ordinal(ordinal: &str) -> bool {
+        if let Ok(o) = ordinal.parse::<u16>() {
+            (1..=366).contains(&o)
+        } else {
+            false
+        }
+    }
+
+    /// Validates whether the provided string represents a valid ISO week number.
+    ///
+    /// # Arguments
+    ///
+    /// * `week` - A string slice representing the ISO week number (expected in "1" to "53").
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the ISO week number is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_iso_week("10"));
+    /// assert!(!DateTime::is_valid_iso_week("54"));
+    /// ```
+    pub fn is_valid_iso_week(week: &str) -> bool {
+        if let Ok(w) = week.parse::<u8>() {
+            (1..=53).contains(&w)
+        } else {
+            false
+        }
+    }
+
+    /// Validates whether the provided string represents a valid time in `HH:MM:SS` format.
+    ///
+    /// # Arguments
+    ///
+    /// * `time` - A string slice representing the time in `HH:MM:SS` format.
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the time is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_time("12:30:45"));
+    /// assert!(!DateTime::is_valid_time("24:00:00"));
+    /// ```
+    pub fn is_valid_time(time: &str) -> bool {
+        let parts: Vec<&str> = time.split(':').collect();
+        if parts.len() != 3 {
+            return false;
+        }
+        Self::is_valid_hour(parts[0])
+            && Self::is_valid_minute(parts[1])
+            && Self::is_valid_second(parts[2])
+    }
+
+    /// Validates whether the provided string is a valid ISO 8601 formatted date.
+    ///
+    /// # Arguments
+    ///
+    /// * `date` - A string slice representing the ISO 8601 date.
+    ///
+    /// # Returns
+    ///
+    /// * `bool` - Returns `true` if the date is valid, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// assert!(DateTime::is_valid_iso_8601("2023-01-01T12:00:00Z"));
+    /// assert!(!DateTime::is_valid_iso_8601("2023-13-01T12:00:00Z"));
+    /// ```
+    pub fn is_valid_iso_8601(date: &str) -> bool {
+        DateTime::parse(date).is_ok()
+    }
 }
 
 impl fmt::Display for DateTime {

@@ -252,50 +252,8 @@ macro_rules! dtt_print_vec {
 #[macro_export]
 macro_rules! is_valid {
     ($name:ident, $type:ty) => {
-        fn $name(input: &str) -> bool {
-            match input.parse::<$type>() {
-                Ok(parsed_val) => match stringify!($name) {
-                    "day" => $crate::datetime::DateTime::is_valid_day(
-                        &parsed_val.to_string(),
-                    ),
-                    "hour" => $crate::datetime::DateTime::is_valid_hour(
-                        &parsed_val.to_string(),
-                    ),
-                    "minute" => {
-                        $crate::datetime::DateTime::is_valid_minute(
-                            &parsed_val.to_string(),
-                        )
-                    }
-                    "month" => $crate::datetime::DateTime::is_valid_month(
-                        &parsed_val.to_string(),
-                    ),
-                    "second" => {
-                        $crate::datetime::DateTime::is_valid_second(
-                            &parsed_val.to_string(),
-                        )
-                    }
-                    "microsecond" => {
-                        $crate::datetime::DateTime::is_valid_microsecond(
-                            &parsed_val.to_string(),
-                        )
-                    }
-                    "ordinal" => {
-                        $crate::datetime::DateTime::is_valid_ordinal(
-                            &parsed_val.to_string(),
-                        )
-                    }
-                    "time" => $crate::datetime::DateTime::is_valid_time(
-                        &parsed_val.to_string(),
-                    ),
-                    "iso_8601" => {
-                        $crate::datetime::DateTime::is_valid_iso_8601(
-                            &parsed_val.to_string(),
-                        )
-                    }
-                    _ => false,
-                },
-                Err(_) => false,
-            }
+        pub fn $name(input: &str) -> bool {
+            $crate::datetime::DateTime::$name(input)
         }
     };
 }
@@ -425,22 +383,9 @@ macro_rules! dtt_diff_days {
 macro_rules! dtt_clone {
     ($dt:expr) => {{
         let dt = $dt;
-        DateTime {
-            day: dt.day(),
-            hour: dt.hour(),
-            iso_8601: dt.iso_8601.clone(),
-            iso_week: dt.iso_week(),
-            microsecond: dt.microsecond(),
-            minute: dt.minute(),
-            month: dt.month().clone(),
-            now: dt.now().clone(),
-            offset: dt.offset().clone(),
-            ordinal: dt.ordinal(),
-            second: dt.second(),
-            time: dt.time().clone(),
-            tz: dt.tz().clone(),
-            weekday: dt.weekday().clone(),
-            year: dt.year(),
+        $crate::datetime::DateTime {
+            datetime: dt.datetime,
+            offset: dt.offset,
         }
     }};
 }
