@@ -5,8 +5,9 @@
 //! # DTT Library Usage Examples
 //!
 //! This program demonstrates the comprehensive usage of the DateTime (DTT) library, covering basic
-//! and advanced DateTime operations, macro usage, date component handling, and error handling
-//! scenarios. Each function provides examples with explanatory output.
+//! and advanced DateTime operations, macro usage, date component handling, error handling
+//! scenarios, serialization, and performance considerations. Each function provides examples with
+//! explanatory output.
 
 #![allow(missing_docs)]
 
@@ -16,6 +17,7 @@ use dtt::{
     dtt_now, dtt_parse, dtt_print_vec, dtt_sub_days, dtt_vec,
 };
 use std::error::Error;
+use std::time::Instant;
 
 /// Entry point for the DTT library usage examples.
 ///
@@ -33,6 +35,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     macro_usage_examples()?;
     date_component_examples()?;
     error_handling_examples()?;
+    serialization_examples()?;
+    performance_examples()?;
+    locale_specific_examples()?;
+
+    println!("\n🎉 All examples completed successfully!");
 
     Ok(())
 }
@@ -92,6 +99,8 @@ fn advanced_datetime_operations() -> Result<(), Box<dyn Error>> {
 
     let utc_date = DateTime::new();
 
+    // Date arithmetic
+    println!("\n📅 Date Arithmetic:");
     let future_date = dtt_add_days!(utc_date, 30)?;
     println!("Date after 30 days: ✅ {:?}", future_date);
 
@@ -102,6 +111,8 @@ fn advanced_datetime_operations() -> Result<(), Box<dyn Error>> {
     let days_between = duration.whole_days();
     println!("Days between dates: ✅ {} days", days_between);
 
+    // Date ranges and comparisons
+    println!("\n📊 Date Ranges and Comparisons:");
     let start_date = DateTime::from_components(
         2023,
         1,
@@ -133,16 +144,21 @@ fn advanced_datetime_operations() -> Result<(), Box<dyn Error>> {
         check_date.is_within_range(&start_date, &end_date);
     println!("Is 2023-06-15 within 2023? ✅ {}", is_in_range);
 
+    // Timezone conversion
+    println!("\n🌍 Timezone Conversion:");
     let nyc_time = utc_date.convert_to_tz("EST")?;
     println!("Current time in New York: ✅ {:?}", nyc_time);
 
+    // Formatting
+    println!("\n📝 Date Formatting:");
     let formatted_date = utc_date.format_rfc3339()?;
     println!("RFC3339 formatted date: ✅ {}", formatted_date);
 
     let iso8601_date = utc_date.format_iso8601()?;
     println!("ISO8601 formatted date: ✅ {}", iso8601_date);
 
-    println!("\nDate ranges:");
+    // Date ranges
+    println!("\n📅 Date Ranges:");
     println!("Start of week: ✅ {:?}", utc_date.start_of_week()?);
     println!("End of week: ✅ {:?}", utc_date.end_of_week()?);
     println!("Start of month: ✅ {:?}", utc_date.start_of_month()?);
@@ -199,6 +215,7 @@ fn date_component_examples() -> Result<(), Box<dyn Error>> {
     println!("\n🦀 Date Component Examples 🦀");
 
     let date = DateTime::new();
+    println!("\n📊 Date Components:");
     println!("Year: {}", date.year());
     println!("Month: {:?}", date.month());
     println!("Day: {}", date.day());
@@ -211,7 +228,7 @@ fn date_component_examples() -> Result<(), Box<dyn Error>> {
     println!("Week of Year: {}", date.iso_week());
     println!("Offset: {:?}", date.offset());
 
-    println!("\nDate Validation Examples:");
+    println!("\n✅ Date Validation Examples:");
     println!("Is 31 a valid day? {}", DateTime::is_valid_day("31"));
     println!("Is 13 a valid month? {}", DateTime::is_valid_month("13"));
     println!("Is 25 a valid hour? {}", DateTime::is_valid_hour("25"));
@@ -316,12 +333,115 @@ fn error_handling_examples() -> Result<(), Box<dyn Error>> {
             );
             println!("dt1 and dt2 are equal: {}", dt1 == dt2);
             println!(
-                "Due to a difference in seconds of: {}",
-                dt1.duration_since(&dt2).whole_seconds()
+                "Difference in microseconds: {}",
+                dt1.duration_since(&dt2).whole_microseconds()
             );
+            // Note: There might be a small difference due to microsecond precision
         }
         Err(e) => println!("Error parsing ISO 8601 string: {}", e),
     }
+
+    Ok(())
+}
+
+/// Demonstrates serialization and deserialization of DateTime objects.
+///
+/// This function shows how to convert DateTime objects to and from JSON representations.
+///
+/// # Errors
+///
+/// Returns a boxed `dyn Error` if serialization or deserialization fails.
+fn serialization_examples() -> Result<(), Box<dyn Error>> {
+    println!("\n🦀 Serialization Examples 🦀");
+
+    let dt = DateTime::new();
+
+    // Serialization
+    let serialized = serde_json::to_string(&dt)?;
+    println!("Serialized DateTime: {}", serialized);
+
+    // Deserialization
+    let deserialized: DateTime = serde_json::from_str(&serialized)?;
+    println!("Deserialized DateTime: {:?}", deserialized);
+
+    // Verify equality
+    println!(
+        "Original and deserialized are equal: {}",
+        dt == deserialized
+    );
+
+    Ok(())
+}
+
+/// Demonstrates performance considerations when using the DateTime library.
+///
+/// This function includes examples of measuring the performance of various DateTime operations.
+///
+/// # Errors
+///
+/// Returns a boxed `dyn Error` if any performance measurement fails.
+fn performance_examples() -> Result<(), Box<dyn Error>> {
+    println!("\n🦀 Performance Examples 🦀");
+
+    // Measure creation performance
+    let start = Instant::now();
+    for _ in 0..10000 {
+        let _ = DateTime::new();
+    }
+    let duration = start.elapsed();
+    println!("Time to create 10,000 DateTime objects: {:?}", duration);
+
+    // Measure parsing performance
+    let start = Instant::now();
+    for _ in 0..10000 {
+        let _ = DateTime::parse("2023-09-01T12:00:00Z")?;
+    }
+    let duration = start.elapsed();
+    println!("Time to parse 10,000 ISO8601 strings: {:?}", duration);
+
+    // Measure formatting performance
+    let dt = DateTime::new();
+    let start = Instant::now();
+    for _ in 0..10000 {
+        let _ = dt.format_iso8601()?;
+    }
+    let duration = start.elapsed();
+    println!(
+        "Time to format 10,000 DateTime objects to ISO8601: {:?}",
+        duration
+    );
+
+    // Measure arithmetic performance
+    let dt = DateTime::new();
+    let start = Instant::now();
+    for i in 0..10000 {
+        let _ = dt.add_days(i)?;
+    }
+    let duration = start.elapsed();
+    println!("Time to perform 10,000 date additions: {:?}", duration);
+
+    Ok(())
+}
+
+/// Demonstrates locale-specific formatting capabilities of the library.
+///
+/// This function provides information about the library's support (or lack thereof)
+/// for locale-specific date formatting.
+///
+/// # Errors
+///
+/// This function does not return any errors as it only prints information.
+fn locale_specific_examples() -> Result<(), Box<dyn Error>> {
+    println!("\n🦀 Locale-Specific Formatting Information 🦀");
+
+    println!("Note: The current version of the DateTime library does not support locale-specific formatting.");
+    println!("For formatting dates, you can use the standard formatting methods like `format_iso8601` or `format_rfc3339`.");
+
+    let dt = DateTime::new();
+    println!("Example ISO 8601 format: {}", dt.format_iso8601()?);
+    println!("Example RFC 3339 format: {}", dt.format_rfc3339()?);
+
+    println!("\nIf you need locale-specific formatting, consider using additional libraries or implementing custom formatting functions.");
 
     Ok(())
 }
