@@ -665,6 +665,34 @@ mod tests {
                 Err(DateTimeError::InvalidFormat)
             ));
         }
+
+        #[test]
+        fn test_parse_error() {
+            use time::format_description::well_known::Rfc3339;
+
+            let invalid_datetime_str = "2023-02-30T25:61:61Z"; // Invalid date and time string
+            let result = time::OffsetDateTime::parse(
+                invalid_datetime_str,
+                &Rfc3339,
+            );
+
+            assert!(result.is_err());
+        }
+
+        #[test]
+        fn test_component_range_error() {
+            use time::error::ComponentRange;
+            use time::{Date, Month};
+
+            // Example: Creating a date with an invalid day (32) for January.
+            let result =
+                Date::from_calendar_date(2023, Month::January, 32);
+
+            assert!(
+                matches!(result, Err(ComponentRange { .. })),
+                "Expected a component range error due to invalid day."
+            );
+        }
     }
 
     /// Test suite for construction of `DateTime` objects.
@@ -1810,6 +1838,124 @@ mod tests {
             .unwrap();
             let end_of_feb = dt.end_of_month().unwrap();
             assert_eq!(end_of_feb.day(), 28);
+        }
+    }
+
+    #[cfg(test)]
+    mod datetime_tests {
+        use super::*;
+        use time::{Date, Month, PrimitiveDateTime, Time, UtcOffset};
+
+        #[test]
+        fn test_datetime_creation() {
+            // Create a basic DateTime object
+            let date =
+                Date::from_calendar_date(2023, Month::January, 1)
+                    .unwrap();
+            let time = Time::from_hms(12, 0, 0).unwrap();
+            let datetime = PrimitiveDateTime::new(date, time);
+            let offset = UtcOffset::from_hms(0, 0, 0).unwrap();
+            let dt = DateTime { datetime, offset };
+
+            assert_eq!(dt.datetime, datetime);
+            assert_eq!(dt.offset, offset);
+        }
+
+        #[test]
+        fn test_datetime_serialization() {
+            // Test serialization of DateTime
+            let date =
+                Date::from_calendar_date(2023, Month::January, 1)
+                    .unwrap();
+            let time = Time::from_hms(12, 0, 0).unwrap();
+            let datetime = PrimitiveDateTime::new(date, time);
+            let offset = UtcOffset::from_hms(0, 0, 0).unwrap();
+            let dt = DateTime { datetime, offset };
+
+            let serialized = serde_json::to_string(&dt)
+                .expect("Failed to serialize DateTime");
+            let deserialized: DateTime =
+                serde_json::from_str(&serialized)
+                    .expect("Failed to deserialize DateTime");
+
+            assert_eq!(dt, deserialized);
+        }
+
+        #[test]
+        fn test_datetime_comparison() {
+            // Test comparison between two DateTime objects
+            let date1 =
+                Date::from_calendar_date(2023, Month::January, 1)
+                    .unwrap();
+            let time1 = Time::from_hms(12, 0, 0).unwrap();
+            let datetime1 = PrimitiveDateTime::new(date1, time1);
+            let offset1 = UtcOffset::from_hms(0, 0, 0).unwrap();
+            let dt1 = DateTime {
+                datetime: datetime1,
+                offset: offset1,
+            };
+
+            let date2 =
+                Date::from_calendar_date(2023, Month::January, 2)
+                    .unwrap();
+            let time2 = Time::from_hms(12, 0, 0).unwrap();
+            let datetime2 = PrimitiveDateTime::new(date2, time2);
+            let offset2 = UtcOffset::from_hms(0, 0, 0).unwrap();
+            let dt2 = DateTime {
+                datetime: datetime2,
+                offset: offset2,
+            };
+
+            assert_ne!(dt1, dt2);
+            assert!(dt1 < dt2);
+        }
+
+        #[test]
+        fn test_datetime_offset_handling() {
+            // Test offset handling in DateTime
+            let date =
+                Date::from_calendar_date(2023, Month::January, 1)
+                    .unwrap();
+            let time = Time::from_hms(12, 0, 0).unwrap();
+            let datetime = PrimitiveDateTime::new(date, time);
+            let offset = UtcOffset::from_hms(2, 0, 0).unwrap();
+            let dt = DateTime { datetime, offset };
+
+            // Check that the offset is correctly stored
+            assert_eq!(dt.offset, offset);
+        }
+
+        #[test]
+        fn test_datetime_copy_clone() {
+            // Test Copy and Clone traits
+            let date =
+                Date::from_calendar_date(2023, Month::January, 1)
+                    .unwrap();
+            let time = Time::from_hms(12, 0, 0).unwrap();
+            let datetime = PrimitiveDateTime::new(date, time);
+            let offset = UtcOffset::from_hms(0, 0, 0).unwrap();
+            let dt = DateTime { datetime, offset };
+
+            let dt_copy = dt;
+
+            assert_eq!(dt, dt_copy);
+        }
+
+        #[test]
+        fn test_datetime_debug_output() {
+            // Test Debug trait output
+            let date =
+                Date::from_calendar_date(2023, Month::January, 1)
+                    .unwrap();
+            let time = Time::from_hms(12, 0, 0).unwrap();
+            let datetime = PrimitiveDateTime::new(date, time);
+            let offset = UtcOffset::from_hms(0, 0, 0).unwrap();
+            let dt = DateTime { datetime, offset };
+
+            let debug_output = format!("{:?}", dt);
+            assert!(debug_output.contains("DateTime"));
+            assert!(debug_output.contains("datetime"));
+            assert!(debug_output.contains("offset"));
         }
     }
 }

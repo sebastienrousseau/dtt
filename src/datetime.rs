@@ -50,8 +50,10 @@ pub enum DateTimeError {
 /// A structure representing a date and time with timezone information.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct DateTime {
-    datetime: PrimitiveDateTime,
-    offset: UtcOffset,
+    /// datetime: The date and time in UTC.
+    pub datetime: PrimitiveDateTime,
+    /// offset: The timezone offset in UTC.
+    pub offset: UtcOffset,
 }
 
 // A static HashMap containing timezone abbreviations and their UTC offsets.
