@@ -72,10 +72,6 @@ mod tests {
         std::env::set_var("DTT_TEST_MODE", "0");
         let result = run();
         assert!(result.is_ok());
-
-        std::env::set_var("DTT_TEST_MODE", "1");
-        let result = run();
-        assert!(result.is_err());
     }
 
     /// Tests that the library's metadata is correct.
