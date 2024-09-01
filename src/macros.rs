@@ -22,7 +22,7 @@
 #[macro_export]
 macro_rules! dtt_now {
     () => {{
-        dtt::datetime::DateTime::new()
+        $crate::datetime::DateTime::new()
     }};
 }
 
@@ -39,7 +39,7 @@ macro_rules! dtt_now {
 #[macro_export]
 macro_rules! dtt_parse {
     ($input:expr) => {{
-        dtt::datetime::DateTime::parse($input)
+        $crate::datetime::DateTime::parse($input)
     }};
 }
 
@@ -108,14 +108,35 @@ macro_rules! dtt_map {
 ///
 #[macro_export]
 macro_rules! dtt_assert {
-    ($cond:expr) => {
-        if !$cond {
-            panic!("Assertion failed!");
+    ($cond:expr $(, $msg:expr)?) => {
+        if cfg!(debug_assertions) {
+            assert!($cond $(, $msg)?);
         }
     };
-    ($cond:expr, $msg:expr) => {
-        if !$cond {
-            panic!("{}", $msg);
+}
+
+/// This macro generates a function that validates a given input string based on a specified type.
+///
+/// # Parameters
+///
+/// - `$name:ident`: The name of the validation function.
+/// - `$type:ty`: The type to validate.
+///
+/// # Returns
+///
+/// The function returns a boolean value indicating whether the input string is valid for the specified type.
+///
+#[macro_export]
+macro_rules! dtt_is_valid_function {
+    ($name:ident, $type:ty) => {
+        paste! {
+            pub fn [<is_valid_ $name>](input: &str) -> bool {
+                if let Ok(parsed_val) = input.parse::<$type>() {
+                    $crate::datetime::DateTime::[<is_valid_ $name>](&parsed_val.to_string())
+                } else {
+                    false
+                }
+            }
         }
     };
 }
@@ -136,11 +157,33 @@ macro_rules! dtt_min {
     ($x:expr $(, $y:expr)*) => {{
         let mut min = $x;
         $(
-            if min > $y { min = $y; }
+            let y = $y;
+            // This will cause a compile-time error if the types are not comparable
+            if std::cmp::PartialOrd::lt(&y, &min) { min = y; }
         )*
         min
     }};
 }
+
+/// Creates a new vector containing the provided elements.
+///
+/// This macro takes a variable number of expressions and creates a new vector containing those expressions.
+///
+/// # Parameters
+///
+/// - `$($elem:expr),* $(,)?`: A comma-separated list of expressions. Each expression represents an element to be added to the vector.
+///
+/// # Return
+///
+/// - A new vector containing the provided elements.
+///
+#[macro_export]
+macro_rules! dtt_create_vec {
+    ($($elem:expr),* $(,)?) => {{
+        vec![$($elem),*]
+    }};
+}
+
 
 /// Returns the maximum of the given values.
 ///
@@ -213,40 +256,40 @@ macro_rules! is_valid {
         fn $name(input: &str) -> bool {
             match input.parse::<$type>() {
                 Ok(parsed_val) => match stringify!($name) {
-                    "day" => dtt::datetime::DateTime::is_valid_day(
+                    "day" => $crate::datetime::DateTime::is_valid_day(
                         &parsed_val.to_string(),
                     ),
-                    "hour" => dtt::datetime::DateTime::is_valid_hour(
+                    "hour" => $crate::datetime::DateTime::is_valid_hour(
                         &parsed_val.to_string(),
                     ),
                     "minute" => {
-                        dtt::datetime::DateTime::is_valid_minute(
+                        $crate::datetime::DateTime::is_valid_minute(
                             &parsed_val.to_string(),
                         )
                     }
-                    "month" => dtt::datetime::DateTime::is_valid_month(
+                    "month" => $crate::datetime::DateTime::is_valid_month(
                         &parsed_val.to_string(),
                     ),
                     "second" => {
-                        dtt::datetime::DateTime::is_valid_second(
+                        $crate::datetime::DateTime::is_valid_second(
                             &parsed_val.to_string(),
                         )
                     }
                     "microsecond" => {
-                        dtt::datetime::DateTime::is_valid_microsecond(
+                        $crate::datetime::DateTime::is_valid_microsecond(
                             &parsed_val.to_string(),
                         )
                     }
                     "ordinal" => {
-                        dtt::datetime::DateTime::is_valid_ordinal(
+                        $crate::datetime::DateTime::is_valid_ordinal(
                             &parsed_val.to_string(),
                         )
                     }
-                    "time" => dtt::datetime::DateTime::is_valid_time(
+                    "time" => $crate::datetime::DateTime::is_valid_time(
                         &parsed_val.to_string(),
                     ),
                     "iso_8601" => {
-                        dtt::datetime::DateTime::is_valid_iso_8601(
+                        $crate::datetime::DateTime::is_valid_iso_8601(
                             &parsed_val.to_string(),
                         )
                     }
@@ -271,7 +314,7 @@ macro_rules! is_valid {
 #[macro_export]
 macro_rules! dtt_new_with_tz {
     ($tz:expr) => {{
-        dtt::datetime::DateTime::new_with_tz($tz).expect(
+        $crate::datetime::DateTime::new_with_tz($tz).expect(
             "Failed to create DateTime with the specified timezone",
         )
     }};

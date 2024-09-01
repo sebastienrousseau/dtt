@@ -46,6 +46,7 @@ include = [
 [dependencies]
 # Dependencies are only used for building.
 lazy_static = "1.5.0"
+paste = "1.0"
 regex = "1.10"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0"
