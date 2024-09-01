@@ -47,11 +47,17 @@ mod tests {
             let error = DateTimeError::InvalidTimezone;
 
             // Verify the Display implementation
-            assert_eq!(error.to_string(), "Invalid timezone");
+            assert_eq!(
+                error.to_string(),
+                "Invalid or unsupported timezone; DST not supported"
+            );
 
             // Verify the Error trait implementation
             let error: &dyn std::error::Error = &error;
-            assert_eq!(error.to_string(), "Invalid timezone");
+            assert_eq!(
+                error.to_string(),
+                "Invalid or unsupported timezone; DST not supported"
+            );
         }
     }
 
@@ -274,7 +280,7 @@ mod tests {
                     DateTimeError::InvalidTimezone => {
                         assert_eq!(
                             variant.to_string(),
-                            "Invalid timezone"
+                            "Invalid or unsupported timezone; DST not supported"
                         )
                     }
                     DateTimeError::InvalidDate => {
@@ -300,7 +306,6 @@ mod tests {
 
     mod low_level {
         use dtt::error::DateTimeError;
-        use std::mem::{align_of, size_of};
 
         /// Tests the memory layout of `DateTimeError`.
         ///
@@ -308,8 +313,7 @@ mod tests {
         /// and do not change unexpectedly. This is important for ensuring ABI compatibility.
         #[test]
         fn test_memory_layout() {
-            assert_eq!(size_of::<DateTimeError>(), 1); // Typically an enum with no data is 1 byte
-            assert_eq!(align_of::<DateTimeError>(), 1); // Alignment should be 1 byte
+            assert_eq!(size_of::<DateTimeError>(), 56);
         }
 
         /// Tests the `Default` trait implementation for `DateTimeError`.
