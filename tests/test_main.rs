@@ -1,3 +1,5 @@
+// test_main.rs
+//
 // Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 // See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
@@ -5,6 +7,7 @@
 #[cfg(test)]
 mod tests {
     use assert_cmd::prelude::*;
+    use dtt::error::AppError;
     use std::process::Command;
 
     #[test]
@@ -39,19 +42,23 @@ mod tests {
         assert!(stdout.contains("A Rust library for parsing, validating, manipulating, and formatting dates and times."));
     }
 
-    fn run_test_scenario() -> Result<(), Box<dyn std::error::Error>> {
+    fn run_test_scenario() -> Result<(), AppError> {
         // Simulate an error scenario
         // Return an error explicitly
-        Err("Test error".into())
+        Err(AppError::SimulatedError)
     }
 
     #[test]
     fn test_main() {
-        // Test calling the `run()` function directly
+        // Test calling the `run_test_scenario()` function directly
         let result = run_test_scenario();
         assert!(result.is_err());
+        assert_eq!(
+            format!("{}", result.unwrap_err()),
+            "Simulated error"
+        );
 
-        // Test calling the `main()` function
+        // Test calling the `dtt` binary with DTT_TEST_MODE enabled
         let output = Command::cargo_bin("dtt")
             .unwrap()
             .env("DTT_TEST_MODE", "1")

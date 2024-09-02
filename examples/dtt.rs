@@ -12,12 +12,34 @@
 #![allow(missing_docs)]
 
 use dtt::datetime::DateTime;
+use dtt::error::AppError;
 use dtt::{
     dtt_add_days, dtt_assert, dtt_join, dtt_map, dtt_max, dtt_min,
     dtt_now, dtt_parse, dtt_print_vec, dtt_sub_days, dtt_vec,
 };
-use std::error::Error;
 use std::time::Instant;
+
+// /// Custom error type for the DTT examples.
+// ///
+// /// This error type encapsulates all possible errors that might occur during the execution of the examples.
+// #[derive(Error, Debug)]
+// pub enum AppError {
+//     /// Error that occurs during datetime operations.
+//     #[error("DateTime operation error: {0}")]
+//     DateTimeError(#[from] dtt::datetime::DateTimeError),
+
+//     /// Error that occurs during serialization.
+//     #[error("Serialization error: {0}")]
+//     SerializationError(#[from] serde_json::Error),
+
+//     /// General I/O or parsing error.
+//     #[error("General I/O or parsing error: {0}")]
+//     GeneralError(#[from] std::io::Error),
+
+//     /// Error that occurs during other operations.
+//     #[error("Other error: {0}")]
+//     Other(String),
+// }
 
 /// Entry point for the DTT library usage examples.
 ///
@@ -26,8 +48,8 @@ use std::time::Instant;
 ///
 /// # Errors
 ///
-/// Returns a boxed `dyn Error` in case any of the example functions fail.
-fn main() -> Result<(), Box<dyn Error>> {
+/// Returns an `AppError` in case any of the example functions fail.
+fn main() -> Result<(), AppError> {
     println!("🦀 Comprehensive DTT Library Usage Examples 🦀\n");
 
     basic_datetime_examples()?;
@@ -50,8 +72,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 ///
 /// # Errors
 ///
-/// Returns a boxed `dyn Error` if any DateTime parsing or creation fails.
-fn basic_datetime_examples() -> Result<(), Box<dyn Error>> {
+/// Returns an `AppError` if any DateTime parsing or creation fails.
+fn basic_datetime_examples() -> Result<(), AppError> {
     println!("🦀 Basic DateTime Examples 🦀");
 
     let now = dtt_now!();
@@ -93,8 +115,8 @@ fn basic_datetime_examples() -> Result<(), Box<dyn Error>> {
 ///
 /// # Errors
 ///
-/// Returns a boxed `dyn Error` if any advanced operation fails.
-fn advanced_datetime_operations() -> Result<(), Box<dyn Error>> {
+/// Returns an `AppError` if any advanced operation fails.
+fn advanced_datetime_operations() -> Result<(), AppError> {
     println!("\n🦀 Advanced DateTime Operations 🦀");
 
     let utc_date = DateTime::new();
@@ -189,9 +211,9 @@ fn advanced_datetime_operations() -> Result<(), Box<dyn Error>> {
 ///
 /// # Errors
 ///
-/// Returns a boxed `dyn Error` if any macro operation fails.
+/// Returns an `AppError` if any macro operation fails.
 #[allow(clippy::eq_op)]
-fn macro_usage_examples() -> Result<(), Box<dyn Error>> {
+fn macro_usage_examples() -> Result<(), AppError> {
     println!("\n🦀 Macro Usage Examples 🦀");
 
     let vec = dtt_vec![1, 2, 3, 4, 5];
@@ -224,8 +246,8 @@ fn macro_usage_examples() -> Result<(), Box<dyn Error>> {
 ///
 /// # Errors
 ///
-/// Returns a boxed `dyn Error` if any date component retrieval fails.
-fn date_component_examples() -> Result<(), Box<dyn Error>> {
+/// Returns an `AppError` if any date component retrieval fails.
+fn date_component_examples() -> Result<(), AppError> {
     println!("\n🦀 Date Component Examples 🦀");
 
     let date = DateTime::new();
@@ -288,8 +310,8 @@ fn date_component_examples() -> Result<(), Box<dyn Error>> {
 ///
 /// # Errors
 ///
-/// Returns a boxed `dyn Error` if any unexpected behavior occurs during error handling examples.
-fn error_handling_examples() -> Result<(), Box<dyn Error>> {
+/// Returns an `AppError` if any unexpected behavior occurs during error handling examples.
+fn error_handling_examples() -> Result<(), AppError> {
     println!("\n🦀 Error Handling Examples 🦀");
 
     // Invalid timezone
@@ -364,8 +386,8 @@ fn error_handling_examples() -> Result<(), Box<dyn Error>> {
 ///
 /// # Errors
 ///
-/// Returns a boxed `dyn Error` if serialization or deserialization fails.
-fn serialization_examples() -> Result<(), Box<dyn Error>> {
+/// Returns an `AppError` if serialization or deserialization fails.
+fn serialization_examples() -> Result<(), AppError> {
     println!("\n🦀 Serialization Examples 🦀");
 
     let dt = DateTime::new();
@@ -393,8 +415,8 @@ fn serialization_examples() -> Result<(), Box<dyn Error>> {
 ///
 /// # Errors
 ///
-/// Returns a boxed `dyn Error` if any performance measurement fails.
-fn performance_examples() -> Result<(), Box<dyn Error>> {
+/// Returns an `AppError` if any performance measurement fails.
+fn performance_examples() -> Result<(), AppError> {
     println!("\n🦀 Performance Examples 🦀");
 
     // Measure creation performance
@@ -445,7 +467,7 @@ fn performance_examples() -> Result<(), Box<dyn Error>> {
 /// # Errors
 ///
 /// This function does not return any errors as it only prints information.
-fn locale_specific_examples() -> Result<(), Box<dyn Error>> {
+fn locale_specific_examples() -> Result<(), AppError> {
     println!("\n🦀 Locale-Specific Formatting Information 🦀");
 
     println!("Note: The current version of the DateTime library does not support locale-specific formatting.");

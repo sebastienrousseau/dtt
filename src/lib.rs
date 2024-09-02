@@ -125,12 +125,37 @@ pub mod error;
 /// The `macros` module contains functions for generating macros.
 pub mod macros;
 
-use std::error::Error;
+use error::AppError;
+use std::env;
 
-/// This is the main entry point for the `DateTime (DTT)` library.
-pub fn run() -> Result<(), Box<dyn Error>> {
-    if std::env::var("DTT_TEST_MODE").unwrap_or_default() == "1" {
-        return Err("Simulated error".into());
+/// Runs the main logic of the application.
+///
+/// # Errors
+///
+/// This function will return an error in the following situations:
+/// - If the `DTT_TEST_MODE` environment variable is set to `1`, an `AppError::SimulatedError` is returned.
+/// - If there is an issue retrieving an environment variable, an `AppError::EnvVarError` is returned.
+///
+/// # Examples
+///
+/// ```rust
+/// use dtt::run;
+/// use dtt::error::AppError;
+/// fn main() -> Result<(), AppError> {
+///     if std::env::var("DTT_TEST_MODE").unwrap_or_default() == "1" {
+///         // This will return a SimulatedError.
+///         return Err(AppError::SimulatedError);
+///     }
+///
+///     // Your main application logic here
+///
+///     Ok(())
+/// }
+/// ```
+pub fn run() -> Result<(), AppError> {
+    // Check if the test mode is enabled via the environment variable
+    if env::var("DTT_TEST_MODE").unwrap_or_default() == "1" {
+        return Err(AppError::SimulatedError);
     }
     let name = "dtt";
     println!("Welcome to `{}` 👋!", { name }.to_uppercase());

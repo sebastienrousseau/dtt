@@ -1,7 +1,42 @@
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::hash::{Hash, Hasher};
+use serde_json;
+use std::{
+    env,
+    hash::{Hash, Hasher},
+};
 use thiserror::Error;
 use time::error::{ComponentRange, Parse};
+
+/// Custom error type for the application.
+///
+/// This error type encapsulates all possible errors that might occur in the application,
+/// including simulated errors for testing and environment variable retrieval errors.
+#[derive(Error, Debug)]
+pub enum AppError {
+    /// Error that occurs during datetime operations.
+    #[error("DateTime operation error: {0}")]
+    DateTimeError(#[from] DateTimeError),
+
+    /// Error that occurs during serialization.
+    #[error("Serialization error: {0}")]
+    SerializationError(#[from] serde_json::Error),
+
+    /// General I/O or parsing error.
+    #[error("General I/O or parsing error: {0}")]
+    GeneralError(#[from] std::io::Error),
+
+    /// Error that occurs during other operations.
+    #[error("Other error: {0}")]
+    Other(String),
+
+    /// Error for simulating a failure in test mode.
+    #[error("Simulated error")]
+    SimulatedError,
+
+    /// Error that occurs when retrieving environment variables.
+    #[error("Environment variable error: {0}")]
+    EnvVarError(#[from] env::VarError),
+}
 
 /// Custom error type for the DateTime library.
 ///
