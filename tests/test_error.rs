@@ -8,18 +8,19 @@
 ///
 /// This module contains a comprehensive set of unit tests for the `DateTimeError` enum,
 /// which is defined in `error.rs`. The tests cover various aspects, including:
-/// - Basic functionality checks.
-/// - Trait implementations like Debug, Clone, Copy, Ord, PartialOrd, Hash.
-/// - Serialization and deserialization using `serde`.
-/// - Comparison and equality checks.
-/// - Error handling validations.
-/// - Future-proofing for additional variants.
-/// - Low-level checks such as memory layout and default values.
+/// - Basic Functionality: Ensuring each variant of DateTimeError behaves as expected.
+/// - Trait Implementations: Verifying Debug, Clone, Copy, PartialEq, and Hash traits are correctly implemented.
+/// - Serialization and Deserialization: Checking both the serialization to and deserialization from JSON, as well as handling of invalid JSON.
+/// - Comparison and Equality: Ensuring correct comparisons between variants.
+/// - Error Handling: Testing the Error trait implementation, including source, and the Debug and Display traits.
+/// - Future Proofing: Ensuring that potential future changes don't break existing functionality.
+/// - Low-Level Checks: Verifying the memory layout and Default trait implementation.
+/// - Default Implementation: Confirming that the default() method returns the expected variant.
 
 #[cfg(test)]
 mod tests {
 
-    mod basic_functionality {
+    mod basic_functionality_tests {
         use dtt::error::DateTimeError;
 
         /// Tests the `InvalidFormat` variant of `DateTimeError`.
@@ -29,11 +30,7 @@ mod tests {
         #[test]
         fn test_invalid_format() {
             let error = DateTimeError::InvalidFormat;
-
-            // Verify the Display implementation
             assert_eq!(error.to_string(), "Invalid date format");
-
-            // Verify the Error trait implementation
             let error: &dyn std::error::Error = &error;
             assert_eq!(error.to_string(), "Invalid date format");
         }
@@ -45,23 +42,33 @@ mod tests {
         #[test]
         fn test_invalid_timezone() {
             let error = DateTimeError::InvalidTimezone;
-
-            // Verify the Display implementation
             assert_eq!(
                 error.to_string(),
                 "Invalid or unsupported timezone; DST not supported"
             );
-
-            // Verify the Error trait implementation
             let error: &dyn std::error::Error = &error;
             assert_eq!(
                 error.to_string(),
                 "Invalid or unsupported timezone; DST not supported"
             );
         }
+
+        /// Tests the `InvalidDate` variant of `DateTimeError`.
+        #[test]
+        fn test_invalid_date() {
+            let error = DateTimeError::InvalidDate;
+            assert_eq!(error.to_string(), "Invalid date");
+        }
+
+        /// Tests the `InvalidTime` variant of `DateTimeError`.
+        #[test]
+        fn test_invalid_time() {
+            let error = DateTimeError::InvalidTime;
+            assert_eq!(error.to_string(), "Invalid time");
+        }
     }
 
-    mod trait_implementations {
+    mod trait_implementations_tests {
         use dtt::error::DateTimeError;
         use std::collections::HashSet;
 
@@ -73,7 +80,6 @@ mod tests {
         fn test_debug_impl() {
             let format_error = DateTimeError::InvalidFormat;
             let timezone_error = DateTimeError::InvalidTimezone;
-
             assert_eq!(format!("{:?}", format_error), "InvalidFormat");
             assert_eq!(
                 format!("{:?}", timezone_error),
@@ -90,7 +96,6 @@ mod tests {
             let original = DateTimeError::InvalidFormat;
             let cloned = original;
             let copied = original;
-
             assert_eq!(original, cloned);
             assert_eq!(original, copied);
         }
@@ -104,15 +109,29 @@ mod tests {
             let mut set = HashSet::new();
             let _ = set.insert(DateTimeError::InvalidFormat);
             let _ = set.insert(DateTimeError::InvalidTimezone);
-
             assert_eq!(set.len(), 2);
             assert!(set.contains(&DateTimeError::InvalidFormat));
             assert!(set.contains(&DateTimeError::InvalidTimezone));
         }
+
+        /// Tests the PartialEq implementation for DateTimeError.
+        ///
+        /// This test ensures that DateTimeError variants can be compared for
+        /// equality and inequality.
+        #[test]
+        fn test_partial_eq() {
+            let parse_error1 = DateTimeError::InvalidFormat;
+            let parse_error2 = DateTimeError::InvalidFormat;
+            let range_error = DateTimeError::InvalidTimezone;
+
+            assert_eq!(parse_error1, parse_error2);
+            assert_ne!(parse_error1, range_error);
+        }
     }
 
-    mod serialization {
+    mod serialization_tests {
         use dtt::error::DateTimeError;
+        use time::error::{Parse, TryFromParsed};
 
         /// Tests the serialization and deserialization of `DateTimeError`.
         ///
@@ -123,7 +142,6 @@ mod tests {
             let format_error = DateTimeError::InvalidFormat;
             let timezone_error = DateTimeError::InvalidTimezone;
 
-            // Serialize the errors to JSON
             let serialized_format =
                 serde_json::to_string(&format_error)
                     .expect("Serialization failed");
@@ -131,7 +149,6 @@ mod tests {
                 serde_json::to_string(&timezone_error)
                     .expect("Serialization failed");
 
-            // Deserialize the errors from JSON
             let deserialized_format: DateTimeError =
                 serde_json::from_str(&serialized_format)
                     .expect("Deserialization failed");
@@ -139,12 +156,66 @@ mod tests {
                 serde_json::from_str(&serialized_timezone)
                     .expect("Deserialization failed");
 
-            // Verify the results
             assert_eq!(format_error, deserialized_format);
             assert_eq!(timezone_error, deserialized_timezone);
         }
 
-        /// Tests deserialization of `DateTimeError` from strings.
+        /// Tests the deserialization of `DateTimeError`.
+        #[test]
+        fn test_deserialization() {
+            let format_error_str = "\"InvalidFormat\"";
+            let timezone_error_str = "\"InvalidTimezone\"";
+
+            // Deserialize the JSON strings back into `DateTimeError` variants
+            let deserialized_format: DateTimeError =
+                serde_json::from_str(format_error_str)
+                    .expect("Deserialization failed");
+            let deserialized_timezone: DateTimeError =
+                serde_json::from_str(timezone_error_str)
+                    .expect("Deserialization failed");
+
+            // Verify the deserialized output
+            assert_eq!(
+                deserialized_format,
+                DateTimeError::InvalidFormat
+            );
+            assert_eq!(
+                deserialized_timezone,
+                DateTimeError::InvalidTimezone
+            );
+        }
+
+        /// Tests custom serialization and deserialization of DateTimeError.
+        ///
+        /// This test ensures that the custom serialization and deserialization
+        /// implementations for `DateTimeError` work correctly.
+        #[test]
+        fn test_custom_serde_impl() {
+            // Test with InvalidFormat variant
+            let format_error = DateTimeError::InvalidFormat;
+            let serialized_format =
+                serde_json::to_string(&format_error)
+                    .expect("Serialization failed");
+            assert_eq!(
+                format_error,
+                serde_json::from_str(&serialized_format)
+                    .expect("Deserialization failed")
+            );
+
+            // Test with ParseError variant using a mock string, because we cannot directly deserialize ParseError
+            let parse_error =
+                DateTimeError::ParseError(Parse::TryFromParsed(
+                    TryFromParsed::InsufficientInformation,
+                ));
+            let serialized_parse = serde_json::to_string(&parse_error)
+                .expect("Serialization failed");
+
+            // Deserialize into a string and assert that it matches the known string for ParseError
+            assert_eq!(serialized_parse, "\"ParseError\"");
+            assert!(serde_json::from_str::<DateTimeError>(&serialized_parse).is_err());
+        }
+
+        /// Tests deserialization of `DateTimeError` from strings.a
         ///
         /// This test verifies that `DateTimeError` can be deserialized from valid
         /// JSON strings and that invalid strings result in errors.
@@ -179,7 +250,7 @@ mod tests {
         }
     }
 
-    mod comparison_and_equality {
+    mod comparison_and_equality_tests {
         use dtt::error::DateTimeError;
 
         /// Tests the equality and inequality comparisons for `DateTimeError`.
@@ -207,9 +278,43 @@ mod tests {
             assert_eq!(format_error, format_error);
             assert_eq!(timezone_error, timezone_error);
         }
+
+        /// Tests the equality comparison for identical `DateTimeError` variants.
+        #[test]
+        fn test_eq_for_same_variant() {
+            let error1 = DateTimeError::InvalidFormat;
+            let error2 = DateTimeError::InvalidFormat;
+            assert_eq!(error1, error2);
+        }
+
+        /// Tests the inequality comparison for different `DateTimeError` variants.
+        #[test]
+        fn test_ne_for_different_variants() {
+            let error1 = DateTimeError::InvalidFormat;
+            let error2 = DateTimeError::InvalidTimezone;
+            assert_ne!(error1, error2);
+        }
+
+        /// Tests that different `DateTimeError` variants are not equal to each other.
+        #[test]
+        fn test_different_variants_comparison() {
+            let format_error = DateTimeError::InvalidFormat;
+            let timezone_error = DateTimeError::InvalidTimezone;
+            let date_error = DateTimeError::InvalidDate;
+            let time_error = DateTimeError::InvalidTime;
+
+            assert_ne!(format_error, timezone_error);
+            assert_ne!(format_error, date_error);
+            assert_ne!(format_error, time_error);
+
+            assert_ne!(timezone_error, date_error);
+            assert_ne!(timezone_error, time_error);
+
+            assert_ne!(date_error, time_error);
+        }
     }
 
-    mod error_handling {
+    mod error_handling_tests {
         use dtt::error::DateTimeError;
         use std::error::Error;
 
@@ -241,9 +346,33 @@ mod tests {
             )
             .unwrap();
         }
+
+        /// Tests the `Debug` and `Display` trait implementations for error variants.
+        ///
+        /// This test ensures that the `Debug` and `Display` implementations provide meaningful
+        /// output for each error variant.
+        #[test]
+        fn test_debug_display_impl() {
+            let format_error = DateTimeError::InvalidFormat;
+            assert_eq!(format!("{:?}", format_error), "InvalidFormat");
+            assert_eq!(
+                format!("{}", format_error),
+                "Invalid date format"
+            );
+
+            let timezone_error = DateTimeError::InvalidTimezone;
+            assert_eq!(
+                format!("{:?}", timezone_error),
+                "InvalidTimezone"
+            );
+            assert_eq!(
+                format!("{}", timezone_error),
+                "Invalid or unsupported timezone; DST not supported"
+            );
+        }
     }
 
-    mod future_proofing {
+    mod future_proofing_tests {
         use dtt::error::DateTimeError;
         // We can't directly use Parse and ComponentRange variants due to privacy
         // So, focus on the variants that are testable.
@@ -304,8 +433,9 @@ mod tests {
         }
     }
 
-    mod low_level {
+    mod low_level_tests {
         use dtt::error::DateTimeError;
+        use std::mem::size_of;
 
         /// Tests the memory layout of `DateTimeError`.
         ///
@@ -314,20 +444,6 @@ mod tests {
         #[test]
         fn test_memory_layout() {
             assert_eq!(size_of::<DateTimeError>(), 56);
-        }
-
-        /// Tests the `Default` trait implementation for `DateTimeError`.
-        ///
-        /// This test checks that the `Default` trait is implemented correctly,
-        /// ensuring that the default value of `DateTimeError` is as expected.
-        #[test]
-        fn test_default_trait() {
-            // This test assumes that InvalidFormat is the default variant.
-            // If that's not the case, adjust the assertion accordingly.
-            assert_eq!(
-                DateTimeError::default(),
-                DateTimeError::InvalidFormat
-            );
         }
 
         #[test]
@@ -342,6 +458,20 @@ mod tests {
             let deserialized: DateTimeError =
                 serde_json::from_str("\"InvalidDate\"").unwrap();
             assert_eq!(deserialized, DateTimeError::InvalidDate);
+        }
+    }
+
+    mod default_implementation_tests {
+        use dtt::error::DateTimeError;
+
+        /// Tests the `Default` trait implementation for `DateTimeError`.
+        ///
+        /// This test ensures that the `default()` method returns the expected default variant.
+        #[test]
+        fn test_default_trait() {
+            // Assuming `InvalidFormat` is the default variant for `DateTimeError`
+            let default_error = DateTimeError::default();
+            assert_eq!(default_error, DateTimeError::InvalidFormat);
         }
     }
 }

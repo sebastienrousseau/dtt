@@ -1,3 +1,9 @@
+// test_readme.rs
+//
+// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+
 //! # Test Suite for DateTime (DTT) Library
 //!
 //! This module contains a series of unit tests that demonstrate and verify the functionality
