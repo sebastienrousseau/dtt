@@ -16,8 +16,8 @@ license = "MIT OR Apache-2.0"
 name = "dtt"
 readme = "README.md"
 repository = "https://github.com/sebastienrousseau/dtt.git"
-rust-version = "1.60.0"
-version = "0.0.6"
+rust-version = "1.56.0"
+version = "0.0.7"
 
 # Included and excluded files.
 include = [
@@ -45,14 +45,24 @@ debug = true
 
 [dependencies]
 # Dependencies are only used for building.
-regex = "1.10.4"
-serde = { version = "1.0.200", features = ["derive"] }
-time = "0.3.36"
+lazy_static = "1.5.0"
+paste = "1.0"
+regex = "1.10"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1.0"
+serde_json = "1.0"
+time = { version = "0.3", features = ["serde", "formatting", "parsing", "macros"] }
+thiserror = "1.0"
 
 [dev-dependencies]
 # Development dependencies are only used for testing and building.
-assert_cmd = "2.0.14"
-criterion = "0.5.1"
+assert_cmd = "2.0"
+criterion = "0.5"
+serde_json = "1.0"
+
+[build-dependencies]
+# Dependencies for build scripts.
+version_check = "0.9.4" # Check the Rust version used to compile the package.
 
 [lib]
 # Library configuration.
@@ -63,22 +73,32 @@ path = "src/lib.rs"
 [features]
 # No default features
 default = []
+bench = []
 
 [package.metadata.docs.rs]
+# Specify arguments for rustdoc to enhance documentation quality.
+rustdoc-args = [
+    "--generate-link-to-definition",
+    "--cfg", "docsrs",
+    "--document-private-items",
+    "--display-warnings"
+]
+# Build docs with all crate features enabled to cover the entire API.
+all-features = true
+# Target platform for the docs, ensuring compatibility with common Linux servers.
 targets = ["x86_64-unknown-linux-gnu"]
-rustdoc-args = ["--generate-link-to-definition"]
 
 # Linting config
 [lints.rust]
 
 ## Warn
-# box_pointers = "warn"
-# missing_copy_implementations = "warn"
-# missing_docs = "warn"
-# unstable_features = "warn"
+box_pointers = "warn"
+missing_copy_implementations = "warn"
+missing_docs = "warn"
+unstable_features = "warn"
 # unused_crate_dependencies = "warn"
-# unused_extern_crates = "warn"
-# unused_results = "warn"
+unused_extern_crates = "warn"
+unused_results = "warn"
 
 ## Allow
 bare_trait_objects = "allow"
@@ -90,7 +110,6 @@ unsafe_code = "allow"
 
 ## Forbid
 missing_debug_implementations = "forbid"
-# missing_docs = "warn"
 non_ascii_idents = "forbid"
 unreachable_pub = "forbid"
 
@@ -100,12 +119,11 @@ deprecated_in_future = "deny"
 ellipsis_inclusive_range_patterns = "deny"
 explicit_outlives_requirements = "deny"
 future_incompatible = { level = "deny", priority = -1 }
-keyword_idents = "deny"
+keyword_idents = { level = "deny", priority = -1 }
 macro_use_extern_crate = "deny"
 meta_variable_misuse = "deny"
 missing_fragment_specifier = "deny"
 noop_method_call = "deny"
-pointer_structural_match = "deny"
 rust_2018_idioms = { level = "deny", priority = -1 }
 rust_2021_compatibility = { level = "deny", priority = -1 }
 single_use_lifetimes = "deny"
@@ -120,8 +138,14 @@ unused_macro_rules = "deny"
 unused_qualifications = "deny"
 variant_size_differences = "deny"
 
+
 [package.metadata.clippy]
-warn-lints = ["clippy::all", "clippy::pedantic", "clippy::cargo", "clippy::nursery"]
+warn-lints = [
+    "clippy::all",
+    "clippy::pedantic",
+    "clippy::cargo",
+    "clippy::nursery",
+]
 
 [profile.dev]
 codegen-units = 256
