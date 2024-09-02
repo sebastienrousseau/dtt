@@ -30,9 +30,9 @@ use time::{
 /// A structure representing a date and time with timezone information.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct DateTime {
-    /// datetime: The date and time in UTC.
+    /// The date and time in UTC.
     pub datetime: PrimitiveDateTime,
-    /// offset: The timezone offset in UTC.
+    /// The timezone offset in UTC.
     pub offset: UtcOffset,
 }
 
@@ -716,8 +716,17 @@ impl DateTime {
         self.offset
     }
 
-    /// Returns the local time zone offset of the `DateTime` instance.
-    pub fn now(&self) -> Self {
+    /// Returns the current `DateTime` instance.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::now();
+    /// println!("Current time: {}", dt);
+    /// ```
+    pub fn now() -> Self {
         Self::new()
     }
 
@@ -1083,18 +1092,6 @@ impl DateTime {
     /// # Returns
     ///
     /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the months added, or an error if the operation fails.
-    ///   Adds a specified number of months to the `DateTime` instance.
-    ///
-    /// This method handles edge cases such as month-end dates and leap years.
-    /// It also correctly handles negative month additions (subtractions).
-    ///
-    /// # Arguments
-    ///
-    /// * `months` - The number of months to add (can be negative for subtraction).
-    ///
-    /// # Returns
-    ///
-    /// * `Result<Self, DateTimeError>` - A new `DateTime` instance with the months added, or an error if the operation fails.
     pub fn add_months(
         &self,
         months: i32,
@@ -1400,7 +1397,7 @@ impl Hash for DateTime {
     }
 }
 
-/// Helper function to determine the number of days in a given month and year
+/// Helper function to determine the number of days in a given month and year.
 fn days_in_month(year: i32, month: u8) -> Result<u8, DateTimeError> {
     match month {
         1 | 3 | 5 | 7 | 8 | 10 | 12 => Ok(31),
@@ -1410,7 +1407,7 @@ fn days_in_month(year: i32, month: u8) -> Result<u8, DateTimeError> {
     }
 }
 
-/// Helper function to determine if a year is a leap year
+/// Helper function to determine if a year is a leap year.
 fn is_leap_year(year: i32) -> bool {
     (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
 }

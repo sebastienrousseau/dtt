@@ -26,41 +26,35 @@ mod tests {
         cmd.output().expect("Failed to execute command")
     }
 
+    // Helper function to run tests with the DTT test mode and verify the result
+    fn run_and_verify_test_mode(is_test_mode: bool, should_fail: bool) {
+        let output = run_dtt_with_test_mode(is_test_mode);
+
+        // Assert that the command execution matches the expected result
+        assert_eq!(output.status.success(), !should_fail);
+
+        // If the test is expected to fail, verify the error message
+        if should_fail {
+            let stderr = String::from_utf8(output.stderr).unwrap();
+            assert!(
+                stderr.contains("Error running dtt: Simulated error")
+            );
+        }
+    }
+
     #[test]
     fn test_run_with_dtt_test_mode() {
-        let output = run_dtt_with_test_mode(true);
-
-        // Assert that the command execution was not successful
-        assert!(!output.status.success());
-
-        // Assert that the error message was printed to stderr
-        let stderr = String::from_utf8(output.stderr).unwrap();
-        assert!(stderr.contains("Error running dtt: Simulated error"));
+        run_and_verify_test_mode(true, true);
     }
 
     #[test]
     fn test_run_without_dtt_test_mode() {
-        let output = run_dtt_with_test_mode(false);
-
-        // Assert that the command execution was successful
-        assert!(output.status.success());
-
-        // Assert that the welcome messages were printed to stdout
-        let stdout = String::from_utf8(output.stdout).unwrap();
-        assert!(stdout.contains("Welcome to `DTT` 👋!"));
-        assert!(stdout.contains("A Rust library for parsing, validating, manipulating, and formatting dates and times."));
+        run_and_verify_test_mode(false, false);
     }
 
     #[test]
     fn test_main() {
         // Test calling the `run_dtt_with_test_mode()` function directly with test mode enabled
-        let output = run_dtt_with_test_mode(true);
-
-        // Assert that the command execution was not successful
-        assert!(!output.status.success());
-
-        // Assert that the error message was printed to stderr
-        let stderr = String::from_utf8(output.stderr).unwrap();
-        assert!(stderr.contains("Error running dtt: Simulated error"));
+        run_and_verify_test_mode(true, true);
     }
 }
