@@ -110,76 +110,63 @@ The library provides several examples and test cases to help you get started. Yo
 #### Example 1: Creating a new DateTime object and printing it
 
 ```rust
-use dtt::datetime::DateTime;
-use dtt::dtt_print;
+  use dtt::datetime::DateTime;
+  use dtt::dtt_print;
 
-#[test]
-fn example_1() {
-    let now = DateTime::new();
-    dtt_print!(now);
-}
+  let now = DateTime::new();
+  dtt_print!(now);
 ```
 
 #### Example 2: Validate methods for various date and time components
 
 ```rust
-use dtt::datetime::DateTime;
-use dtt::{
-    is_valid_day, is_valid_hour, is_valid_minute, is_valid_month,
-    is_valid_second, is_valid_microsecond, is_valid_ordinal,
-    is_valid_time, is_valid_iso_8601
-};
+  use dtt::datetime::DateTime;
 
-assert!(DateTime::is_valid_microsecond("999999"));
-assert!(!DateTime::is_valid_microsecond("1000000"));
+  assert!(DateTime::is_valid_microsecond("999999"));
+  assert!(!DateTime::is_valid_microsecond("1000000"));
 
-assert!(DateTime::is_valid_second("59"));
-assert!(!DateTime::is_valid_second("60"));
+  assert!(DateTime::is_valid_second("59"));
+  assert!(!DateTime::is_valid_second("60"));
 
-assert!(DateTime::is_valid_minute("59"));
-assert!(!DateTime::is_valid_minute("60"));
+  assert!(DateTime::is_valid_minute("59"));
+  assert!(!DateTime::is_valid_minute("60"));
 
-assert!(DateTime::is_valid_hour("23"));
-assert!(!DateTime::is_valid_hour("24"));
+  assert!(DateTime::is_valid_hour("23"));
+  assert!(!DateTime::is_valid_hour("24"));
 
-assert!(DateTime::is_valid_month("12"));
-assert!(!DateTime::is_valid_month("13"));
+  assert!(DateTime::is_valid_month("12"));
+  assert!(!DateTime::is_valid_month("13"));
 
-assert!(DateTime::is_valid_ordinal("366"));
-assert!(!DateTime::is_valid_ordinal("367"));
+  assert!(DateTime::is_valid_ordinal("366"));
+  assert!(!DateTime::is_valid_ordinal("367"));
 
-assert!(DateTime::is_valid_time("23:59:59"));
-assert!(!DateTime::is_valid_time("24:00:00"));
+  assert!(DateTime::is_valid_time("23:59:59"));
+  assert!(!DateTime::is_valid_time("24:00:00"));
 
-assert!(
-
-DateTime::is_valid_iso_8601("2023-05-11T17:30:00Z"));
-assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00Z"));
+  assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00Z"));
+  assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00Z"));
 ```
 
 #### Example 3: Validate string to `DateTime` conversion
 
 ```rust
-use dtt::datetime::DateTime;
-use std::str::FromStr;
+  use dtt::datetime::DateTime;
+  use std::str::FromStr;
+  use time::Month;
 
-let date_str = "2022-01-01T12:00:00+01:00";
-let mut result: Result<DateTime, dtt::datetime::DateTimeError> = DateTime::from_str(date_str);
+  let date_str = "2022-01-01T12:00:00+01:00";
+  let mut result: Result<DateTime, dtt::error::DateTimeError> =
+      DateTime::from_str(date_str);
 
-assert_eq!(result.as_mut().unwrap().iso_8601, date_str);
-assert_eq!(result.as_mut().unwrap().year, 2022);
-assert_eq!(result.as_mut().unwrap().month, "01");
-assert_eq!(result.as_mut().unwrap().day, 1);
-assert_eq!(result.as_mut().unwrap().hour, 12);
-assert_eq!(result.as_mut().unwrap().minute, 0);
-assert_eq!(result.as_mut().unwrap().second, 0);
-assert_eq!(result.as_mut().unwrap().offset, "+01:00");
-assert_eq!(result.as_mut().unwrap().time, "12:00:00");
-assert_eq!(result.as_mut().unwrap().tz, "CET");
-assert_eq!(result.as_mut().unwrap().iso_week, 52);
-assert_eq!(result.as_mut().unwrap().weekday, "Saturday");
-assert_eq!(result.as_mut().unwrap().ordinal, 1);
-assert_eq!(result.as_mut().unwrap().microsecond, 0);
+  assert_eq!(result.as_mut().unwrap().year(), 2022);
+  assert_eq!(result.as_mut().unwrap().month(), Month::January);
+  assert_eq!(result.as_mut().unwrap().day(), 1);
+  assert_eq!(result.as_mut().unwrap().hour(), 12);
+  assert_eq!(result.as_mut().unwrap().minute(), 0);
+  assert_eq!(result.as_mut().unwrap().second(), 0);
+  assert_eq!(result.as_mut().unwrap().iso_week(), 52);
+  assert_eq!(result.as_mut().unwrap().ordinal(), 1);
+  assert_eq!(result.as_mut().unwrap().microsecond(), 0);
 ```
 
 ## Documentation
