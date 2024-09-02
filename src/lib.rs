@@ -82,6 +82,14 @@
 //!   - `dtt_diff_seconds!(datetime1, datetime2)`: Calculates the difference in seconds between two `DateTime` objects.
 //!   - `dtt_diff_days!(datetime1, datetime2)`: Calculates the difference in days between two `DateTime` objects.
 //!
+//! ## Documentation
+//!
+//! For full API documentation, please visit [https://doc.dttlib.com/][17] or [https://docs.rs/dtt][09].
+//!
+//! ## Rust Version Compatibility
+//!
+//! Compiler support: requires rustc 1.56.0+
+//!
 //! ## License
 //!
 //! Licensed under either of the [Apache License][02] or the

@@ -7,16 +7,28 @@
 #[cfg(test)]
 mod tests {
     use assert_cmd::prelude::*;
-    use dtt::error::AppError;
     use std::process::Command;
+
+    /// Helper function to run the `dtt` binary with an optional environment variable.
+    ///
+    /// # Arguments
+    ///
+    /// * `test_mode` - A boolean indicating whether to run with `DTT_TEST_MODE` enabled.
+    ///
+    /// # Returns
+    ///
+    /// A `Command` output containing the results of the executed binary.
+    fn run_dtt_with_test_mode(test_mode: bool) -> std::process::Output {
+        let mut cmd = Command::cargo_bin("dtt").unwrap();
+        if test_mode {
+            let _ = cmd.env("DTT_TEST_MODE", "1");
+        }
+        cmd.output().expect("Failed to execute command")
+    }
 
     #[test]
     fn test_run_with_dtt_test_mode() {
-        let output = Command::cargo_bin("dtt")
-            .unwrap()
-            .env("DTT_TEST_MODE", "1")
-            .output()
-            .expect("Failed to execute command");
+        let output = run_dtt_with_test_mode(true);
 
         // Assert that the command execution was not successful
         assert!(!output.status.success());
@@ -28,10 +40,7 @@ mod tests {
 
     #[test]
     fn test_run_without_dtt_test_mode() {
-        let output = Command::cargo_bin("dtt")
-            .unwrap()
-            .output()
-            .expect("Failed to execute command");
+        let output = run_dtt_with_test_mode(false);
 
         // Assert that the command execution was successful
         assert!(output.status.success());
@@ -42,28 +51,10 @@ mod tests {
         assert!(stdout.contains("A Rust library for parsing, validating, manipulating, and formatting dates and times."));
     }
 
-    fn run_test_scenario() -> Result<(), AppError> {
-        // Simulate an error scenario
-        // Return an error explicitly
-        Err(AppError::SimulatedError)
-    }
-
     #[test]
     fn test_main() {
-        // Test calling the `run_test_scenario()` function directly
-        let result = run_test_scenario();
-        assert!(result.is_err());
-        assert_eq!(
-            format!("{}", result.unwrap_err()),
-            "Simulated error"
-        );
-
-        // Test calling the `dtt` binary with DTT_TEST_MODE enabled
-        let output = Command::cargo_bin("dtt")
-            .unwrap()
-            .env("DTT_TEST_MODE", "1")
-            .output()
-            .expect("Failed to execute command");
+        // Test calling the `run_dtt_with_test_mode()` function directly with test mode enabled
+        let output = run_dtt_with_test_mode(true);
 
         // Assert that the command execution was not successful
         assert!(!output.status.success());

@@ -109,7 +109,6 @@ trivial_bounds = "allow"
 unsafe_code = "allow"
 
 ## Forbid
-# missing_docs = "warn"
 missing_debug_implementations = "forbid"
 non_ascii_idents = "forbid"
 unreachable_pub = "forbid"

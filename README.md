@@ -182,6 +182,14 @@ assert_eq!(result.as_mut().unwrap().ordinal, 1);
 assert_eq!(result.as_mut().unwrap().microsecond, 0);
 ```
 
+## Documentation
+
+For full API documentation, please visit [https://doc.dttlib.com/][17] or [https://docs.rs/dtt][09].
+
+## Rust Version Compatibility
+
+Compiler support: requires rustc 1.56.0+
+
 ## Contributing
 
 Contributions are welcome! Please see the [contributing instructions][05] for more information.
@@ -218,6 +226,7 @@ A special thank you goes to the [Rust Reddit][13] community for providing a lot 
 [14]: https://www.rust-lang.org "The Rust Programming Language"
 [15]: https://codecov.io/gh/sebastienrousseau/dtt "Codecov"
 [16]: https://github.com/sebastienrousseau/dtt/actions?query=branch%3Amain "Build Status"
+[17]: https://doc.dttlib.com/ "DateTime (DTT) Library Documentation"
 
 [build-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/dtt/release.yml?branch=main&style=for-the-badge&logo=github "Build Status"
 [github-badge]: https://img.shields.io/badge/github-sebastienrousseau/main-8da0cb?style=for-the-badge&labelColor=555555&logo=github "GitHub"
