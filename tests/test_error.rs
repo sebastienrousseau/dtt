@@ -212,7 +212,10 @@ mod tests {
 
             // Deserialize into a string and assert that it matches the known string for ParseError
             assert_eq!(serialized_parse, "\"ParseError\"");
-            assert!(serde_json::from_str::<DateTimeError>(&serialized_parse).is_err());
+            assert!(serde_json::from_str::<DateTimeError>(
+                &serialized_parse
+            )
+            .is_err());
         }
 
         /// Tests deserialization of `DateTimeError` from strings.a
