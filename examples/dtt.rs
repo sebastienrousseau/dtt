@@ -149,6 +149,20 @@ fn advanced_datetime_operations() -> Result<(), Box<dyn Error>> {
     let nyc_time = utc_date.convert_to_tz("EST")?;
     println!("Current time in New York: ✅ {:?}", nyc_time);
 
+    // Timezone formatting
+    println!("\n🌍 Timezone Formatting:");
+    let la_time = DateTime::format_time_in_timezone(
+        "PST",
+        "[hour repr:12]:[minute] [period]",
+    )?;
+    println!("Current time in Los Angeles: ✅ {}", la_time);
+
+    let tokyo_time = DateTime::format_time_in_timezone(
+        "JST",
+        "[year]-[month]-[day] [hour]:[minute]",
+    )?;
+    println!("Current time in Tokyo: ✅ {}", tokyo_time);
+
     // Formatting
     println!("\n📝 Date Formatting:");
     let formatted_date = utc_date.format_rfc3339()?;
