@@ -217,7 +217,7 @@ checksum = "fea41bba32d969b513997752735605054bc0dfa92b4c56bf1189f2e174be7a10"
 
 [[package]]
 name = "dtt"
-version = "0.0.7"
+version = "0.0.8"
 dependencies = [
  "assert_cmd",
  "criterion",
