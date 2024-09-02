@@ -1,8 +1,6 @@
 <!-- markdownlint-disable MD033 MD041 -->
-
 <img src="https://kura.pro/dtt/images/logos/dtt.svg"
 alt="DateTime (DTT) logo" height="66" align="right" />
-
 <!-- markdownlint-enable MD033 MD041 -->
 
 # DateTime (DTT)
@@ -40,48 +38,115 @@ The `DateTime (DTT)` library offers the following features:
   - `new_with_tz(tz: &str)`: Creates a new `DateTime` object with the specified timezone.
   - `new_with_custom_offset(hours: i8, minutes: i8)`: Creates a `DateTime` object with a custom UTC offset.
   - `from_components(year: i32, month: u8, day: u8, hour: u8, minute: u8, second: u8, offset: UtcOffset)`: Creates a `DateTime` object from individual date and time components.
+  - `update(&self)`: Updates the `DateTime` object to the current date and time.
+  - `now()`: Returns the current `DateTime`.
+  - `from_str(s: &str)`: Parses a string into a `DateTime` instance (implementation of `FromStr` trait).
+  - `default()`: Returns the current UTC time as the default value for `DateTime`.
 
 - **Parsing and Formatting**:
   - `parse(input: &str)`: Parses a date-time string into a `DateTime` object.
   - `parse_custom_format(input: &str, format: &str)`: Parses a date-time string using a custom format.
   - `format(&self, format_str: &str)`: Formats the `DateTime` object as a string using the specified format.
-
-- **Validation**:
-  - `is_valid_day(input: &str)`: Checks if the input represents a valid day of the month.
-  - `is_valid_hour(input: &str)`: Checks if the input represents a valid hour of the day.
-  - `is_valid_second(input: &str)`: Checks if the input represents a valid second of the minute.
-  - `is_valid_minute(input: &str)`: Checks if the input represents a valid minute of the hour.
-  - `is_valid_month(input: &str)`: Checks if the input represents a valid month of the year.
-  - `is_valid_ordinal(input: &str)`: Checks if the input represents a valid ordinal date.
-  - `is_valid_time(input: &str)`: Checks if the input represents a valid time.
-  - `is_valid_iso_week(input: &str)`: Checks if the input represents a valid ISO week number.
-  - `is_valid_iso_8601(input: &str)`: Checks if the input represents a valid ISO 8601 date and time.
-  - `is_valid_microsecond(input: &str)`: Checks if the input represents a valid microsecond.
+  - `format_rfc3339(&self)`: Formats the `DateTime` as an RFC 3339 string.
+  - `format_iso8601(&self)`: Formats the `DateTime` as an ISO 8601 string.
 
 - **Date-Time Manipulation**:
-  - `update(&self)`: Updates the `DateTime` object with the current date and time based on the timezone.
   - `convert_to_tz(&self, new_tz: &str)`: Converts the `DateTime` object to a different timezone.
   - `unix_timestamp(&self)`: Returns the Unix timestamp of the `DateTime` object.
-  - `add_days(&self, days: i64)`: Creates a new `DateTime` object with the specified number of days added.
+  - `add_days(&self, days: i64)`: Adds a specified number of days to the `DateTime`.
+  - `add_months(&self, months: i32)`: Adds a specified number of months to the `DateTime`.
+  - `add_years(&self, years: i32)`: Adds a specified number of years to the `DateTime`.
+  - `sub_months(&self, months: i32)`: Subtracts a specified number of months from the `DateTime`.
+  - `sub_years(&self, years: i32)`: Subtracts a specified number of years from the `DateTime`.
+  - `next_day(&self)`: Returns a new `DateTime` instance representing the next day.
+  - `previous_day(&self)`: Returns a new `DateTime` instance representing the previous day.
+  - `start_of_week(&self)`: Returns a new `DateTime` instance at the start of the week.
+  - `end_of_week(&self)`: Returns a new `DateTime` instance at the end of the week.
+  - `start_of_month(&self)`: Returns a new `DateTime` instance at the start of the month.
+  - `end_of_month(&self)`: Returns a new `DateTime` instance at the end of the month.
+  - `start_of_year(&self)`: Returns a new `DateTime` instance at the start of the year.
+  - `end_of_year(&self)`: Returns a new `DateTime` instance at the end of the year.
+  - `is_within_range(&self, start: &Self, end: &Self)`: Checks if the `DateTime` falls within a specific range.
+  - `duration_since(&self, other: &Self)`: Calculates the duration between two `DateTime` instances.
 
-- **Utility Macros**:
+- **Getters**:
+  - `year(&self)`: Returns the year.
+  - `month(&self)`: Returns the month.
+  - `day(&self)`: Returns the day of the month.
+  - `hour(&self)`: Returns the hour.
+  - `minute(&self)`: Returns the minute.
+  - `second(&self)`: Returns the second.
+  - `microsecond(&self)`: Returns the microsecond.
+  - `weekday(&self)`: Returns the weekday.
+  - `ordinal(&self)`: Returns the day of the year (ordinal).
+  - `iso_week(&self)`: Returns the ISO week number.
+  - `offset(&self)`: Returns the UTC offset.
+
+- **Setters**:
+  - `set_date(&self, year: i32, month: u8, day: u8)`: Sets a new date for the `DateTime` instance.
+  - `set_time(&self, hour: u8, minute: u8, second: u8)`: Sets a new time for the `DateTime` instance.
+
+- **Validation**:
+  - `is_valid_day(day: &str)`: Checks if the input represents a valid day of the month.
+  - `is_valid_hour(hour: &str)`: Checks if the input represents a valid hour of the day.
+  - `is_valid_minute(minute: &str)`: Checks if the input represents a valid minute of the hour.
+  - `is_valid_second(second: &str)`: Checks if the input represents a valid second of the minute.
+  - `is_valid_month(month: &str)`: Checks if the input represents a valid month of the year.
+  - `is_valid_year(year: &str)`: Checks if the input represents a valid year.
+  - `is_valid_microsecond(microsecond: &str)`: Checks if the input represents a valid microsecond.
+  - `is_valid_ordinal(ordinal: &str)`: Checks if the input represents a valid ordinal day of the year.
+  - `is_valid_iso_week(week: &str)`: Checks if the input represents a valid ISO week number.
+  - `is_valid_time(time: &str)`: Checks if the input represents a valid time in `HH:MM:SS` format.
+  - `is_valid_iso_8601(date: &str)`: Checks if the input represents a valid ISO 8601 formatted date.
+
+- **Utility Functions**:
+  - `format_time_in_timezone(tz: &str, format: &str)`: Formats the current time for a specific timezone.
+
+- **Arithmetic Operations**:
+  - `Add<Duration>`: Adds a `Duration` to the `DateTime` instance.
+  - `Sub<Duration>`: Subtracts a `Duration` from the `DateTime` instance.
+
+- **Comparison Operations**:
+  - `PartialOrd`: Allows partial ordering comparisons between `DateTime` instances.
+  - `Ord`: Allows total ordering comparisons between `DateTime` instances.
+
+- **Hashing**:
+  - `Hash`: Allows `DateTime` instances to be used as keys in hash-based collections.
+
+- **Macros**:
   - `dtt_now!()`: Generates the current date and time.
   - `dtt_parse!(input)`: Parses a date-time string into a `DateTime` object.
   - `dtt_print!(datetime)`: Prints a `DateTime` object.
   - `dtt_vec![]`: Creates a vector.
   - `dtt_map!{}`: Creates a map.
   - `dtt_assert!`: Asserts conditions during testing.
-
-- **Validation Macros**:
   - `is_valid!`: Checks the validity of various date-time components.
   - `dtt_is_valid_function!(func_name)`: Defines a custom validation function.
-
-- **Date-Time Manipulation Macros**:
   - `dtt_new_with_tz!(tz)`: Creates a new `DateTime` object with a specified timezone.
   - `dtt_add_days!(datetime, days)`: Adds days to a `DateTime` object.
   - `dtt_sub_days!(datetime, days)`: Subtracts days from a `DateTime` object.
   - `dtt_diff_seconds!(datetime1, datetime2)`: Calculates the difference in seconds between two `DateTime` objects.
   - `dtt_diff_days!(datetime1, datetime2)`: Calculates the difference in days between two `DateTime` objects.
+  - `dtt_clone!`: Creates a deep copy of a `DateTime` object.
+  - `dtt_format!`: Formats a `DateTime` object using a provided format string.
+  - `dtt_create_vec!`: Creates a new vector containing provided elements.
+  - `dtt_min!`: Returns the minimum of given values.
+  - `dtt_max!`: Returns the maximum of given values.
+  - `dtt_join!`: Joins a vector of strings into a single string.
+  - `dtt_print_vec!`: Prints a vector of elements to the console.
+
+- **Helper Functions**:
+  - `days_in_month(year: i32, month: u8)`: Determines the number of days in a given month and year.
+  - `is_leap_year(year: i32)`: Determines if a year is a leap year.
+
+- **Error Handling**:
+  The library provides comprehensive error handling through the `DateTimeError` enum, allowing for robust error management in date and time operations.
+
+- **Timezone Support**:
+  DateTime (DTT) offers extensive timezone support, allowing for creation and manipulation of date-time objects across different timezones.
+
+- **Serialization and Deserialization**:
+  The library supports serialization and deserialization of `DateTime` objects using `serde`, facilitating easy integration with various data formats.
 
 ## Installation
 
@@ -103,70 +168,73 @@ use dtt::*;
 
 Here are some examples of how to use the `DateTime (DTT)` library in your Rust projects.
 
-### Examples and Test Cases
-
-The library provides several examples and test cases to help you get started. You can find these in the `examples` and `tests` directories of the project.
-
-#### Example 1: Creating a new DateTime object and printing it
+### Basic Usage
 
 ```rust
-  use dtt::datetime::DateTime;
-  use dtt::dtt_print;
+use dtt::datetime::DateTime;
+use dtt::dtt_print;
 
-  let now = DateTime::new();
-  dtt_print!(now);
+fn main() {
+    // Create a new DateTime object with the current UTC time
+    let now = DateTime::new();
+    dtt_print!(now);
+
+    // Create a DateTime object with a specific timezone
+    let ny_time = DateTime::new_with_tz("EST").expect("Valid timezone");
+    println!("Current time in New York: {}", ny_time);
+
+    // Parse a date string
+    let date = DateTime::parse("2023-05-20T15:30:00Z").expect("Valid date string");
+    println!("Parsed date: {}", date);
+
+    // Add days to a date
+    let future_date = date.add_days(7).expect("Valid date");
+    println!("Date after 7 days: {}", future_date);
+}
 ```
 
-#### Example 2: Validate methods for various date and time components
+### Macro Usage
+
+The DateTime (DTT) library provides a rich set of macros to simplify common operations:
 
 ```rust
-  use dtt::datetime::DateTime;
+use dtt::{dtt_now, dtt_parse, dtt_add_days, dtt_diff_days};
 
-  assert!(DateTime::is_valid_microsecond("999999"));
-  assert!(!DateTime::is_valid_microsecond("1000000"));
+fn main() {
+    let now = dtt_now!();
+    println!("Current time: {}", now);
 
-  assert!(DateTime::is_valid_second("59"));
-  assert!(!DateTime::is_valid_second("60"));
+    let parsed_date = dtt_parse!("2023-05-20T15:30:00Z").expect("Valid date string");
+    println!("Parsed date: {}", parsed_date);
 
-  assert!(DateTime::is_valid_minute("59"));
-  assert!(!DateTime::is_valid_minute("60"));
+    let future_date = dtt_add_days!(parsed_date, 7).expect("Valid date");
+    println!("Date after 7 days: {}", future_date);
 
-  assert!(DateTime::is_valid_hour("23"));
-  assert!(!DateTime::is_valid_hour("24"));
-
-  assert!(DateTime::is_valid_month("12"));
-  assert!(!DateTime::is_valid_month("13"));
-
-  assert!(DateTime::is_valid_ordinal("366"));
-  assert!(!DateTime::is_valid_ordinal("367"));
-
-  assert!(DateTime::is_valid_time("23:59:59"));
-  assert!(!DateTime::is_valid_time("24:00:00"));
-
-  assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00Z"));
-  assert!(DateTime::is_valid_iso_8601("2023-05-11T17:30:00Z"));
+    let days_diff = dtt_diff_days!(now, future_date);
+    println!("Days difference: {}", days_diff);
+}
 ```
 
-#### Example 3: Validate string to `DateTime` conversion
+### Error Handling
+
+The library uses a custom `DateTimeError` type for error handling:
 
 ```rust
-  use dtt::datetime::DateTime;
-  use std::str::FromStr;
-  use time::Month;
+use dtt::datetime::DateTime;
+use dtt::error::DateTimeError;
 
-  let date_str = "2022-01-01T12:00:00+01:00";
-  let mut result: Result<DateTime, dtt::error::DateTimeError> =
-      DateTime::from_str(date_str);
+fn example_with_error_handling() -> Result<(), DateTimeError> {
+    let date = DateTime::parse("2023-05-20T15:30:00Z")?;
+    println!("Parsed date: {}", date);
 
-  assert_eq!(result.as_mut().unwrap().year(), 2022);
-  assert_eq!(result.as_mut().unwrap().month(), Month::January);
-  assert_eq!(result.as_mut().unwrap().day(), 1);
-  assert_eq!(result.as_mut().unwrap().hour(), 12);
-  assert_eq!(result.as_mut().unwrap().minute(), 0);
-  assert_eq!(result.as_mut().unwrap().second(), 0);
-  assert_eq!(result.as_mut().unwrap().iso_week(), 52);
-  assert_eq!(result.as_mut().unwrap().ordinal(), 1);
-  assert_eq!(result.as_mut().unwrap().microsecond(), 0);
+    let invalid_date = DateTime::parse("2023-13-20T15:30:00Z");
+    match invalid_date {
+        Ok(_) => println!("This shouldn't happen"),
+        Err(e) => println!("Error parsing invalid date: {}", e),
+    }
+
+    Ok(())
+}
 ```
 
 ## Documentation

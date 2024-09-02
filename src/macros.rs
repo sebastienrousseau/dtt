@@ -15,33 +15,18 @@
 //! - **DateTime Operations**: Macros that perform arithmetic and comparisons on `DateTime` objects.
 //! - **Validation**: Macros like `is_valid` which validate various aspects of date and time inputs.
 
-/// Creates a new `DateTime` instance.
+/// Creates a new `DateTime` instance with the current date and time in UTC.
 ///
-/// # Returns
+/// # Example
 ///
-/// A new `DateTime` instance.
-///
+/// ```rust
+/// let now = dtt_now!();
+/// println!("Current date and time: {}", now);
+/// ```
 #[macro_export]
 macro_rules! dtt_now {
     () => {{
         $crate::datetime::DateTime::new()
-    }};
-}
-
-/// Parses the input string into a `DateTime` instance.
-///
-/// # Arguments
-///
-/// - `$input:expr`: The input string to parse.
-///
-/// # Returns
-///
-/// A `Result` containing the parsed `DateTime` instance if successful, or an error if parsing fails.
-///
-#[macro_export]
-macro_rules! dtt_parse {
-    ($input:expr) => {{
-        $crate::datetime::DateTime::parse($input)
     }};
 }
 
@@ -51,6 +36,25 @@ macro_rules! dtt_parse {
 ///
 /// - `($($arg:tt)*)`: The arguments to be printed.
 ///
+/// # Example
+///
+/// ```rust
+/// dtt_print!("Hello, World!");
+/// ```
+#[macro_export]
+macro_rules! dtt_parse {
+    ($input:expr) => {{
+        $crate::datetime::DateTime::parse($input)
+    }};
+}
+
+/// Prints the arguments to the console.
+///
+/// # Example
+///
+/// ```rust
+/// dtt_print!("Hello, World!");
+/// ```
 #[macro_export]
 macro_rules! dtt_print {
     ($($arg:tt)*) => {
@@ -60,14 +64,16 @@ macro_rules! dtt_print {
 
 /// Creates a new vector of the given elements.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$($elem:expr),*`: The elements to be added to the vector.
 ///
-/// # Returns
+/// # Example
 ///
-/// A new vector containing the given elements.
-///
+/// ```rust
+/// let v = dtt_vec!(1, 2, 3);
+/// assert_eq!(v, vec![1, 2, 3]);
+/// ```
 #[macro_export]
 macro_rules! dtt_vec {
     ($($elem:expr),*) => {{
@@ -81,14 +87,17 @@ macro_rules! dtt_vec {
 
 /// Creates a new map of the given key-value pairs.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$($key:expr => $value:expr),*`: The key-value pairs to be added to the map.
 ///
-/// # Returns
+/// # Example
 ///
-/// A new map containing the given key-value pairs.
-///
+/// ```rust
+/// let m = dtt_map!("one" => 1, "two" => 2);
+/// assert_eq!(m.get("one"), Some(&1));
+/// assert_eq!(m.get("two"), Some(&2));
+/// ```
 #[macro_export]
 macro_rules! dtt_map {
     ($($key:expr => $value:expr),* $(,)?) => {{
@@ -106,8 +115,16 @@ macro_rules! dtt_map {
 /// If the expression is false, the macro panics with the message "Assertion failed!".
 ///
 /// # Arguments
-/// - `($($arg:tt)*)`: The expression to be evaluated.
 ///
+/// - `$cond:expr`: The condition to be asserted.
+/// - `$msg:expr` (optional): The message to display if the assertion fails.
+///
+/// # Example
+///
+/// ```rust
+/// let is_valid = dtt_parse!("2020-02-29").is_ok();
+/// dtt_assert!(is_valid, "The date must be valid.");
+/// ```
 #[macro_export]
 macro_rules! dtt_assert {
     ($cond:expr $(, $msg:expr)?) => {
@@ -117,17 +134,20 @@ macro_rules! dtt_assert {
     };
 }
 
-/// This macro generates a function that validates a given input string based on a specified type.
+/// Generates a function that validates a given input string based on a specified type.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$name:ident`: The name of the validation function.
 /// - `$type:ty`: The type to validate.
 ///
-/// # Returns
+/// # Example
 ///
-/// The function returns a boolean value indicating whether the input string is valid for the specified type.
-///
+/// ```rust
+/// dtt_is_valid_function!(day, u8);
+/// assert!(is_valid_day("15"));
+/// assert!(!is_valid_day("32"));
+/// ```
 #[macro_export]
 macro_rules! dtt_is_valid_function {
     ($name:ident, $type:ty) => {
@@ -145,15 +165,16 @@ macro_rules! dtt_is_valid_function {
 
 /// Returns the minimum of the given values.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$x:expr`: The first value to be compared.
-/// - `$(, $y:expr)*)`: Additional values to be compared.
+/// - `$(, $y:expr)*`: Additional values to be compared.
 ///
-/// # Returns
+/// # Example
 ///
-/// The minimum value among the given values.
-///
+/// ```rust
+/// assert_eq!(dtt_min!(10, 20, 30), 10);
+/// ```
 #[macro_export]
 macro_rules! dtt_min {
     ($x:expr $(, $y:expr)*) => {{
@@ -169,16 +190,16 @@ macro_rules! dtt_min {
 
 /// Creates a new vector containing the provided elements.
 ///
-/// This macro takes a variable number of expressions and creates a new vector containing those expressions.
-///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$($elem:expr),* $(,)?`: A comma-separated list of expressions. Each expression represents an element to be added to the vector.
 ///
-/// # Return
+/// # Example
 ///
-/// - A new vector containing the provided elements.
-///
+/// ```rust
+/// let v = dtt_create_vec![1, 2, 3];
+/// assert_eq!(v, vec![1, 2, 3]);
+/// ```
 #[macro_export]
 macro_rules! dtt_create_vec {
     ($($elem:expr),* $(,)?) => {{
@@ -188,15 +209,16 @@ macro_rules! dtt_create_vec {
 
 /// Returns the maximum of the given values.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$x:expr`: The first value to be compared.
-/// - `$(, $y:expr)*)`: Additional values to be compared.
+/// - `$(, $y:expr)*`: Additional values to be compared.
 ///
-/// # Returns
+/// # Example
 ///
-/// The maximum value among the given values.
-///
+/// ```rust
+/// assert_eq!(dtt_max!(10, 20, 30), 30);
+/// ```
 #[macro_export]
 macro_rules! dtt_max {
     ($x:expr $(, $y:expr)*) => {{
@@ -208,16 +230,18 @@ macro_rules! dtt_max {
     }};
 }
 
-/// Joins a vector of strings into a single string.
+/// Joins multiple strings into a single string.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$($s:expr),*`: The strings to be joined.
 ///
-/// # Returns
+/// # Example
 ///
-/// A single string containing the concatenated input strings.
-///
+/// ```rust
+/// let s = dtt_join!("Hello", " ", "World");
+/// assert_eq!(s, "Hello World");
+/// ```
 #[macro_export]
 macro_rules! dtt_join {
     ($($s:expr),*) => {{
@@ -231,10 +255,15 @@ macro_rules! dtt_join {
 
 /// Prints a vector of elements to the console.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$($v:expr),*`: The elements to be printed.
 ///
+/// # Example
+///
+/// ```rust
+/// dtt_print_vec!(&[1, 2, 3]);
+/// ```
 #[macro_export]
 macro_rules! dtt_print_vec {
     ($($v:expr),*) => {{
@@ -246,11 +275,18 @@ macro_rules! dtt_print_vec {
 
 /// Validates string input based on the specified type and criteria.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$name:ident`: The name of the validation function.
 /// - `$type:ty`: The type to validate.
 ///
+/// # Example
+///
+/// ```rust
+/// is_valid!(is_valid_hour, u8);
+/// assert!(is_valid_hour("23"));
+/// assert!(!is_valid_hour("24"));
+/// ```
 #[macro_export]
 macro_rules! is_valid {
     ($name:ident, $type:ty) => {
@@ -262,14 +298,16 @@ macro_rules! is_valid {
 
 /// Creates a new `DateTime` instance with the specified timezone.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$tz:expr`: The timezone string.
 ///
-/// # Returns
+/// # Example
 ///
-/// A new `DateTime` instance with the specified timezone.
-///
+/// ```rust
+/// let dt = dtt_new_with_tz!("CET");
+/// assert_eq!(dt.offset().to_string(), "+01:00:00");
+/// ```
 #[macro_export]
 macro_rules! dtt_new_with_tz {
     ($tz:expr) => {{
@@ -281,15 +319,18 @@ macro_rules! dtt_new_with_tz {
 
 /// Adds the specified number of days to the given `DateTime` instance.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$date:expr`: The `DateTime` instance.
 /// - `$days:expr`: The number of days to be added.
 ///
-/// # Returns
+/// # Example
 ///
-/// A new `DateTime` instance with the specified number of days added.
-///
+/// ```rust
+/// let dt = dtt_parse!("2023-01-01T12:00:00+00:00").unwrap();
+/// let future_date = dtt_add_days!(dt, 5).unwrap();
+/// assert_eq!(future_date.day(), 6);
+/// ```
 #[macro_export]
 macro_rules! dtt_add_days {
     ($date:expr, $days:expr) => {
@@ -299,15 +340,18 @@ macro_rules! dtt_add_days {
 
 /// Subtracts the specified number of days from the given `DateTime` instance.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$date:expr`: The `DateTime` instance.
 /// - `$days:expr`: The number of days to be subtracted.
 ///
-/// # Returns
+/// # Example
 ///
-/// A new `DateTime` instance with the specified number of days subtracted.
-///
+/// ```rust
+/// let dt = dtt_parse!("2023-01-06T12:00:00+00:00").unwrap();
+/// let past_date = dtt_sub_days!(dt, 5).unwrap();
+/// assert_eq!(past_date.day(), 1);
+/// ```
 #[macro_export]
 macro_rules! dtt_sub_days {
     ($date:expr, $days:expr) => {
@@ -342,14 +386,19 @@ macro_rules! dtt_diff {
 
 /// Calculates the difference in seconds between two `DateTime` instances.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$dt1:expr`: The first `DateTime` instance.
 /// - `$dt2:expr`: The second `DateTime` instance.
 ///
-/// # Returns
+/// # Example
 ///
-/// The difference in seconds between the two `DateTime` instances.
+/// ```rust
+/// let dt1 = "1609459200"; // 2021-01-01 00:00:00 UTC
+/// let dt2 = "1609459230"; // 2021-01-01 00:00:30 UTC
+/// let seconds_difference = dtt_diff_seconds!(dt1, dt2);
+/// assert_eq!(seconds_difference, 30i64);
+/// ```
 #[macro_export]
 macro_rules! dtt_diff_seconds {
     ($dt1:expr, $dt2:expr) => {
@@ -359,14 +408,19 @@ macro_rules! dtt_diff_seconds {
 
 /// Calculates the difference in days between two `DateTime` instances.
 ///
-/// # Parameters
+/// # Arguments
 ///
 /// - `$dt1:expr`: The first `DateTime` instance.
 /// - `$dt2:expr`: The second `DateTime` instance.
 ///
-/// # Returns
+/// # Example
 ///
-/// The difference in days between the two `DateTime` instances.
+/// ```rust
+/// let dt1 = "1609459200"; // 2021-01-01 00:00:00 UTC
+/// let dt2 = "1609545600"; // 2021-01-02 00:00:00 UTC
+/// let days_difference = dtt_diff_days!(dt1, dt2);
+/// assert_eq!(days_difference, 1i64);
+/// ```
 #[macro_export]
 macro_rules! dtt_diff_days {
     ($dt1:expr, $dt2:expr) => {
@@ -374,16 +428,19 @@ macro_rules! dtt_diff_days {
     };
 }
 
-/// Creates a deep copy of the provided `DateTime` object.
+/// Creates a copy of the provided `DateTime` object.
 ///
 /// # Arguments
 ///
 /// - `$dt:expr`: The `DateTime` object to be cloned.
 ///
-/// # Returns
+/// # Example
 ///
-/// A new `DateTime` object that is a deep copy of the input object.
-///
+/// ```rust
+/// let dt = dtt_parse!("2023-01-01T12:00:00+00:00").unwrap();
+/// let cloned = dtt_clone!(dt);
+/// assert_eq!(dt.year(), cloned.year());
+/// ```
 #[macro_export]
 macro_rules! dtt_clone {
     ($dt:expr) => {{
@@ -402,10 +459,16 @@ macro_rules! dtt_clone {
 /// - `$dt:expr`: The `DateTime` object to be formatted.
 /// - `$format:expr`: The format string to use for formatting the `DateTime` object.
 ///
-/// # Returns
+/// # Example
 ///
-/// A formatted `String` representation of the `DateTime` object.
-///
+/// ```rust
+/// let dt = dtt_parse!("2023-01-01T12:00:00+00:00").unwrap();
+/// let formatted = dtt_format!(
+///     dt,
+///     "{year}-{month}-{day}T{hour}:{minute}:{second}.{microsecond}{offset_sign}{offset_hour}:{offset_minute}"
+/// );
+/// assert_eq!(formatted, "2023-01-01T12:00:00.000000+00:00");
+/// ```
 #[macro_export]
 macro_rules! dtt_format {
     ($dt:expr, $format:expr) => {{
