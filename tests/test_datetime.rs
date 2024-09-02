@@ -2313,4 +2313,55 @@ mod tests {
             assert_eq!(result.second(), 59);
         }
     }
+
+    mod format_time_in_timezone_tests {
+        use regex::Regex;
+
+        use super::*;
+
+        #[test]
+        fn test_format_time_in_timezone_utc() {
+            let result = DateTime::format_time_in_timezone(
+                "UTC",
+                "[hour]:[minute]:[second]",
+            );
+            assert!(result.is_ok());
+            let formatted_time = result.unwrap();
+            let re = Regex::new(r"^\d{2}:\d{2}:\d{2}$").unwrap();
+            assert!(
+                re.is_match(&formatted_time),
+                "Formatted time '{}' does not match expected pattern",
+                formatted_time
+            );
+        }
+
+        #[test]
+        fn test_format_time_in_timezone_pst() {
+            let result = DateTime::format_time_in_timezone(
+                "PST",
+                "[hour repr:12]:[minute] [period]",
+            );
+            assert!(result.is_ok());
+            let formatted_time = result.unwrap();
+            let re = Regex::new(r"^\d{2}:\d{2} (AM|PM)$").unwrap();
+            assert!(
+                re.is_match(&formatted_time),
+                "Formatted time '{}' does not match expected pattern",
+                formatted_time
+            );
+        }
+
+        #[test]
+        fn test_format_time_in_timezone_invalid_tz() {
+            let result = DateTime::format_time_in_timezone(
+                "INVALID",
+                "[hour]:[minute]",
+            );
+            assert!(result.is_err());
+            assert!(matches!(
+                result.unwrap_err(),
+                DateTimeError::InvalidTimezone
+            ));
+        }
+    }
 }

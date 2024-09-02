@@ -22,8 +22,8 @@ use std::{
     str::FromStr,
 };
 use time::{
-    Date, Duration, Month, OffsetDateTime, PrimitiveDateTime, Time,
-    UtcOffset, Weekday,
+    format_description, Date, Duration, Month, OffsetDateTime,
+    PrimitiveDateTime, Time, UtcOffset, Weekday,
 };
 
 /// A structure representing a date and time with timezone information.
@@ -252,12 +252,12 @@ impl DateTime {
         let (datetime, offset) = if let Ok(dt) =
             PrimitiveDateTime::parse(
                 input,
-                &time::format_description::well_known::Rfc3339,
+                &format_description::well_known::Rfc3339,
             ) {
             (dt, UtcOffset::UTC)
         } else if let Ok(date) = Date::parse(
             input,
-            &time::format_description::well_known::Iso8601::DATE,
+            &format_description::well_known::Iso8601::DATE,
         ) {
             (
                 PrimitiveDateTime::new(date, Time::MIDNIGHT),
@@ -293,7 +293,7 @@ impl DateTime {
         input: &str,
         format: &str,
     ) -> Result<Self, DateTimeError> {
-        let format = time::format_description::parse(format)
+        let format = format_description::parse(format)
             .map_err(|_| DateTimeError::InvalidFormat)?;
         let datetime = PrimitiveDateTime::parse(input, &format)
             .map_err(|_| DateTimeError::InvalidFormat)?;
@@ -485,7 +485,7 @@ impl DateTime {
         &self,
         format_str: &str,
     ) -> Result<String, DateTimeError> {
-        let format = time::format_description::parse(format_str)
+        let format = format_description::parse(format_str)
             .map_err(|_| DateTimeError::InvalidFormat)?;
         self.datetime
             .format(&format)
@@ -510,7 +510,7 @@ impl DateTime {
     pub fn format_rfc3339(&self) -> Result<String, DateTimeError> {
         self.datetime
             .assume_offset(self.offset)
-            .format(&time::format_description::well_known::Rfc3339)
+            .format(&format_description::well_known::Rfc3339)
             .map_err(|_| DateTimeError::InvalidFormat)
     }
 
@@ -1214,6 +1214,47 @@ impl DateTime {
     /// ```
     pub fn sub_years(&self, years: i32) -> Result<Self, DateTimeError> {
         self.add_years(-years)
+    }
+
+    /// Formats the current time for a specific timezone.
+    ///
+    /// # Arguments
+    ///
+    /// * `tz` - A string slice that holds the timezone abbreviation (e.g., "UTC", "EST", "PST").
+    /// * `format` - A string slice that specifies the desired output format.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<String, DateTimeError>` - The formatted time string or an error if the operation fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// use time::format_description;
+    ///
+    /// let formatted_time = DateTime::format_time_in_timezone("PST", "[hour repr:12]:[minute] [period]").expect("Formatting failed");
+    /// println!("Current time in Los Angeles: {}", formatted_time);
+    /// ```
+    pub fn format_time_in_timezone(
+        tz: &str,
+        format: &str,
+    ) -> Result<String, DateTimeError> {
+        // Create a new DateTime instance for the current time in UTC
+        let utc_now = Self::new();
+
+        // Convert to the specified timezone
+        let time_in_tz = utc_now.convert_to_tz(tz)?;
+
+        // Parse the format string
+        let format_desc = format_description::parse(format)
+            .map_err(|_| DateTimeError::InvalidFormat)?;
+
+        // Format the time according to the specified format
+        time_in_tz
+            .datetime
+            .format(&format_desc)
+            .map_err(|_| DateTimeError::InvalidFormat)
     }
 }
 
