@@ -71,7 +71,8 @@ mod tests {
     #[test]
     fn example_3() {
         let date_str = "2022-01-01T12:00:00+01:00";
-        let mut result: Result<DateTime, dtt::error::DateTimeError> = DateTime::from_str(date_str);
+        let mut result: Result<DateTime, dtt::error::DateTimeError> =
+            DateTime::from_str(date_str);
 
         // Assert the parsed components of the `DateTime` object
         assert_eq!(result.as_mut().unwrap().year(), 2022);
