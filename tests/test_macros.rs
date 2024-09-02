@@ -175,11 +175,11 @@ mod tests {
 
     #[test]
     fn test_is_valid() {
-        is_valid!(is_valid_hour, u8);
+        dtt_is_valid_function!(hour, u8);
         assert!(is_valid_hour("23"));
         assert!(!is_valid_hour("24"));
 
-        is_valid!(is_valid_minute, u8);
+        dtt_is_valid_function!(minute, u8);
         assert!(is_valid_minute("59"));
         assert!(!is_valid_minute("60"));
     }
