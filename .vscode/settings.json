@@ -1,0 +1,19 @@
+{
+    "cSpell.words": [
+        "CEST",
+        "chrono",
+        "Codecov",
+        "datetime",
+        "elem",
+        "println",
+        "repr",
+        "Rustc",
+        "struct",
+        "thiserror",
+        "timezone",
+        "timezones"
+    ],
+    "conventionalCommits.scopes": [
+        "dtt"
+    ]
+}

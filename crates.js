@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["aho_corasick","deranged","dtt","itoa","lazy_static","memchr","num_conv","paste","powerfmt","proc_macro2","quote","regex","regex_automata","regex_syntax","ryu","serde","serde_derive","serde_json","syn","thiserror","thiserror_impl","time","time_core","time_macros","unicode_ident"];

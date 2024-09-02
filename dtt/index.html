@@ -1,0 +1,188 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A Rust library for parsing, validating, manipulating, and formatting dates and times."><title>dtt - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button><a class="logo-container" href="../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt=""></a></nav><nav class="sidebar"><div class="sidebar-crate"><a class="logo-container" href="../dtt/index.html"><img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="logo"></a><h2><a href="../dtt/index.html">dtt</a><span class="version">0.0.8</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#functions">Functions</a></li></ul></section></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">dtt</a><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><span class="out-of-band"><a class="src" href="../src/dtt/lib.rs.html#7-243">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="a-rust-library-for-parsing-validating-manipulating-and-formatting-dates-and-times"><a class="doc-anchor" href="#a-rust-library-for-parsing-validating-manipulating-and-formatting-dates-and-times">§</a>A Rust library for parsing, validating, manipulating, and formatting dates and times.</h2>
+<p><a href="https://dttlib.com"><img src="https://kura.pro/dtt/images/banners/banner-dtt.svg" alt="DTT Banner" /></a></p>
+<p><a href="https://www.rust-lang.org" title="The Rust Programming Language"><img src="https://img.shields.io/badge/rust-f04041?style=for-the-badge&amp;labelColor=c0282d&amp;logo=rust" alt="Made With Love" title="Made With Rust badge" /></a> <a href="https://crates.io/crates/dtt" title="Crates.io"><img src="https://img.shields.io/crates/v/dtt.svg?style=for-the-badge" alt="Crates.io" title="Crates.io badge" /></a> <a href="https://lib.rs/crates/dtt" title="Lib.rs"><img src="https://img.shields.io/badge/lib.rs-v0.0.8-orange.svg?style=for-the-badge" alt="lib.rs" title="Lib.rs badge" /></a> <a href="https://docs.rs/dtt" title="Docs.rs"><img src="https://img.shields.io/docsrs/dtt.svg?style=for-the-badge" alt="Docs.rs" title="Docs.rs badge" /></a> <a href="https://codecov.io/gh/sebastienrousseau/dtt" title="Codecov"><img src="https://img.shields.io/codecov/c/github/sebastienrousseau/dtt?style=for-the-badge&amp;token=X3ZP0K1SGI" alt="Codecov" title="Codecov" /></a> <a href="https://github.com/sebastienrousseau/dtt/actions?query=branch%3Amain" title="Build Status"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/dtt/release.yml?branch=main&amp;style=for-the-badge&amp;logo=github" alt="Build Status" title="Build Status" /></a></p>
+<!-- markdownlint-disable MD033 MD041 -->
+<center>
+<!-- markdownlint-enable MD033 MD041 -->
+<p>• <a href="https://dttlib.com" title="DateTime (DTT) Library Website">Website</a> • <a href="https://docs.rs/dtt" title="Docs.rs">Documentation</a> • <a href="https://github.com/sebastienrousseau/dtt/issues" title="Issues">Report Bug</a> • <a href="https://github.com/sebastienrousseau/dtt/issues" title="Issues">Request Feature</a> • <a href="https://github.com/sebastienrousseau/dtt/blob/main/CONTRIBUTING.md" title="Contributing Instructions">Contributing Guidelines</a></p>
+<!-- markdownlint-disable MD033 MD041 -->
+</center>
+<!-- markdownlint-enable MD033 MD041 -->
+<h3 id="overview"><a class="doc-anchor" href="#overview">§</a>Overview</h3>
+<p>The <code>DateTime (DTT)</code> library is a comprehensive and flexible tool that enables developers to manage dates and times with ease. It offers a wide range of functions, macros, and data structures for performing date and time operations, such as creating, parsing, validating, and formatting date-time objects.</p>
+<p>The library supports the creation of new <code>DateTime</code> objects with either UTC or custom timezone specifications, providing accurate and relevant date and time information. Additionally, it offers mechanisms for validating input dates and times, ensuring reliable and precise operations.</p>
+<h3 id="features"><a class="doc-anchor" href="#features">§</a>Features</h3>
+<p>The <code>DateTime (DTT)</code> library offers the following features:</p>
+<ul>
+<li>
+<p><strong>Core Fields</strong>:</p>
+<ul>
+<li><code>datetime</code>: The date and time in UTC (<code>PrimitiveDateTime</code>).</li>
+<li><code>offset</code>: The timezone offset in UTC (<code>UtcOffset</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Core Methods</strong>:</p>
+<ul>
+<li><code>new()</code>: Creates a new <code>DateTime</code> instance with the current UTC time.</li>
+<li><code>new_with_tz(tz: &amp;str)</code>: Creates a new <code>DateTime</code> object with the specified timezone.</li>
+<li><code>new_with_custom_offset(hours: i8, minutes: i8)</code>: Creates a <code>DateTime</code> object with a custom UTC offset.</li>
+<li><code>from_components(year: i32, month: u8, day: u8, hour: u8, minute: u8, second: u8, offset: UtcOffset)</code>: Creates a <code>DateTime</code> object from individual date and time components.</li>
+<li><code>update(&amp;self)</code>: Updates the <code>DateTime</code> object to the current date and time.</li>
+<li><code>now()</code>: Returns the current <code>DateTime</code>.</li>
+<li><code>from_str(s: &amp;str)</code>: Parses a string into a <code>DateTime</code> instance (implementation of <code>FromStr</code> trait).</li>
+<li><code>default()</code>: Returns the current UTC time as the default value for <code>DateTime</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Parsing and Formatting</strong>:</p>
+<ul>
+<li><code>parse(input: &amp;str)</code>: Parses a date-time string into a <code>DateTime</code> object.</li>
+<li><code>parse_custom_format(input: &amp;str, format: &amp;str)</code>: Parses a date-time string using a custom format.</li>
+<li><code>format(&amp;self, format_str: &amp;str)</code>: Formats the <code>DateTime</code> object as a string using the specified format.</li>
+<li><code>format_rfc3339(&amp;self)</code>: Formats the <code>DateTime</code> as an RFC 3339 string.</li>
+<li><code>format_iso8601(&amp;self)</code>: Formats the <code>DateTime</code> as an ISO 8601 string.</li>
+</ul>
+</li>
+<li>
+<p><strong>Date-Time Manipulation</strong>:</p>
+<ul>
+<li><code>convert_to_tz(&amp;self, new_tz: &amp;str)</code>: Converts the <code>DateTime</code> object to a different timezone.</li>
+<li><code>unix_timestamp(&amp;self)</code>: Returns the Unix timestamp of the <code>DateTime</code> object.</li>
+<li><code>add_days(&amp;self, days: i64)</code>: Adds a specified number of days to the <code>DateTime</code>.</li>
+<li><code>add_months(&amp;self, months: i32)</code>: Adds a specified number of months to the <code>DateTime</code>.</li>
+<li><code>add_years(&amp;self, years: i32)</code>: Adds a specified number of years to the <code>DateTime</code>.</li>
+<li><code>sub_months(&amp;self, months: i32)</code>: Subtracts a specified number of months from the <code>DateTime</code>.</li>
+<li><code>sub_years(&amp;self, years: i32)</code>: Subtracts a specified number of years from the <code>DateTime</code>.</li>
+<li><code>next_day(&amp;self)</code>: Returns a new <code>DateTime</code> instance representing the next day.</li>
+<li><code>previous_day(&amp;self)</code>: Returns a new <code>DateTime</code> instance representing the previous day.</li>
+<li><code>start_of_week(&amp;self)</code>: Returns a new <code>DateTime</code> instance at the start of the week.</li>
+<li><code>end_of_week(&amp;self)</code>: Returns a new <code>DateTime</code> instance at the end of the week.</li>
+<li><code>start_of_month(&amp;self)</code>: Returns a new <code>DateTime</code> instance at the start of the month.</li>
+<li><code>end_of_month(&amp;self)</code>: Returns a new <code>DateTime</code> instance at the end of the month.</li>
+<li><code>start_of_year(&amp;self)</code>: Returns a new <code>DateTime</code> instance at the start of the year.</li>
+<li><code>end_of_year(&amp;self)</code>: Returns a new <code>DateTime</code> instance at the end of the year.</li>
+<li><code>is_within_range(&amp;self, start: &amp;Self, end: &amp;Self)</code>: Checks if the <code>DateTime</code> falls within a specific range.</li>
+<li><code>duration_since(&amp;self, other: &amp;Self)</code>: Calculates the duration between two <code>DateTime</code> instances.</li>
+</ul>
+</li>
+<li>
+<p><strong>Getters</strong>:</p>
+<ul>
+<li><code>year(&amp;self)</code>: Returns the year.</li>
+<li><code>month(&amp;self)</code>: Returns the month.</li>
+<li><code>day(&amp;self)</code>: Returns the day of the month.</li>
+<li><code>hour(&amp;self)</code>: Returns the hour.</li>
+<li><code>minute(&amp;self)</code>: Returns the minute.</li>
+<li><code>second(&amp;self)</code>: Returns the second.</li>
+<li><code>microsecond(&amp;self)</code>: Returns the microsecond.</li>
+<li><code>weekday(&amp;self)</code>: Returns the weekday.</li>
+<li><code>ordinal(&amp;self)</code>: Returns the day of the year (ordinal).</li>
+<li><code>iso_week(&amp;self)</code>: Returns the ISO week number.</li>
+<li><code>offset(&amp;self)</code>: Returns the UTC offset.</li>
+</ul>
+</li>
+<li>
+<p><strong>Setters</strong>:</p>
+<ul>
+<li><code>set_date(&amp;self, year: i32, month: u8, day: u8)</code>: Sets a new date for the <code>DateTime</code> instance.</li>
+<li><code>set_time(&amp;self, hour: u8, minute: u8, second: u8)</code>: Sets a new time for the <code>DateTime</code> instance.</li>
+</ul>
+</li>
+<li>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li><code>is_valid_day(day: &amp;str)</code>: Checks if the input represents a valid day of the month.</li>
+<li><code>is_valid_hour(hour: &amp;str)</code>: Checks if the input represents a valid hour of the day.</li>
+<li><code>is_valid_minute(minute: &amp;str)</code>: Checks if the input represents a valid minute of the hour.</li>
+<li><code>is_valid_second(second: &amp;str)</code>: Checks if the input represents a valid second of the minute.</li>
+<li><code>is_valid_month(month: &amp;str)</code>: Checks if the input represents a valid month of the year.</li>
+<li><code>is_valid_year(year: &amp;str)</code>: Checks if the input represents a valid year.</li>
+<li><code>is_valid_microsecond(microsecond: &amp;str)</code>: Checks if the input represents a valid microsecond.</li>
+<li><code>is_valid_ordinal(ordinal: &amp;str)</code>: Checks if the input represents a valid ordinal day of the year.</li>
+<li><code>is_valid_iso_week(week: &amp;str)</code>: Checks if the input represents a valid ISO week number.</li>
+<li><code>is_valid_time(time: &amp;str)</code>: Checks if the input represents a valid time in <code>HH:MM:SS</code> format.</li>
+<li><code>is_valid_iso_8601(date: &amp;str)</code>: Checks if the input represents a valid ISO 8601 formatted date.</li>
+</ul>
+</li>
+<li>
+<p><strong>Utility Functions</strong>:</p>
+<ul>
+<li><code>format_time_in_timezone(tz: &amp;str, format: &amp;str)</code>: Formats the current time for a specific timezone.</li>
+</ul>
+</li>
+<li>
+<p><strong>Arithmetic Operations</strong>:</p>
+<ul>
+<li><code>Add&lt;Duration&gt;</code>: Adds a <code>Duration</code> to the <code>DateTime</code> instance.</li>
+<li><code>Sub&lt;Duration&gt;</code>: Subtracts a <code>Duration</code> from the <code>DateTime</code> instance.</li>
+</ul>
+</li>
+<li>
+<p><strong>Comparison Operations</strong>:</p>
+<ul>
+<li><code>PartialOrd</code>: Allows partial ordering comparisons between <code>DateTime</code> instances.</li>
+<li><code>Ord</code>: Allows total ordering comparisons between <code>DateTime</code> instances.</li>
+</ul>
+</li>
+<li>
+<p><strong>Hashing</strong>:</p>
+<ul>
+<li><code>Hash</code>: Allows <code>DateTime</code> instances to be used as keys in hash-based collections.</li>
+</ul>
+</li>
+<li>
+<p><strong>Macros</strong>:</p>
+<ul>
+<li><code>dtt_now!()</code>: Generates the current date and time.</li>
+<li><code>dtt_parse!(input)</code>: Parses a date-time string into a <code>DateTime</code> object.</li>
+<li><code>dtt_print!(datetime)</code>: Prints a <code>DateTime</code> object.</li>
+<li><code>dtt_vec![]</code>: Creates a vector.</li>
+<li><code>dtt_map!{}</code>: Creates a map.</li>
+<li><code>dtt_assert!</code>: Asserts conditions during testing.</li>
+<li><code>is_valid!</code>: Checks the validity of various date-time components.</li>
+<li><code>dtt_is_valid_function!(func_name)</code>: Defines a custom validation function.</li>
+<li><code>dtt_new_with_tz!(tz)</code>: Creates a new <code>DateTime</code> object with a specified timezone.</li>
+<li><code>dtt_add_days!(datetime, days)</code>: Adds days to a <code>DateTime</code> object.</li>
+<li><code>dtt_sub_days!(datetime, days)</code>: Subtracts days from a <code>DateTime</code> object.</li>
+<li><code>dtt_diff_seconds!(datetime1, datetime2)</code>: Calculates the difference in seconds between two <code>DateTime</code> objects.</li>
+<li><code>dtt_diff_days!(datetime1, datetime2)</code>: Calculates the difference in days between two <code>DateTime</code> objects.</li>
+<li><code>dtt_clone!</code>: Creates a deep copy of a <code>DateTime</code> object.</li>
+<li><code>dtt_format!</code>: Formats a <code>DateTime</code> object using a provided format string.</li>
+<li><code>dtt_create_vec!</code>: Creates a new vector containing provided elements.</li>
+<li><code>dtt_min!</code>: Returns the minimum of given values.</li>
+<li><code>dtt_max!</code>: Returns the maximum of given values.</li>
+<li><code>dtt_join!</code>: Joins a vector of strings into a single string.</li>
+<li><code>dtt_print_vec!</code>: Prints a vector of elements to the console.</li>
+</ul>
+</li>
+<li>
+<p><strong>Helper Functions</strong>:</p>
+<ul>
+<li><code>days_in_month(year: i32, month: u8)</code>: Determines the number of days in a given month and year.</li>
+<li><code>is_leap_year(year: i32)</code>: Determines if a year is a leap year.</li>
+</ul>
+</li>
+<li>
+<p><strong>Error Handling</strong>:
+The library provides comprehensive error handling through the <code>DateTimeError</code> enum, allowing for robust error management in date and time operations.</p>
+</li>
+<li>
+<p><strong>Timezone Support</strong>:
+DateTime (DTT) offers extensive timezone support, allowing for creation and manipulation of date-time objects across different timezones.</p>
+</li>
+<li>
+<p><strong>Serialization and Deserialization</strong>:
+The library supports serialization and deserialization of <code>DateTime</code> objects using <code>serde</code>, facilitating easy integration with various data formats.</p>
+</li>
+</ul>
+<h3 id="documentation"><a class="doc-anchor" href="#documentation">§</a>Documentation</h3>
+<p>For full API documentation, please visit <a href="https://doc.dttlib.com/" title="DateTime (DTT) Library Documentation">https://doc.dttlib.com/</a> or <a href="https://docs.rs/dtt" title="Docs.rs">https://docs.rs/dtt</a>.</p>
+<h3 id="rust-version-compatibility"><a class="doc-anchor" href="#rust-version-compatibility">§</a>Rust Version Compatibility</h3>
+<p>Compiler support: requires rustc 1.56.0+</p>
+<h3 id="license"><a class="doc-anchor" href="#license">§</a>License</h3>
+<p>Licensed under either of the <a href="https://opensource.org/license/apache-2-0/" title="Apache License, Version 2.0">Apache License</a> or the
+<a href="https://opensource.org/licenses/MIT" title="MIT license">MIT license</a> at your option.</p>
+<p>Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this crate by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.</p>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="datetime/index.html" title="mod dtt::datetime">datetime</a></div><div class="desc docblock-short">The <code>datetime</code> module contains the <code>DateTime</code> struct and its associated methods.
+A DateTime module for handling dates, times, and timezones.</div></li><li><div class="item-name"><a class="mod" href="error/index.html" title="mod dtt::error">error</a></div><div class="desc docblock-short">The <code>error</code> module contains custom error types for DateTime parsing.</div></li><li><div class="item-name"><a class="mod" href="macros/index.html" title="mod dtt::macros">macros</a></div><div class="desc docblock-short">The <code>macros</code> module contains functions for generating macros.</div></li></ul><h2 id="macros" class="section-header">Macros<a href="#macros" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="macro" href="macro.dtt_add_days.html" title="macro dtt::dtt_add_days">dtt_add_days</a></div><div class="desc docblock-short">Adds the specified number of days to the given <code>DateTime</code> instance.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_assert.html" title="macro dtt::dtt_assert">dtt_assert</a></div><div class="desc docblock-short">Asserts that the given expression is true.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_clone.html" title="macro dtt::dtt_clone">dtt_clone</a></div><div class="desc docblock-short">Creates a copy of the provided <code>DateTime</code> object.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_create_vec.html" title="macro dtt::dtt_create_vec">dtt_create_vec</a></div><div class="desc docblock-short">Creates a new vector containing the provided elements.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_diff.html" title="macro dtt::dtt_diff">dtt_diff</a></div><div class="desc docblock-short">A helper macro to calculate the difference between two <code>DateTime</code> instances.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_diff_days.html" title="macro dtt::dtt_diff_days">dtt_diff_days</a></div><div class="desc docblock-short">Calculates the difference in days between two <code>DateTime</code> instances.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_diff_seconds.html" title="macro dtt::dtt_diff_seconds">dtt_diff_seconds</a></div><div class="desc docblock-short">Calculates the difference in seconds between two <code>DateTime</code> instances.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_format.html" title="macro dtt::dtt_format">dtt_format</a></div><div class="desc docblock-short">Formats a <code>DateTime</code> object using the provided format string.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_is_valid_function.html" title="macro dtt::dtt_is_valid_function">dtt_is_valid_function</a></div><div class="desc docblock-short">Generates a function that validates a given input string based on a specified type.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_join.html" title="macro dtt::dtt_join">dtt_join</a></div><div class="desc docblock-short">Joins multiple strings into a single string.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_map.html" title="macro dtt::dtt_map">dtt_map</a></div><div class="desc docblock-short">Creates a new map of the given key-value pairs.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_max.html" title="macro dtt::dtt_max">dtt_max</a></div><div class="desc docblock-short">Returns the maximum of the given values.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_min.html" title="macro dtt::dtt_min">dtt_min</a></div><div class="desc docblock-short">Returns the minimum of the given values.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_new_with_tz.html" title="macro dtt::dtt_new_with_tz">dtt_new_with_tz</a></div><div class="desc docblock-short">Creates a new <code>DateTime</code> instance with the specified timezone.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_now.html" title="macro dtt::dtt_now">dtt_now</a></div><div class="desc docblock-short">Creates a new <code>DateTime</code> instance with the current date and time in UTC.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_parse.html" title="macro dtt::dtt_parse">dtt_parse</a></div><div class="desc docblock-short">Prints the arguments to the console.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_print.html" title="macro dtt::dtt_print">dtt_print</a></div><div class="desc docblock-short">Prints the arguments to the console.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_print_vec.html" title="macro dtt::dtt_print_vec">dtt_print_vec</a></div><div class="desc docblock-short">Prints a vector of elements to the console.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_sub_days.html" title="macro dtt::dtt_sub_days">dtt_sub_days</a></div><div class="desc docblock-short">Subtracts the specified number of days from the given <code>DateTime</code> instance.</div></li><li><div class="item-name"><a class="macro" href="macro.dtt_vec.html" title="macro dtt::dtt_vec">dtt_vec</a></div><div class="desc docblock-short">Creates a new vector of the given elements.</div></li><li><div class="item-name"><a class="macro" href="macro.is_valid.html" title="macro dtt::is_valid">is_valid</a></div><div class="desc docblock-short">Generates a function that validates a given input string based on a specified type.</div></li></ul><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="fn" href="fn.run.html" title="fn dtt::run">run</a></div><div class="desc docblock-short">Runs the main logic of the application.</div></li></ul></section></div></main></body></html>
