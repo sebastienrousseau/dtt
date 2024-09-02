@@ -20,8 +20,8 @@ mod tests {
     fn test_dtt_map() {
         let m = dtt_map!("one" => 1, "two" => 2);
         let mut expected = HashMap::new();
-        expected.insert("one", 1);
-        expected.insert("two", 2);
+        let _ = expected.insert("one", 1);
+        let _ = expected.insert("two", 2);
         assert_eq!(m, expected);
     }
 

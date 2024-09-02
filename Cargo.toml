@@ -59,7 +59,6 @@ assert_cmd = "2.0"
 criterion = "0.5"
 serde_json = "1.0"
 
-
 [build-dependencies]
 # Dependencies for build scripts.
 version_check = "0.9.4" # Check the Rust version used to compile the package.
@@ -98,7 +97,7 @@ missing_docs = "warn"
 unstable_features = "warn"
 # unused_crate_dependencies = "warn"
 unused_extern_crates = "warn"
-# unused_results = "warn"
+unused_results = "warn"
 
 ## Allow
 bare_trait_objects = "allow"

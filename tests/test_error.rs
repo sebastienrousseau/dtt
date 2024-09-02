@@ -102,8 +102,8 @@ mod tests {
         #[test]
         fn test_hash() {
             let mut set = HashSet::new();
-            set.insert(DateTimeError::InvalidFormat);
-            set.insert(DateTimeError::InvalidTimezone);
+            let _ = set.insert(DateTimeError::InvalidFormat);
+            let _ = set.insert(DateTimeError::InvalidTimezone);
 
             assert_eq!(set.len(), 2);
             assert!(set.contains(&DateTimeError::InvalidFormat));
