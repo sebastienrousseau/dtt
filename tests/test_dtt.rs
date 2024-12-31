@@ -186,16 +186,16 @@ mod tests {
         let custom_format = date
             .format("[year]-[month]-[day] [hour]:[minute]:[second]")
             .expect("Failed to format date");
-        assert!(custom_format.contains("-")); // Basic check to ensure the format is applied
+        assert!(custom_format.contains('-')); // Basic check to ensure the format is applied
 
         let rfc3339_format = date
             .format_rfc3339()
             .expect("Failed to format RFC3339 date");
-        assert!(rfc3339_format.contains("T"));
+        assert!(rfc3339_format.contains('T')); // Use char for single character
 
         let iso8601_format = date
             .format_iso8601()
             .expect("Failed to format ISO8601 date");
-        assert!(iso8601_format.contains("T"));
+        assert!(iso8601_format.contains('T')); // Use char for single character
     }
 }

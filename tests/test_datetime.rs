@@ -712,42 +712,23 @@ mod tests {
 
         /// Test for updating a `DateTime` instance.
         #[test]
-        fn test_update() {
+        fn test_update() -> Result<(), Box<dyn std::error::Error>> {
             let dt = DateTime::new();
             std::thread::sleep(std::time::Duration::from_secs(2)); // Sleep for 2 seconds
-            let updated_dt = match dt.update() {
-                Ok(updated) => updated,
-                Err(err) => {
-                    panic!("Failed to update DateTime: {:?}", err)
-                }
-            };
+            let updated_dt = dt.update()?; // Propagate error using `?`
             assert!(updated_dt > dt);
+            Ok(())
         }
 
         /// Test for converting a `DateTime` instance to a different timezone.
         #[test]
-        fn test_convert_to_tz() {
-            let dt = match DateTime::new_with_tz("EST") {
-                Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to create DateTime with timezone: {:?}",
-                    err
-                ),
-            };
-            let paris_time = match dt.convert_to_tz("CET") {
-                Ok(converted) => converted,
-                Err(err) => panic!(
-                    "Failed to convert DateTime to timezone: {:?}",
-                    err
-                ),
-            };
-            let expected_offset = match UtcOffset::from_hms(1, 0, 0) {
-                Ok(offset) => offset,
-                Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
-                }
-            };
+        fn test_convert_to_tz() -> Result<(), Box<dyn std::error::Error>>
+        {
+            let dt = DateTime::new_with_tz("EST")?;
+            let paris_time = dt.convert_to_tz("CET")?;
+            let expected_offset = UtcOffset::from_hms(1, 0, 0)?;
             assert_eq!(paris_time.offset(), expected_offset);
+            Ok(())
         }
 
         /// Test for handling an invalid timezone in `convert_to_tz`.
@@ -892,41 +873,27 @@ mod tests {
         }
 
         #[test]
-        fn test_new_with_tz() {
-            let dt = match DateTime::new_with_tz("EST") {
-                Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to create DateTime with timezone: {:?}",
-                    err
-                ),
-            };
-            let expected_offset = match UtcOffset::from_hms(-5, 0, 0) {
-                Ok(offset) => offset,
-                Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
-                }
-            };
+        fn test_new_with_tz() -> Result<(), Box<dyn std::error::Error>>
+        {
+            let dt = DateTime::new_with_tz("EST")?;
+            let expected_offset = UtcOffset::from_hms(-5, 0, 0)?;
             assert_eq!(dt.offset(), expected_offset);
+            Ok(())
         }
 
         #[test]
-        fn test_new_with_custom_offset() {
-            let dt = match DateTime::new_with_custom_offset(5, 30) {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to create DateTime with custom offset: {:?}", err),
-    };
-            let expected_offset = match UtcOffset::from_hms(5, 30, 0) {
-                Ok(offset) => offset,
-                Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
-                }
-            };
+        fn test_new_with_custom_offset(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::new_with_custom_offset(5, 30)?;
+            let expected_offset = UtcOffset::from_hms(5, 30, 0)?;
             assert_eq!(dt.offset(), expected_offset);
+            Ok(())
         }
 
         #[test]
-        fn test_from_components() {
-            let dt = match DateTime::from_components(
+        fn test_from_components(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::from_components(
                 2024,
                 8,
                 31,
@@ -934,13 +901,7 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to create DateTime from components: {:?}",
-                    err
-                ),
-            };
+            )?;
             assert_eq!(dt.year(), 2024);
             assert_eq!(dt.month() as u8, 8);
             assert_eq!(dt.day(), 31);
@@ -948,6 +909,7 @@ mod tests {
             assert_eq!(dt.minute(), 0);
             assert_eq!(dt.second(), 0);
             assert_eq!(dt.offset(), UtcOffset::UTC);
+            Ok(())
         }
 
         #[test]
@@ -962,8 +924,9 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_add_duration() {
-            let dt = match DateTime::from_components(
+        fn test_add_duration() -> Result<(), Box<dyn std::error::Error>>
+        {
+            let dt = DateTime::from_components(
                 2024,
                 8,
                 31,
@@ -971,61 +934,44 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
-            let future_dt = match dt + Duration::days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => panic!("Failed to add duration: {:?}", err),
-            };
+            )?;
+            let future_dt = (dt + Duration::days(1))?;
             assert_eq!(future_dt.day(), 1);
             assert_eq!(future_dt.month() as u8, 9);
+            Ok(())
         }
 
         #[test]
-        fn test_sub_duration() {
+        fn test_sub_duration() -> Result<(), Box<dyn std::error::Error>>
+        {
             let dt = DateTime::new();
-            let past_dt = match dt - Duration::days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to subtract duration: {:?}", err)
-                }
-            };
+            let past_dt = (dt - Duration::days(1))?;
             assert_eq!(
                 past_dt.day(),
                 if dt.day() == 1 { 31 } else { dt.day() - 1 }
             );
+            Ok(())
         }
 
         #[test]
-        fn test_add_negative_days() {
+        fn test_add_negative_days(
+        ) -> Result<(), Box<dyn std::error::Error>> {
             let dt = DateTime::new();
-            let result = dt.add_days(-1);
-            match result {
-                Ok(updated_dt) => assert_eq!(
-                    updated_dt.day(),
-                    if dt.day() == 1 { 31 } else { dt.day() - 1 }
-                ),
-                Err(err) => {
-                    panic!("Failed to add negative days: {:?}", err)
-                }
-            };
+            let updated_dt = dt.add_days(-1)?;
+            assert_eq!(
+                updated_dt.day(),
+                if dt.day() == 1 { 31 } else { dt.day() - 1 }
+            );
+            Ok(())
         }
 
         #[test]
-        fn test_update() {
+        fn test_update() -> Result<(), Box<dyn std::error::Error>> {
             let dt = DateTime::new();
             std::thread::sleep(std::time::Duration::from_secs(2)); // Sleep for 2 seconds
-            let updated_dt = match dt.update() {
-                Ok(updated) => updated,
-                Err(err) => {
-                    panic!("Failed to update DateTime: {:?}", err)
-                }
-            };
+            let updated_dt = dt.update()?;
             assert!(updated_dt > dt);
+            Ok(())
         }
 
         #[test]
@@ -1048,25 +994,13 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_convert_to_tz() {
-            let dt = match DateTime::new_with_tz("EST") {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to create DateTime with timezone 'EST': {:?}", err),
-    };
-
-            let paris_time = match dt.convert_to_tz("CET") {
-        Ok(converted) => converted,
-        Err(err) => panic!("Failed to convert DateTime to timezone 'CET': {:?}", err),
-    };
-
-            let expected_offset = match UtcOffset::from_hms(1, 0, 0) {
-                Ok(offset) => offset,
-                Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
-                }
-            };
-
+        fn test_convert_to_tz() -> Result<(), Box<dyn std::error::Error>>
+        {
+            let dt = DateTime::new_with_tz("EST")?;
+            let paris_time = dt.convert_to_tz("CET")?;
+            let expected_offset = UtcOffset::from_hms(1, 0, 0)?;
             assert_eq!(paris_time.offset(), expected_offset);
+            Ok(())
         }
 
         #[test]
@@ -1085,13 +1019,8 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_parse() {
-            let dt = match DateTime::parse("2024-08-31T15:00:00Z") {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to parse DateTime: {:?}", err)
-                }
-            };
+        fn test_parse() -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::parse("2024-08-31T15:00:00Z")?;
             assert_eq!(dt.year(), 2024);
             assert_eq!(dt.month() as u8, 8);
             assert_eq!(dt.day(), 31);
@@ -1099,64 +1028,49 @@ mod tests {
             assert_eq!(dt.minute(), 0);
             assert_eq!(dt.second(), 0);
             assert_eq!(dt.offset(), UtcOffset::UTC);
+            Ok(())
         }
 
         #[test]
-        fn test_parse_custom_format() {
-            let dt = match DateTime::parse_custom_format(
+        fn test_parse_custom_format(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::parse_custom_format(
                 "2024-08-31 15:00:00",
                 "[year]-[month]-[day] [hour]:[minute]:[second]",
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to parse DateTime with custom format: {:?}",
-                    err
-                ),
-            };
+            )?;
             assert_eq!(dt.year(), 2024);
             assert_eq!(dt.month() as u8, 8);
             assert_eq!(dt.day(), 31);
             assert_eq!(dt.hour(), 15);
             assert_eq!(dt.minute(), 0);
             assert_eq!(dt.second(), 0);
+            Ok(())
         }
 
         #[test]
-        fn test_format() {
+        fn test_format() -> Result<(), Box<dyn std::error::Error>> {
             let dt = DateTime::new();
-            let formatted = match dt.format("[year]-[month]-[day]") {
-                Ok(result) => result,
-                Err(err) => {
-                    panic!("Failed to format DateTime: {:?}", err)
-                }
-            };
+            let formatted = dt.format("[year]-[month]-[day]")?;
             assert!(formatted.starts_with(&dt.year().to_string()));
+            Ok(())
         }
 
         #[test]
-        fn test_format_rfc3339() {
+        fn test_format_rfc3339(
+        ) -> Result<(), Box<dyn std::error::Error>> {
             let dt = DateTime::new();
-            let rfc3339_format = match dt.format_rfc3339() {
-                Ok(result) => result,
-                Err(err) => panic!(
-                    "Failed to format DateTime as RFC 3339: {:?}",
-                    err
-                ),
-            };
+            let rfc3339_format = dt.format_rfc3339()?;
             assert!(rfc3339_format.contains("T"));
+            Ok(())
         }
 
         #[test]
-        fn test_format_iso8601() {
+        fn test_format_iso8601(
+        ) -> Result<(), Box<dyn std::error::Error>> {
             let dt = DateTime::new();
-            let iso8601_format = match dt.format_iso8601() {
-                Ok(result) => result,
-                Err(err) => panic!(
-                    "Failed to format DateTime as ISO 8601: {:?}",
-                    err
-                ),
-            };
+            let iso8601_format = dt.format_iso8601()?;
             assert!(iso8601_format.contains("T"));
+            Ok(())
         }
     }
 
@@ -1166,31 +1080,24 @@ mod tests {
         use std::collections::hash_map::DefaultHasher;
 
         #[test]
-        fn test_partial_ord() {
+        fn test_partial_ord() -> Result<(), Box<dyn std::error::Error>>
+        {
             let dt1 = DateTime::new();
-            let dt2 = match dt1.add_days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to add days to DateTime: {:?}", err)
-                }
-            };
+            let dt2 = dt1.add_days(1)?;
             assert!(dt1 < dt2);
+            Ok(())
         }
 
         #[test]
-        fn test_ord() {
+        fn test_ord() -> Result<(), Box<dyn std::error::Error>> {
             let dt1 = DateTime::new();
-            let dt2 = match dt1.add_days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to add days to DateTime: {:?}", err)
-                }
-            };
+            let dt2 = dt1.add_days(1)?;
             assert!(dt1.cmp(&dt2) == std::cmp::Ordering::Less);
+            Ok(())
         }
 
         #[test]
-        fn test_hash() {
+        fn test_hash() -> Result<(), Box<dyn std::error::Error>> {
             let dt = DateTime::new();
             let mut hasher = DefaultHasher::new();
             dt.hash(&mut hasher);
@@ -1201,25 +1108,18 @@ mod tests {
             let hash2 = hasher.finish();
 
             assert_eq!(hash1, hash2);
+            Ok(())
         }
 
         #[test]
-        fn test_is_within_range() {
+        fn test_is_within_range(
+        ) -> Result<(), Box<dyn std::error::Error>> {
             let dt1 = DateTime::new();
-            let dt2 = match dt1.add_days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to add days to DateTime: {:?}", err)
-                }
-            };
-            let dt3 = match dt1.add_days(2) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to add days to DateTime: {:?}", err)
-                }
-            };
+            let dt2 = dt1.add_days(1)?;
+            let dt3 = dt1.add_days(2)?;
             assert!(dt2.is_within_range(&dt1, &dt3));
             assert!(!dt1.is_within_range(&dt2, &dt3));
+            Ok(())
         }
     }
 
@@ -1228,8 +1128,9 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_add_duration_invalid() {
-            let dt = match DateTime::from_components(
+        fn test_add_duration_invalid(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::from_components(
                 9999,
                 12,
                 31,
@@ -1237,20 +1138,17 @@ mod tests {
                 59,
                 59,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
+            )?;
             let result = dt + Duration::days(1);
             assert!(matches!(result, Err(DateTimeError::InvalidDate)));
+            Ok(())
         }
 
         #[test]
-        fn test_end_of_month_scenarios() {
+        fn test_end_of_month_scenarios(
+        ) -> Result<(), Box<dyn std::error::Error>> {
             // Test for February in a leap year
-            let dt = match DateTime::from_components(
+            let dt = DateTime::from_components(
                 2024,
                 2,
                 1,
@@ -1258,21 +1156,12 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
-            match dt.end_of_month() {
-                Ok(end_date) => assert_eq!(end_date.day(), 29),
-                Err(err) => {
-                    panic!("Failed to compute end of month: {:?}", err)
-                }
-            };
+            )?;
+            let end_date = dt.end_of_month()?;
+            assert_eq!(end_date.day(), 29);
 
             // Test for February in a non-leap year
-            let dt = match DateTime::from_components(
+            let dt = DateTime::from_components(
                 2023,
                 2,
                 1,
@@ -1280,21 +1169,12 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
-            match dt.end_of_month() {
-                Ok(end_date) => assert_eq!(end_date.day(), 28),
-                Err(err) => {
-                    panic!("Failed to compute end of month: {:?}", err)
-                }
-            };
+            )?;
+            let end_date = dt.end_of_month()?;
+            assert_eq!(end_date.day(), 28);
 
             // Test for a 30-day month
-            let dt = match DateTime::from_components(
+            let dt = DateTime::from_components(
                 2024,
                 4,
                 1,
@@ -1302,21 +1182,12 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
-            match dt.end_of_month() {
-                Ok(end_date) => assert_eq!(end_date.day(), 30),
-                Err(err) => {
-                    panic!("Failed to compute end of month: {:?}", err)
-                }
-            };
+            )?;
+            let end_date = dt.end_of_month()?;
+            assert_eq!(end_date.day(), 30);
 
             // Test for a 31-day month
-            let dt = match DateTime::from_components(
+            let dt = DateTime::from_components(
                 2024,
                 5,
                 1,
@@ -1324,23 +1195,17 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
-            match dt.end_of_month() {
-                Ok(end_date) => assert_eq!(end_date.day(), 31),
-                Err(err) => {
-                    panic!("Failed to compute end of month: {:?}", err)
-                }
-            };
+            )?;
+            let end_date = dt.end_of_month()?;
+            assert_eq!(end_date.day(), 31);
+
+            Ok(())
         }
 
         #[test]
-        fn test_microsecond_precision() {
-            let dt = match DateTime::from_components(
+        fn test_microsecond_precision(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::from_components(
                 2024,
                 1,
                 1,
@@ -1348,18 +1213,15 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
+            )?;
             assert_eq!(dt.microsecond(), 0);
+            Ok(())
         }
 
         #[test]
-        fn test_ordinal_day() {
-            let dt = match DateTime::from_components(
+        fn test_ordinal_day() -> Result<(), Box<dyn std::error::Error>>
+        {
+            let dt = DateTime::from_components(
                 2024,
                 1,
                 1,
@@ -1367,18 +1229,14 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
+            )?;
             assert_eq!(dt.ordinal(), 1);
+            Ok(())
         }
 
         #[test]
-        fn test_iso_week() {
-            let dt = match DateTime::from_components(
+        fn test_iso_week() -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::from_components(
                 2024,
                 1,
                 1,
@@ -1386,18 +1244,14 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
+            )?;
             assert!(dt.iso_week() > 0 && dt.iso_week() <= 53);
+            Ok(())
         }
 
         #[test]
-        fn test_display() {
-            let dt = match DateTime::from_components(
+        fn test_display() -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::from_components(
                 2024,
                 1,
                 1,
@@ -1405,14 +1259,10 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
+            )?;
             let display_string = format!("{}", dt);
             assert!(display_string.starts_with("2024-01-01T00:00:00"));
+            Ok(())
         }
     }
 
@@ -1461,13 +1311,24 @@ mod tests {
         #[test]
         fn test_new_with_tz() {
             let dt = match DateTime::new_with_tz("EST") {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to create DateTime with timezone 'EST': {:?}", err),
-    };
+                Ok(date_time) => date_time,
+                Err(_) => {
+                    assert!(
+                        false,
+                        "Failed to create DateTime with timezone 'EST'"
+                    );
+                    return;
+                }
+            };
             let expected_offset = match UtcOffset::from_hms(-5, 0, 0) {
                 Ok(offset) => offset,
-                Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
+                Err(_) => {
+                    assert!(
+                        false,
+                        "Failed to create UtcOffset: {:?}",
+                        "error"
+                    );
+                    return;
                 }
             };
             assert_eq!(dt.offset(), expected_offset);
@@ -1476,13 +1337,21 @@ mod tests {
         #[test]
         fn test_new_with_custom_offset() {
             let dt = match DateTime::new_with_custom_offset(5, 30) {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to create DateTime with custom offset: {:?}", err),
-    };
+                Ok(date_time) => date_time,
+                Err(err) => {
+                    assert!(false, "Failed to create DateTime with custom offset: {:?}", err);
+                    return;
+                }
+            };
             let expected_offset = match UtcOffset::from_hms(5, 30, 0) {
                 Ok(offset) => offset,
                 Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
+                    assert!(
+                        false,
+                        "Failed to create UtcOffset: {:?}",
+                        err
+                    );
+                    return;
                 }
             };
             assert_eq!(dt.offset(), expected_offset);
@@ -1500,10 +1369,10 @@ mod tests {
                 UtcOffset::UTC,
             ) {
                 Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to create DateTime from components: {:?}",
-                    err
-                ),
+                Err(err) => {
+                    assert!(false, "Failed to create DateTime from components: {:?}", err);
+                    return;
+                }
             };
             assert_eq!(dt.year(), 2024);
             assert_eq!(dt.month() as u8, 8);
@@ -1519,7 +1388,12 @@ mod tests {
             let dt = match DateTime::parse("2024-08-31T15:00:00Z") {
                 Ok(date_time) => date_time,
                 Err(err) => {
-                    panic!("Failed to parse DateTime: {:?}", err)
+                    assert!(
+                        false,
+                        "Failed to parse DateTime: {:?}",
+                        err
+                    );
+                    return;
                 }
             };
             assert_eq!(dt.year(), 2024);
@@ -1538,10 +1412,10 @@ mod tests {
                 "[year]-[month]-[day] [hour]:[minute]:[second]",
             ) {
                 Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to parse DateTime with custom format: {:?}",
-                    err
-                ),
+                Err(err) => {
+                    assert!(false, "Failed to parse DateTime with custom format: {:?}", err);
+                    return;
+                }
             };
             assert_eq!(dt.year(), 2024);
             assert_eq!(dt.month() as u8, 8);
@@ -1815,47 +1689,31 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_is_within_range() {
+        fn test_is_within_range(
+        ) -> Result<(), Box<dyn std::error::Error>> {
             let dt1 = DateTime::new();
-            let dt2 = match dt1.add_days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to add 1 day to DateTime: {:?}", err)
-                }
-            };
-            let dt3 = match dt1.add_days(2) {
-                Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to add 2 days to DateTime: {:?}",
-                    err
-                ),
-            };
+            let dt2 = dt1.add_days(1)?;
+            let dt3 = dt1.add_days(2)?;
             assert!(dt2.is_within_range(&dt1, &dt3));
             assert!(!dt1.is_within_range(&dt2, &dt3));
+            Ok(())
         }
 
         #[test]
-        fn test_partial_ord() {
+        fn test_partial_ord() -> Result<(), Box<dyn std::error::Error>>
+        {
             let dt1 = DateTime::new();
-            let dt2 = match dt1.add_days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to add 1 day to DateTime: {:?}", err)
-                }
-            };
+            let dt2 = dt1.add_days(1)?;
             assert!(dt1 < dt2);
+            Ok(())
         }
 
         #[test]
-        fn test_ord() {
+        fn test_ord() -> Result<(), Box<dyn std::error::Error>> {
             let dt1 = DateTime::new();
-            let dt2 = match dt1.add_days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to add 1 day to DateTime: {:?}", err)
-                }
-            };
+            let dt2 = dt1.add_days(1)?;
             assert!(dt1.cmp(&dt2) == std::cmp::Ordering::Less);
+            Ok(())
         }
 
         #[test]
@@ -1878,8 +1736,9 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_add_duration() {
-            let dt = match DateTime::from_components(
+        fn test_add_duration() -> Result<(), Box<dyn std::error::Error>>
+        {
+            let dt = DateTime::from_components(
                 2024,
                 8,
                 31,
@@ -1887,37 +1746,23 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
-            let future_dt = match dt + Duration::days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to add duration to DateTime: {:?}",
-                    err
-                ),
-            };
+            )?;
+            let future_dt = (dt + Duration::days(1))?;
             assert_eq!(future_dt.day(), 1);
             assert_eq!(future_dt.month() as u8, 9);
+            Ok(())
         }
 
         #[test]
-        fn test_sub_duration() {
+        fn test_sub_duration() -> Result<(), Box<dyn std::error::Error>>
+        {
             let dt = DateTime::new();
-            let past_dt = match dt - Duration::days(1) {
-                Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to subtract duration from DateTime: {:?}",
-                    err
-                ),
-            };
+            let past_dt = (dt - Duration::days(1))?;
             assert_eq!(
                 past_dt.day(),
                 if dt.day() == 1 { 31 } else { dt.day() - 1 }
             );
+            Ok(())
         }
 
         #[test]
@@ -1927,8 +1772,9 @@ mod tests {
         }
 
         #[test]
-        fn test_add_duration_invalid() {
-            let dt = match DateTime::from_components(
+        fn test_add_duration_invalid(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::from_components(
                 9999,
                 12,
                 31,
@@ -1936,30 +1782,22 @@ mod tests {
                 59,
                 59,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
+            )?;
             let result = dt + Duration::days(1);
             assert!(matches!(result, Err(DateTimeError::InvalidDate)));
+            Ok(())
         }
 
         #[test]
-        fn test_add_negative_days() {
+        fn test_add_negative_days(
+        ) -> Result<(), Box<dyn std::error::Error>> {
             let dt = DateTime::new();
-            let result = dt.add_days(-1);
-            match result {
-                Ok(updated_dt) => assert_eq!(
-                    updated_dt.day(),
-                    if dt.day() == 1 { 31 } else { dt.day() - 1 }
-                ),
-                Err(err) => panic!(
-                    "Failed to add negative days to DateTime: {:?}",
-                    err
-                ),
-            };
+            let updated_dt = dt.add_days(-1)?;
+            assert_eq!(
+                updated_dt.day(),
+                if dt.day() == 1 { 31 } else { dt.day() - 1 }
+            );
+            Ok(())
         }
 
         #[test]
@@ -1977,8 +1815,8 @@ mod tests {
         }
 
         #[test]
-        fn test_display() {
-            let dt = match DateTime::from_components(
+        fn test_display() -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::from_components(
                 2024,
                 1,
                 1,
@@ -1986,14 +1824,10 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
+            )?;
             let display_string = format!("{}", dt);
             assert!(display_string.starts_with("2024-01-01T00:00:00"));
+            Ok(())
         }
 
         #[test]
@@ -2132,35 +1966,19 @@ mod tests {
         }
 
         #[test]
-        fn test_new_with_custom_offset_edge_cases() {
+        fn test_new_with_custom_offset_edge_cases(
+        ) -> Result<(), Box<dyn std::error::Error>> {
             // Test with positive custom offset
-            let dt = match DateTime::new_with_custom_offset(23, 59) {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to create DateTime with custom offset (23:59): {:?}", err),
-    };
-            let expected_offset = match UtcOffset::from_hms(23, 59, 0) {
-                Ok(offset) => offset,
-                Err(err) => panic!(
-                    "Failed to create UtcOffset for 23:59: {:?}",
-                    err
-                ),
-            };
+            let dt = DateTime::new_with_custom_offset(23, 59)?;
+            let expected_offset = UtcOffset::from_hms(23, 59, 0)?;
             assert_eq!(dt.offset(), expected_offset);
 
             // Test with negative custom offset
-            let dt = match DateTime::new_with_custom_offset(-23, -59) {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to create DateTime with custom offset (-23:-59): {:?}", err),
-    };
-            let expected_offset = match UtcOffset::from_hms(-23, -59, 0)
-            {
-                Ok(offset) => offset,
-                Err(err) => panic!(
-                    "Failed to create UtcOffset for -23:-59: {:?}",
-                    err
-                ),
-            };
+            let dt = DateTime::new_with_custom_offset(-23, -59)?;
+            let expected_offset = UtcOffset::from_hms(-23, -59, 0)?;
             assert_eq!(dt.offset(), expected_offset);
+
+            Ok(())
         }
     }
 
@@ -2168,40 +1986,23 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_convert_to_dst_timezone() {
-            let dt = match DateTime::new_with_tz("EST") {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to create DateTime with timezone 'EST': {:?}", err),
-    };
-            let dst_time = match dt.convert_to_tz("EDT") {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to convert DateTime to timezone 'EDT': {:?}", err),
-    };
-            let expected_offset = match UtcOffset::from_hms(-4, 0, 0) {
-                Ok(offset) => offset,
-                Err(err) => panic!(
-                    "Failed to create UtcOffset for 'EDT': {:?}",
-                    err
-                ),
-            };
+        fn test_convert_to_dst_timezone(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::new_with_tz("EST")?;
+            let dst_time = dt.convert_to_tz("EDT")?;
+            let expected_offset = UtcOffset::from_hms(-4, 0, 0)?;
             assert_eq!(dst_time.offset(), expected_offset);
+            Ok(())
         }
 
         #[test]
-        fn test_convert_multiple_timezones() {
-            let dt = match DateTime::new_with_tz("EST") {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to create DateTime with timezone 'EST': {:?}", err),
-    };
-            let dt_pst = match dt.convert_to_tz("PST") {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to convert DateTime to timezone 'PST': {:?}", err),
-    };
-            let dt_gmt = match dt_pst.convert_to_tz("GMT") {
-        Ok(date_time) => date_time,
-        Err(err) => panic!("Failed to convert DateTime to timezone 'GMT': {:?}", err),
-    };
+        fn test_convert_multiple_timezones(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::new_with_tz("EST")?;
+            let dt_pst = dt.convert_to_tz("PST")?;
+            let dt_gmt = dt_pst.convert_to_tz("GMT")?;
             assert_eq!(dt_gmt.offset(), UtcOffset::UTC);
+            Ok(())
         }
     }
 
@@ -2209,8 +2010,9 @@ mod tests {
         use super::*;
 
         #[test]
-        fn test_add_duration_across_year_end() {
-            let dt = match DateTime::from_components(
+        fn test_add_duration_across_year_end(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::from_components(
                 2024,
                 12,
                 31,
@@ -2218,28 +2020,19 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
-            let future_dt = match dt + Duration::hours(2) {
-                Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to add duration to DateTime: {:?}",
-                    err
-                ),
-            };
+            )?;
+            let future_dt = (dt + Duration::hours(2))?;
             assert_eq!(future_dt.year(), 2025);
             assert_eq!(future_dt.month() as u8, 1);
             assert_eq!(future_dt.day(), 1);
             assert_eq!(future_dt.hour(), 1);
+            Ok(())
         }
 
         #[test]
-        fn test_sub_duration_across_year_start() {
-            let dt = match DateTime::from_components(
+        fn test_sub_duration_across_year_start(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            let dt = DateTime::from_components(
                 2024,
                 1,
                 1,
@@ -2247,23 +2040,13 @@ mod tests {
                 0,
                 0,
                 UtcOffset::UTC,
-            ) {
-                Ok(date_time) => date_time,
-                Err(err) => {
-                    panic!("Failed to create DateTime: {:?}", err)
-                }
-            };
-            let past_dt = match dt - Duration::hours(2) {
-                Ok(date_time) => date_time,
-                Err(err) => panic!(
-                    "Failed to subtract duration from DateTime: {:?}",
-                    err
-                ),
-            };
+            )?;
+            let past_dt = (dt - Duration::hours(2))?;
             assert_eq!(past_dt.year(), 2023);
             assert_eq!(past_dt.month() as u8, 12);
             assert_eq!(past_dt.day(), 31);
             assert_eq!(past_dt.hour(), 23);
+            Ok(())
         }
     }
 
@@ -2355,18 +2138,31 @@ mod tests {
                 {
                     Ok(date) => date,
                     Err(err) => {
-                        panic!("Failed to create Date: {:?}", err)
+                        assert!(
+                            false,
+                            "Failed to create Date: {:?}",
+                            err
+                        );
+                        return;
                     }
                 };
             let time = match Time::from_hms(12, 0, 0) {
                 Ok(time) => time,
-                Err(err) => panic!("Failed to create Time: {:?}", err),
+                Err(err) => {
+                    assert!(false, "Failed to create Time: {:?}", err);
+                    return;
+                }
             };
             let datetime = PrimitiveDateTime::new(date, time);
             let offset = match UtcOffset::from_hms(0, 0, 0) {
                 Ok(offset) => offset,
                 Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
+                    assert!(
+                        false,
+                        "Failed to create UtcOffset: {:?}",
+                        err
+                    );
+                    return;
                 }
             };
             let dt = DateTime { datetime, offset };
@@ -2382,18 +2178,31 @@ mod tests {
                 {
                     Ok(date) => date,
                     Err(err) => {
-                        panic!("Failed to create Date: {:?}", err)
+                        assert!(
+                            false,
+                            "Failed to create Date: {:?}",
+                            err
+                        );
+                        return;
                     }
                 };
             let time = match Time::from_hms(12, 0, 0) {
                 Ok(time) => time,
-                Err(err) => panic!("Failed to create Time: {:?}", err),
+                Err(err) => {
+                    assert!(false, "Failed to create Time: {:?}", err);
+                    return;
+                }
             };
             let datetime = PrimitiveDateTime::new(date, time);
             let offset = match UtcOffset::from_hms(0, 0, 0) {
                 Ok(offset) => offset,
                 Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
+                    assert!(
+                        false,
+                        "Failed to create UtcOffset: {:?}",
+                        err
+                    );
+                    return;
                 }
             };
             let dt = DateTime { datetime, offset };
@@ -2401,16 +2210,25 @@ mod tests {
             let serialized = match serde_json::to_string(&dt) {
                 Ok(json) => json,
                 Err(err) => {
-                    panic!("Failed to serialize DateTime: {:?}", err)
+                    assert!(
+                        false,
+                        "Failed to serialize DateTime: {:?}",
+                        err
+                    );
+                    return;
                 }
             };
             let deserialized: DateTime =
                 match serde_json::from_str(&serialized) {
                     Ok(dt) => dt,
-                    Err(err) => panic!(
-                        "Failed to deserialize DateTime: {:?}",
-                        err
-                    ),
+                    Err(err) => {
+                        assert!(
+                            false,
+                            "Failed to deserialize DateTime: {:?}",
+                            err
+                        );
+                        return;
+                    }
                 };
 
             assert_eq!(dt, deserialized);
@@ -2423,18 +2241,31 @@ mod tests {
                 {
                     Ok(date) => date,
                     Err(err) => {
-                        panic!("Failed to create Date: {:?}", err)
+                        assert!(
+                            false,
+                            "Failed to create Date: {:?}",
+                            err
+                        );
+                        return;
                     }
                 };
             let time1 = match Time::from_hms(12, 0, 0) {
                 Ok(time) => time,
-                Err(err) => panic!("Failed to create Time: {:?}", err),
+                Err(err) => {
+                    assert!(false, "Failed to create Time: {:?}", err);
+                    return;
+                }
             };
             let datetime1 = PrimitiveDateTime::new(date1, time1);
             let offset1 = match UtcOffset::from_hms(0, 0, 0) {
                 Ok(offset) => offset,
                 Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
+                    assert!(
+                        false,
+                        "Failed to create UtcOffset: {:?}",
+                        err
+                    );
+                    return;
                 }
             };
             let dt1 = DateTime {
@@ -2447,18 +2278,31 @@ mod tests {
                 {
                     Ok(date) => date,
                     Err(err) => {
-                        panic!("Failed to create Date: {:?}", err)
+                        assert!(
+                            false,
+                            "Failed to create Date: {:?}",
+                            err
+                        );
+                        return;
                     }
                 };
             let time2 = match Time::from_hms(12, 0, 0) {
                 Ok(time) => time,
-                Err(err) => panic!("Failed to create Time: {:?}", err),
+                Err(err) => {
+                    assert!(false, "Failed to create Time: {:?}", err);
+                    return;
+                }
             };
             let datetime2 = PrimitiveDateTime::new(date2, time2);
             let offset2 = match UtcOffset::from_hms(0, 0, 0) {
                 Ok(offset) => offset,
                 Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
+                    assert!(
+                        false,
+                        "Failed to create UtcOffset: {:?}",
+                        err
+                    );
+                    return;
                 }
             };
             let dt2 = DateTime {
@@ -2477,18 +2321,31 @@ mod tests {
                 {
                     Ok(date) => date,
                     Err(err) => {
-                        panic!("Failed to create Date: {:?}", err)
+                        assert!(
+                            false,
+                            "Failed to create Date: {:?}",
+                            err
+                        );
+                        return;
                     }
                 };
             let time = match Time::from_hms(12, 0, 0) {
                 Ok(time) => time,
-                Err(err) => panic!("Failed to create Time: {:?}", err),
+                Err(err) => {
+                    assert!(false, "Failed to create Time: {:?}", err);
+                    return;
+                }
             };
             let datetime = PrimitiveDateTime::new(date, time);
             let offset = match UtcOffset::from_hms(2, 0, 0) {
                 Ok(offset) => offset,
                 Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
+                    assert!(
+                        false,
+                        "Failed to create UtcOffset: {:?}",
+                        err
+                    );
+                    return;
                 }
             };
             let dt = DateTime { datetime, offset };
@@ -2503,18 +2360,31 @@ mod tests {
                 {
                     Ok(date) => date,
                     Err(err) => {
-                        panic!("Failed to create Date: {:?}", err)
+                        assert!(
+                            false,
+                            "Failed to create Date: {:?}",
+                            err
+                        );
+                        return;
                     }
                 };
             let time = match Time::from_hms(12, 0, 0) {
                 Ok(time) => time,
-                Err(err) => panic!("Failed to create Time: {:?}", err),
+                Err(err) => {
+                    assert!(false, "Failed to create Time: {:?}", err);
+                    return;
+                }
             };
             let datetime = PrimitiveDateTime::new(date, time);
             let offset = match UtcOffset::from_hms(0, 0, 0) {
                 Ok(offset) => offset,
                 Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
+                    assert!(
+                        false,
+                        "Failed to create UtcOffset: {:?}",
+                        err
+                    );
+                    return;
                 }
             };
             let dt = DateTime { datetime, offset };
@@ -2530,19 +2400,33 @@ mod tests {
                 match Date::from_calendar_date(2023, Month::January, 1)
                 {
                     Ok(date) => date,
-                    Err(err) => {
-                        panic!("Failed to create Date: {:?}", err)
+                    Err(_) => {
+                        assert_eq!(
+                            Ok::<(), &str>(()),
+                            Err("Failed to create Date")
+                        );
+                        return;
                     }
                 };
             let time = match Time::from_hms(12, 0, 0) {
                 Ok(time) => time,
-                Err(err) => panic!("Failed to create Time: {:?}", err),
+                Err(_) => {
+                    assert_eq!(
+                        Ok::<(), &str>(()),
+                        Err("Failed to create Time")
+                    );
+                    return;
+                }
             };
             let datetime = PrimitiveDateTime::new(date, time);
             let offset = match UtcOffset::from_hms(0, 0, 0) {
                 Ok(offset) => offset,
-                Err(err) => {
-                    panic!("Failed to create UtcOffset: {:?}", err)
+                Err(_) => {
+                    assert_eq!(
+                        Ok::<(), &str>(()),
+                        Err("Failed to create UtcOffset")
+                    );
+                    return;
                 }
             };
             let dt = DateTime { datetime, offset };
