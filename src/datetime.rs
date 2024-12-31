@@ -356,11 +356,11 @@ impl DateTime {
     ///     // ...
     /// }
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the timezone is invalid.
-    /// 
+    ///
     pub fn new_with_tz(tz: &str) -> Result<Self, DateTimeError> {
         let offset = TIMEZONE_OFFSETS
             .get(tz)
@@ -403,28 +403,34 @@ impl DateTime {
     ///     // ...
     /// }
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the timezone is invalid.
     ///
-    pub fn new_with_custom_offset(hours: i8, minutes: i8) -> Result<Self, DateTimeError> {
-    // Direct numeric checks (no casts needed)
-    if hours.abs() > 23 || minutes.abs() > 59 {
-        return Err(DateTimeError::InvalidTimezone);
+    pub fn new_with_custom_offset(
+        hours: i8,
+        minutes: i8,
+    ) -> Result<Self, DateTimeError> {
+        // Direct numeric checks (no casts needed)
+        if hours.abs() > 23 || minutes.abs() > 59 {
+            return Err(DateTimeError::InvalidTimezone);
+        }
+
+        let offset = UtcOffset::from_hms(hours, minutes, 0)
+            .map_err(|_| DateTimeError::InvalidTimezone)?;
+
+        let now_utc = OffsetDateTime::now_utc();
+        let now_local = now_utc.to_offset(offset);
+
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(
+                now_local.date(),
+                now_local.time(),
+            ),
+            offset,
+        })
     }
-
-    let offset = UtcOffset::from_hms(hours, minutes, 0)
-        .map_err(|_| DateTimeError::InvalidTimezone)?;
-
-    let now_utc = OffsetDateTime::now_utc();
-    let now_local = now_utc.to_offset(offset);
-
-    Ok(Self {
-        datetime: PrimitiveDateTime::new(now_local.date(), now_local.time()),
-        offset,
-    })
-}
 
     /// Returns a new `DateTime` which is exactly one day earlier.
     ///
@@ -442,11 +448,11 @@ impl DateTime {
     /// let maybe_yesterday = now.previous_day();
     /// assert!(maybe_yesterday.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the resulting date would be invalid.
-    /// 
+    ///
     pub fn previous_day(&self) -> Result<Self, DateTimeError> {
         self.add_days(-1)
     }
@@ -467,11 +473,11 @@ impl DateTime {
     /// let maybe_tomorrow = now.next_day();
     /// assert!(maybe_tomorrow.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the resulting date would be invalid.
-    /// 
+    ///
     pub fn next_day(&self) -> Result<Self, DateTimeError> {
         self.add_days(1)
     }
@@ -505,11 +511,11 @@ impl DateTime {
     ///     assert_eq!(new_val.second(), 45);
     /// }
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the resulting time would be invalid.
-    /// 
+    ///
     pub fn set_time(
         &self,
         hour: u8,
@@ -553,59 +559,58 @@ impl DateTime {
     /// let maybe_past = dt.sub_years(1);
     /// assert!(maybe_past.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the resulting date would be invalid.
-    /// 
+    ///
     pub fn sub_years(&self, years: i32) -> Result<Self, DateTimeError> {
         self.add_years(-years)
     }
 
     /// Converts this `DateTime` to another timezone, then formats it
-/// using the provided `format_str`.
-///
-/// # Arguments
-///
-/// * `tz` - Target timezone abbreviation (e.g., "UTC", "EST", "PST").
-/// * `format_str` - A format description (see the `time` crate documentation
-///   for the supported syntax).
-///
-/// # Returns
-///
-/// Returns a `Result<String, DateTimeError>` containing either
-/// the formatted datetime string or an error if conversion or
-/// formatting fails.
-///
-/// # Errors
-///
-/// This function will return a [`DateTimeError`] if:
-/// - The specified timezone is not recognized or invalid.
-/// - The formatting operation fails due to an invalid `format_str`.
-///
-/// # Examples
-///
-/// ```
-/// use dtt::datetime::DateTime;
-///
-/// let dt = DateTime::new();
-/// let result = dt.format_time_in_timezone("EST", "[hour]:[minute]:[second]");
-/// if let Ok(formatted_str) = result {
-///     println!("Time in EST: {}", formatted_str);
-/// }
-/// ```
-pub fn format_time_in_timezone(
-    &self,
-    tz: &str,
-    format_str: &str,
-) -> Result<String, DateTimeError> {
-    // 1. Convert this DateTime to the specified timezone
-    let dt_tz = self.convert_to_tz(tz)?;
+    /// using the provided `format_str`.
+    ///
+    /// # Arguments
+    ///
+    /// * `tz` - Target timezone abbreviation (e.g., "UTC", "EST", "PST").
+    /// * `format_str` - A format description (see the `time` crate documentation
+    ///   for the supported syntax).
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result<String, DateTimeError>` containing either
+    /// the formatted datetime string or an error if conversion or
+    /// formatting fails.
+    ///
+    /// # Errors
+    ///
+    /// This function will return a [`DateTimeError`] if:
+    /// - The specified timezone is not recognized or invalid.
+    /// - The formatting operation fails due to an invalid `format_str`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let result = dt.format_time_in_timezone("EST", "[hour]:[minute]:[second]");
+    /// if let Ok(formatted_str) = result {
+    ///     println!("Time in EST: {}", formatted_str);
+    /// }
+    /// ```
+    pub fn format_time_in_timezone(
+        &self,
+        tz: &str,
+        format_str: &str,
+    ) -> Result<String, DateTimeError> {
+        // 1. Convert this DateTime to the specified timezone
+        let dt_tz = self.convert_to_tz(tz)?;
 
-    // 2. Format the timezone-adjusted DateTime using the provided format string
-    dt_tz.format(format_str)
-}
-
+        // 2. Format the timezone-adjusted DateTime using the provided format string
+        dt_tz.format(format_str)
+    }
 
     /// Returns `true` if the input string is a valid ISO 8601 or RFC 3339–like datetime/date.
     ///
@@ -682,11 +687,11 @@ pub fn format_time_in_timezone(
     /// let dt = DateTime::from_components(2024, 1, 1, 12, 0, 0, UtcOffset::UTC);
     /// assert!(dt.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if any component is invalid.
-    /// 
+    ///
     pub fn from_components(
         year: i32,
         month: u8,
@@ -809,11 +814,11 @@ pub fn format_time_in_timezone(
     /// assert!(dt1.is_ok());
     /// assert!(dt2.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the input string is not a valid date/time.
-    /// 
+    ///
     pub fn parse(input: &str) -> Result<Self, DateTimeError> {
         // Try RFC 3339 format first
         if let Ok(dt) = PrimitiveDateTime::parse(
@@ -863,11 +868,11 @@ pub fn format_time_in_timezone(
     /// );
     /// assert!(dt.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the input string is not a valid date/time.
-    /// 
+    ///
     pub fn parse_custom_format(
         input: &str,
         format: &str,
@@ -907,11 +912,11 @@ pub fn format_time_in_timezone(
     /// let formatted = dt.format("[year]-[month]-[day]");
     /// assert!(formatted.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the format string is invalid.
-    /// 
+    ///
     pub fn format(
         &self,
         format_str: &str,
@@ -939,11 +944,11 @@ pub fn format_time_in_timezone(
     /// let maybe_rfc3339 = dt.format_rfc3339();
     /// assert!(maybe_rfc3339.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if formatting fails.
-    /// 
+    ///
     pub fn format_rfc3339(&self) -> Result<String, DateTimeError> {
         self.datetime
             .assume_offset(self.offset)
@@ -967,11 +972,11 @@ pub fn format_time_in_timezone(
     /// let maybe_iso8601 = dt.format_iso8601();
     /// assert!(maybe_iso8601.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if formatting fails.
-    /// 
+    ///
     pub fn format_iso8601(&self) -> Result<String, DateTimeError> {
         self.format("[year]-[month]-[day]T[hour]:[minute]:[second]")
     }
@@ -995,11 +1000,11 @@ pub fn format_time_in_timezone(
     /// let updated_dt = dt.update();
     /// assert!(updated_dt.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the update fails.
-    /// 
+    ///
     pub fn update(&self) -> Result<Self, DateTimeError> {
         let now = OffsetDateTime::now_utc().to_offset(self.offset);
         Ok(Self {
@@ -1032,11 +1037,11 @@ pub fn format_time_in_timezone(
     /// let maybe_est = utc.convert_to_tz("EST");
     /// assert!(maybe_est.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the timezone is invalid.
-    /// 
+    ///
     pub fn convert_to_tz(
         &self,
         new_tz: &str,
@@ -1124,200 +1129,215 @@ pub fn format_time_in_timezone(
     // -------------------------------------------------------------------------
 
     /// Adds a specified number of days to the `DateTime`.
-///
-/// # Arguments
-///
-/// * `days` - Number of days to add (can be negative for subtraction)
-///
-/// # Returns
-///
-/// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
-/// if the operation would result in an invalid date.
-///
-/// # Errors
-///
-/// This function returns a [`DateTimeError::InvalidDate`] if adding `days` results
-/// in a date overflow or otherwise invalid date.
-///
-/// # Examples
-///
-/// ```
-/// use dtt::datetime::DateTime;
-///
-/// let dt = DateTime::new();
-/// let future = dt.add_days(7);
-/// assert!(future.is_ok());
-/// ```
-pub fn add_days(&self, days: i64) -> Result<Self, DateTimeError> {
-    let new_datetime = self
-        .datetime
-        .checked_add(Duration::days(days))
-        .ok_or(DateTimeError::InvalidDate)?;
+    ///
+    /// # Arguments
+    ///
+    /// * `days` - Number of days to add (can be negative for subtraction)
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the operation would result in an invalid date.
+    ///
+    /// # Errors
+    ///
+    /// This function returns a [`DateTimeError::InvalidDate`] if adding `days` results
+    /// in a date overflow or otherwise invalid date.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let future = dt.add_days(7);
+    /// assert!(future.is_ok());
+    /// ```
+    pub fn add_days(&self, days: i64) -> Result<Self, DateTimeError> {
+        let new_datetime = self
+            .datetime
+            .checked_add(Duration::days(days))
+            .ok_or(DateTimeError::InvalidDate)?;
 
-    Ok(Self {
-        datetime: new_datetime,
-        offset: self.offset,
-    })
-}
-
+        Ok(Self {
+            datetime: new_datetime,
+            offset: self.offset,
+        })
+    }
 
     /// Adds a specified number of months to the `DateTime`.
-///
-/// Handles month-end dates and leap years appropriately.
-///
-/// # Arguments
-///
-/// * `months` - Number of months to add (can be negative for subtraction)
-///
-/// # Returns
-///
-/// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
-/// if the operation would result in an invalid date.
-///
-/// # Errors
-///
-/// This function returns a [`DateTimeError`] if:
-/// - The calculated year, month, or day is invalid (e.g., out of range).
-/// - The underlying date library fails to construct a valid date.
-///
-/// # Examples
-///
-/// ```
-/// use dtt::datetime::DateTime;
-///
-/// let dt = DateTime::new();
-/// let future = dt.add_months(3);
-/// assert!(future.is_ok());
-/// ```
-pub fn add_months(
-    &self,
-    months: i32,
-) -> Result<Self, DateTimeError> {
-    let current_date = self.datetime.date();
-    let total_months = current_date.year() * 12 + current_date.month() as i32 - 1 + months;
+    ///
+    /// Handles month-end dates and leap years appropriately.
+    ///
+    /// # Arguments
+    ///
+    /// * `months` - Number of months to add (can be negative for subtraction)
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the operation would result in an invalid date.
+    ///
+    /// # Errors
+    ///
+    /// This function returns a [`DateTimeError`] if:
+    /// - The calculated year, month, or day is invalid (e.g., out of range).
+    /// - The underlying date library fails to construct a valid date.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let future = dt.add_months(3);
+    /// assert!(future.is_ok());
+    /// ```
+    pub fn add_months(
+        &self,
+        months: i32,
+    ) -> Result<Self, DateTimeError> {
+        let current_date = self.datetime.date();
+        let total_months =
+            current_date.year() * 12 + current_date.month() as i32 - 1
+                + months;
 
-    let target_year = total_months / 12;
-    let target_month = u8::try_from((total_months % 12) + 1);
+        let target_year = total_months / 12;
+        let target_month = u8::try_from((total_months % 12) + 1);
 
-    let target_month = target_month.map_err(|_| DateTimeError::InvalidDate)?;
-    let days_in_target_month = days_in_month(target_year, target_month)?;
-    let target_day = current_date.day().min(days_in_target_month);
+        let target_month =
+            target_month.map_err(|_| DateTimeError::InvalidDate)?;
+        let days_in_target_month =
+            days_in_month(target_year, target_month)?;
+        let target_day = current_date.day().min(days_in_target_month);
 
-    let new_month = Month::try_from(target_month).map_err(|_| DateTimeError::InvalidDate)?;
-    let new_date = Date::from_calendar_date(target_year, new_month, target_day)
+        let new_month = Month::try_from(target_month)
+            .map_err(|_| DateTimeError::InvalidDate)?;
+        let new_date = Date::from_calendar_date(
+            target_year,
+            new_month,
+            target_day,
+        )
         .map_err(|_| DateTimeError::InvalidDate)?;
 
-    Ok(Self {
-        datetime: PrimitiveDateTime::new(new_date, self.datetime.time()),
-        offset: self.offset,
-    })
-}
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(
+                new_date,
+                self.datetime.time(),
+            ),
+            offset: self.offset,
+        })
+    }
 
     /// Subtracts a specified number of months from the `DateTime`.
-///
-/// # Arguments
-///
-/// * `months` - Number of months to subtract
-///
-/// # Returns
-///
-/// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
-/// if the operation would result in an invalid date.
-///
-/// # Errors
-///
-/// This function returns a [`DateTimeError::InvalidDate`] if:
-/// - The resulting date is out of valid range.
-/// - The underlying date library fails to construct a valid `DateTime`.
-///
-/// # Examples
-///
-/// ```
-/// use dtt::datetime::DateTime;
-///
-/// let dt = DateTime::new();
-/// let past = dt.sub_months(3);
-/// assert!(past.is_ok());
-/// ```
-pub fn sub_months(
-    &self,
-    months: i32,
-) -> Result<Self, DateTimeError> {
-    self.add_months(-months)
-}
+    ///
+    /// # Arguments
+    ///
+    /// * `months` - Number of months to subtract
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the operation would result in an invalid date.
+    ///
+    /// # Errors
+    ///
+    /// This function returns a [`DateTimeError::InvalidDate`] if:
+    /// - The resulting date is out of valid range.
+    /// - The underlying date library fails to construct a valid `DateTime`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let past = dt.sub_months(3);
+    /// assert!(past.is_ok());
+    /// ```
+    pub fn sub_months(
+        &self,
+        months: i32,
+    ) -> Result<Self, DateTimeError> {
+        self.add_months(-months)
+    }
 
-/// Adds a specified number of years to the `DateTime`.
-///
-/// Handles leap-year transitions appropriately.
-///
-/// # Arguments
-///
-/// * `years` - Number of years to add (can be negative for subtraction)
-///
-/// # Returns
-///
-/// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
-/// if the operation would result in an invalid date.
-///
-/// # Errors
-///
-/// This function returns a [`DateTimeError::InvalidDate`] if:
-/// - The resulting year is out of valid range.
-/// - A non-leap year cannot accommodate February 29th.
-/// - Any other invalid date scenario occurs during calculation.
-///
-/// # Examples
-///
-/// ```
-/// use dtt::datetime::DateTime;
-///
-/// let dt = DateTime::new();
-/// let future = dt.add_years(5);
-/// assert!(future.is_ok());
-/// ```
-pub fn add_years(&self, years: i32) -> Result<Self, DateTimeError> {
-    let current_date = self.datetime.date();
-    let target_year = current_date
-        .year()
-        .checked_add(years)
-        .ok_or(DateTimeError::InvalidDate)?;
+    /// Adds a specified number of years to the `DateTime`.
+    ///
+    /// Handles leap-year transitions appropriately.
+    ///
+    /// # Arguments
+    ///
+    /// * `years` - Number of years to add (can be negative for subtraction)
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the operation would result in an invalid date.
+    ///
+    /// # Errors
+    ///
+    /// This function returns a [`DateTimeError::InvalidDate`] if:
+    /// - The resulting year is out of valid range.
+    /// - A non-leap year cannot accommodate February 29th.
+    /// - Any other invalid date scenario occurs during calculation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let future = dt.add_years(5);
+    /// assert!(future.is_ok());
+    /// ```
+    pub fn add_years(&self, years: i32) -> Result<Self, DateTimeError> {
+        let current_date = self.datetime.date();
+        let target_year = current_date
+            .year()
+            .checked_add(years)
+            .ok_or(DateTimeError::InvalidDate)?;
 
-    // Handle February 29th in leap years
-    let new_day = if current_date.month() == Month::February
-        && current_date.day() == 29
-        && !is_leap_year(target_year)
-    {
-        28
-    } else {
-        current_date.day()
-    };
+        // Handle February 29th in leap years
+        let new_day = if current_date.month() == Month::February
+            && current_date.day() == 29
+            && !is_leap_year(target_year)
+        {
+            28
+        } else {
+            current_date.day()
+        };
 
-    let new_date = Date::from_calendar_date(
-        target_year,
-        current_date.month(),
-        new_day,
-    )
-    .map_err(|_| DateTimeError::InvalidDate)?;
+        let new_date = Date::from_calendar_date(
+            target_year,
+            current_date.month(),
+            new_day,
+        )
+        .map_err(|_| DateTimeError::InvalidDate)?;
 
-    Ok(Self {
-        datetime: PrimitiveDateTime::new(new_date, self.datetime.time()),
-        offset: self.offset,
-    })
-}
-
+        Ok(Self {
+            datetime: PrimitiveDateTime::new(
+                new_date,
+                self.datetime.time(),
+            ),
+            offset: self.offset,
+        })
+    }
 
     // -------------------------------------------------------------------------
     // Range / Boundary Helper Methods
     // -------------------------------------------------------------------------
 
-        /// Returns a new `DateTime` for the start of the current week (Monday).
+    /// Returns a new `DateTime` for the start of the current week (Monday).
     ///
     /// # Errors
     ///
     /// This function can return a [`DateTimeError`] if an overflow or
     /// invalid date calculation occurs during date arithmetic.
     pub fn start_of_week(&self) -> Result<Self, DateTimeError> {
-        let days_since_monday = i64::from(self.datetime.weekday().number_days_from_monday());
+        let days_since_monday = i64::from(
+            self.datetime.weekday().number_days_from_monday(),
+        );
         self.add_days(-days_since_monday)
     }
 
@@ -1328,7 +1348,9 @@ pub fn add_years(&self, years: i32) -> Result<Self, DateTimeError> {
     /// This function can return a [`DateTimeError`] if an overflow or
     /// invalid date calculation occurs during date arithmetic.
     pub fn end_of_week(&self) -> Result<Self, DateTimeError> {
-        let days_until_sunday = 6 - i64::from(self.datetime.weekday().number_days_from_monday());
+        let days_until_sunday = 6 - i64::from(
+            self.datetime.weekday().number_days_from_monday(),
+        );
         self.add_days(days_until_sunday)
     }
 
@@ -1339,7 +1361,11 @@ pub fn add_years(&self, years: i32) -> Result<Self, DateTimeError> {
     /// This function can return a [`DateTimeError`] if the date cannot be
     /// constructed (e.g., due to an invalid year or month).
     pub fn start_of_month(&self) -> Result<Self, DateTimeError> {
-        self.set_date(self.datetime.year(), self.datetime.month() as u8, 1)
+        self.set_date(
+            self.datetime.year(),
+            self.datetime.month() as u8,
+            1,
+        )
     }
 
     /// Returns a new `DateTime` for the end of the current month.
@@ -1374,7 +1400,6 @@ pub fn add_years(&self, years: i32) -> Result<Self, DateTimeError> {
     pub fn end_of_year(&self) -> Result<Self, DateTimeError> {
         self.set_date(self.datetime.year(), 12, 31)
     }
-
 
     // -------------------------------------------------------------------------
     // Range Validation
@@ -1433,11 +1458,11 @@ pub fn add_years(&self, years: i32) -> Result<Self, DateTimeError> {
     /// let new_dt = dt.set_date(2024, 1, 1);
     /// assert!(new_dt.is_ok());
     /// ```
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns a `DateTimeError` if the resulting date would be invalid.
-    /// 
+    ///
     pub fn set_date(
         &self,
         year: i32,
@@ -1558,7 +1583,8 @@ impl DateTime {
 impl fmt::Display for DateTime {
     /// Formats the `DateTime` using RFC 3339 format.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.format_rfc3339().map_or(Err(fmt::Error), |s| write!(f, "{s}"))
+        self.format_rfc3339()
+            .map_or(Err(fmt::Error), |s| write!(f, "{s}"))
     }
 }
 
@@ -1592,10 +1618,15 @@ impl Add<Duration> for DateTime {
     /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`.
     fn add(self, rhs: Duration) -> Self::Output {
         let maybe_new = self.datetime.checked_add(rhs);
-        maybe_new.map_or(Err(DateTimeError::InvalidDate), |new_datetime| Ok(Self {
-                datetime: new_datetime,
-                offset: self.offset,
-            }))
+        maybe_new.map_or(
+            Err(DateTimeError::InvalidDate),
+            |new_datetime| {
+                Ok(Self {
+                    datetime: new_datetime,
+                    offset: self.offset,
+                })
+            },
+        )
     }
 }
 
@@ -1613,10 +1644,15 @@ impl Sub<Duration> for DateTime {
     /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`.
     fn sub(self, rhs: Duration) -> Self::Output {
         let maybe_new = self.datetime.checked_sub(rhs);
-        maybe_new.map_or(Err(DateTimeError::InvalidDate), |new_datetime| Ok(Self {
-                datetime: new_datetime,
-                offset: self.offset,
-            }))
+        maybe_new.map_or(
+            Err(DateTimeError::InvalidDate),
+            |new_datetime| {
+                Ok(Self {
+                    datetime: new_datetime,
+                    offset: self.offset,
+                })
+            },
+        )
     }
 }
 
@@ -1656,12 +1692,15 @@ impl Hash for DateTime {
 /// # Returns
 ///
 /// Returns a `Result` containing either the number of days or a `DateTimeError`.
-/// 
+///
 /// # Errors
-/// 
+///
 /// Returns a `DateTimeError` if the day in the month is invalid.
 ///
-pub const fn days_in_month(year: i32, month: u8) -> Result<u8, DateTimeError> {
+pub const fn days_in_month(
+    year: i32,
+    month: u8,
+) -> Result<u8, DateTimeError> {
     match month {
         1 | 3 | 5 | 7 | 8 | 10 | 12 => Ok(31),
         4 | 6 | 9 | 11 => Ok(30),

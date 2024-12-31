@@ -21,7 +21,6 @@
 /// - Future Proofing: Ensuring that potential future changes don't break existing functionality.
 /// - Low-Level Checks: Verifying the memory layout and Default trait implementation.
 /// - Default Implementation: Confirming that the default() method returns the expected variant.
-
 #[cfg(test)]
 mod tests {
 

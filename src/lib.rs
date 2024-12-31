@@ -118,26 +118,27 @@ mod tests {
     }
 
     #[test]
-#[allow(clippy::const_is_empty)]
-fn test_version_constant() {
-    // Just to demonstrate we have a version string from Cargo
-    assert!(!VERSION.is_empty());
-}
-
+    #[allow(clippy::const_is_empty)]
+    fn test_version_constant() {
+        // Just to demonstrate we have a version string from Cargo
+        assert!(!VERSION.is_empty());
+    }
 
     #[test]
-fn test_is_test_mode() {
-    env::remove_var(TEST_MODE_ENV);
+    fn test_is_test_mode() {
+        env::remove_var(TEST_MODE_ENV);
 
-    // is_test_mode()? returns a bool or an error. The ? operator
-    // propagates any error, meaning we won't panic or unwrap.
-    let first_check = is_test_mode();
-    assert!(!first_check, "Should not be in test mode by default");
+        // is_test_mode()? returns a bool or an error. The ? operator
+        // propagates any error, meaning we won't panic or unwrap.
+        let first_check = is_test_mode();
+        assert!(!first_check, "Should not be in test mode by default");
 
-    env::set_var(TEST_MODE_ENV, TEST_MODE_ENABLED);
+        env::set_var(TEST_MODE_ENV, TEST_MODE_ENABLED);
 
-    let second_check = is_test_mode();
-    assert!(second_check, "Should be in test mode after enabling it");
-}
-
+        let second_check = is_test_mode();
+        assert!(
+            second_check,
+            "Should be in test mode after enabling it"
+        );
+    }
 }
