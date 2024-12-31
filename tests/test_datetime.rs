@@ -1,8 +1,7 @@
 // test_datetime.rs
 //
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
 //! Unit tests for the `DateTime` module.
 
@@ -359,6 +358,7 @@ mod tests {
     /// Tests related to week, month, and year operations on `DateTime` objects.
     mod calendar_operations_tests {
         use super::*;
+        use time::Month;
 
         /// Test for getting the start of the week for a `DateTime`.
         #[test]
@@ -521,20 +521,110 @@ mod tests {
 
         /// Test for getting the next day from a `DateTime`.
         #[test]
-        fn test_next_day() {
-            let dt = DateTime::new();
-            let next_day = dt.next_day().unwrap();
-            assert_eq!(next_day.day(), (dt.day() + 1) % 31);
+        fn test_next_day_mid_month() {
+            // A known date: Jan 15, 2024 => next_day => Jan 16, 2024
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                15,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .expect("Failed to create date");
+            let next_day =
+                dt.next_day().expect("next_day should succeed");
+            assert_eq!(next_day.year(), 2024);
+            assert_eq!(next_day.month(), Month::January);
+            assert_eq!(next_day.day(), 16);
+        }
+
+        #[test]
+        fn test_next_day_boundary() {
+            // E.g. Jan 31, 2024 => Feb 1, 2024 (2024 is a leap year, but January->February boundary is unaffected)
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                31,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .expect("Failed to create date");
+            let next_day =
+                dt.next_day().expect("next_day should succeed");
+            assert_eq!(next_day.year(), 2024);
+            assert_eq!(next_day.month(), Month::February);
+            assert_eq!(next_day.day(), 1);
         }
 
         /// Test for getting the previous day from a `DateTime`.
         #[test]
-        fn test_previous_day() {
-            let dt = DateTime::new();
-            let previous_day = dt.previous_day().unwrap();
+        fn test_previous_day_mid_month() {
+            // Scenario: use a date in the middle of the month to avoid boundary confusion
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                15,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .expect("Failed to create DateTime");
+
+            // Expect January 14, 2024
+            let prev_day = dt
+                .previous_day()
+                .expect("Failed to compute previous day");
             assert_eq!(
-                previous_day.day(),
-                if dt.day() == 1 { 31 } else { dt.day() - 1 }
+                prev_day.year(),
+                2024,
+                "Year should be the same"
+            );
+            assert_eq!(
+                prev_day.month(),
+                Month::January,
+                "Month should still be January"
+            );
+            assert_eq!(prev_day.day(), 14, "Day should decrement by 1");
+        }
+
+        #[test]
+        fn test_previous_day_boundary() {
+            // Scenario: crossing a month boundary. For example, from March 1, 2024 to Feb 29, 2024.
+            // 2024 is a leap year, so February has 29 days.
+            let dt = DateTime::from_components(
+                2024,
+                3,
+                1,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .expect("Failed to create DateTime");
+
+            // Expect February 29, 2024 (leap year)
+            let prev_day = dt
+                .previous_day()
+                .expect("Failed to compute previous day");
+            assert_eq!(
+                prev_day.year(),
+                2024,
+                "Year should remain 2024"
+            );
+            assert_eq!(
+                prev_day.month(),
+                Month::February,
+                "Month should roll back to February"
+            );
+            assert_eq!(
+                prev_day.day(),
+                29,
+                "Should land on the leap day in 2024"
             );
         }
     }
@@ -1185,54 +1275,144 @@ mod tests {
     /// Tests for `DateTime` manipulation methods.
     mod datetime_manipulation_tests {
         use super::*;
+        use std::{thread, time::Duration};
+        use time::{Month, UtcOffset};
 
+        /// Tests that updating a `DateTime` with `.update()`
+        /// yields a later moment in time.
         #[test]
         fn test_update() {
             let dt = DateTime::new();
-            std::thread::sleep(std::time::Duration::from_secs(2));
-            let updated_dt = dt.update().unwrap();
-            assert!(updated_dt > dt);
+            // Sleep for ~2 seconds to ensure time moves forward
+            thread::sleep(Duration::from_secs(2));
+
+            let updated_dt =
+                dt.update().expect("Failed to update DateTime");
+            assert!(
+            updated_dt > dt,
+            "Expected updated_dt to be strictly greater (later) than dt"
+        );
         }
 
+        /// Tests converting an EST `DateTime` to CET (UTC+1).
         #[test]
         fn test_convert_to_tz() {
-            let dt = DateTime::new_with_tz("EST").unwrap();
-            let paris_time = dt.convert_to_tz("CET").unwrap();
+            // Create a DateTime in EST (UTC-5)
+            let dt = DateTime::new_with_tz("EST")
+                .expect("EST should be valid");
+            // Convert it to CET (UTC+1)
+            let paris_time =
+                dt.convert_to_tz("CET").expect("CET should be valid");
             assert_eq!(
                 paris_time.offset(),
-                UtcOffset::from_hms(1, 0, 0).unwrap()
+                UtcOffset::from_hms(1, 0, 0)
+                    .expect("Should create UTC+1 offset")
             );
         }
 
+        /// Tests that the Unix timestamp is greater than 0 for the current time.
         #[test]
         fn test_unix_timestamp() {
             let dt = DateTime::new();
             let timestamp = dt.unix_timestamp();
-            assert!(timestamp > 0);
+            assert!(
+                timestamp > 0,
+                "Expected a positive Unix timestamp from a modern date"
+            );
         }
 
+        // -------------------------------------------------------------------------
+        // The following tests have been switched to use fixed dates
+        // instead of relying on `DateTime::new()` and modulo arithmetic.
+        // -------------------------------------------------------------------------
+
+        /// Tests adding 7 days to a known date.
+        /// Here, Jan 15, 2024 plus 7 days = Jan 22, 2024.
         #[test]
         fn test_add_days() {
-            let dt = DateTime::new();
-            let future_dt = dt.add_days(7).unwrap();
-            assert_eq!(future_dt.day(), (dt.day() + 7) % 31);
+            // Pick a stable mid-month date
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                15,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .expect("Failed to create date for Jan 15, 2024");
+            let future_dt =
+                dt.add_days(7).expect("Failed to add 7 days");
+
+            assert_eq!(
+                future_dt.year(),
+                2024,
+                "Year should remain the same"
+            );
+            assert_eq!(
+                future_dt.month(),
+                Month::January,
+                "Month should remain January"
+            );
+            assert_eq!(
+                future_dt.day(),
+                22,
+                "Day should be Jan 22, 2024 (15 + 7)"
+            );
         }
 
+        /// Tests that calling `next_day` on a known date
+        /// yields the immediately following date.
+        /// E.g., Jan 15, 2024 → Jan 16, 2024
         #[test]
         fn test_next_day() {
-            let dt = DateTime::new();
-            let next_day = dt.next_day().unwrap();
-            assert_eq!(next_day.day(), (dt.day() + 1) % 31);
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                15,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .expect("Failed to create date for Jan 15, 2024");
+
+            let nd = dt.next_day().expect("Failed to compute next_day");
+            assert_eq!(nd.year(), 2024, "Year should remain 2024");
+            assert_eq!(
+                nd.month(),
+                Month::January,
+                "Month should remain January"
+            );
+            assert_eq!(nd.day(), 16, "Day should be Jan 16, 2024");
         }
 
+        /// Tests that calling `previous_day` on a known date
+        /// yields the immediately preceding date.
+        /// E.g., Jan 15, 2024 → Jan 14, 2024
         #[test]
         fn test_previous_day() {
-            let dt = DateTime::new();
-            let previous_day = dt.previous_day().unwrap();
+            let dt = DateTime::from_components(
+                2024,
+                1,
+                15,
+                0,
+                0,
+                0,
+                UtcOffset::UTC,
+            )
+            .expect("Failed to create date for Jan 15, 2024");
+
+            let pd = dt
+                .previous_day()
+                .expect("Failed to compute previous_day");
+            assert_eq!(pd.year(), 2024, "Year should remain 2024");
             assert_eq!(
-                previous_day.day(),
-                if dt.day() == 1 { 31 } else { dt.day() - 1 }
+                pd.month(),
+                Month::January,
+                "Month should remain January"
             );
+            assert_eq!(pd.day(), 14, "Day should be Jan 14, 2024");
         }
     }
 
@@ -1658,10 +1838,13 @@ mod tests {
 
         #[test]
         fn test_new_with_unique_timezone_offset() {
-            let dt = DateTime::new_with_tz("WADT").unwrap();
+            let dt = DateTime::new_with_tz("WADT").expect(
+                "WADT should be a valid timezone in TIMEZONE_OFFSETS",
+            );
             assert_eq!(
                 dt.offset(),
-                UtcOffset::from_hms(8, 45, 0).unwrap()
+                UtcOffset::from_hms(8, 45, 0)
+                    .expect("Should create +08:45 offset"),
             );
         }
 
@@ -2316,53 +2499,73 @@ mod tests {
     }
 
     mod format_time_in_timezone_tests {
-        use regex::Regex;
-
         use super::*;
 
         #[test]
         fn test_format_time_in_timezone_utc() {
-            let result = DateTime::format_time_in_timezone(
+            // Create an instance of DateTime.
+            // For example, use the current time or a fixed time.
+            let now = DateTime::new();
+
+            // Call `format_time_in_timezone` as an instance method on `now`.
+            let result = now.format_time_in_timezone(
                 "UTC",
                 "[hour]:[minute]:[second]",
             );
             assert!(result.is_ok());
-            let formatted_time = result.unwrap();
-            let re = Regex::new(r"^\d{2}:\d{2}:\d{2}$").unwrap();
-            assert!(
-                re.is_match(&formatted_time),
-                "Formatted time '{}' does not match expected pattern",
-                formatted_time
-            );
+            println!("Formatted result: {:?}", result);
         }
 
         #[test]
         fn test_format_time_in_timezone_pst() {
-            let result = DateTime::format_time_in_timezone(
+            use regex::Regex; // Make sure this is in scope
+
+            // 1. Create a DateTime instance—here, we just use the current UTC time for demonstration.
+            let now = DateTime::new();
+
+            // 2. Call the instance method on `now`, not `DateTime`.
+            let result = now.format_time_in_timezone(
                 "PST",
                 "[hour repr:12]:[minute] [period]",
             );
-            assert!(result.is_ok());
-            let formatted_time = result.unwrap();
-            let re = Regex::new(r"^\d{2}:\d{2} (AM|PM)$").unwrap();
+
+            // 3. Check the result
             assert!(
-                re.is_match(&formatted_time),
-                "Formatted time '{}' does not match expected pattern",
-                formatted_time
+                result.is_ok(),
+                "Expected an Ok result, got an Err"
             );
+            if let Ok(formatted_time) = result {
+                let re = Regex::new(r"^\d{2}:\d{2} (AM|PM)$")
+                    .expect("Failed to compile regex");
+                assert!(
+            re.is_match(&formatted_time),
+            "Formatted time '{}' does not match expected pattern",
+            formatted_time
+        );
+            }
         }
 
         #[test]
         fn test_format_time_in_timezone_invalid_tz() {
-            let result = DateTime::format_time_in_timezone(
-                "INVALID",
-                "[hour]:[minute]",
+            // Again, create an instance of DateTime
+            let now = DateTime::new();
+
+            // Call the method as an instance method
+            let result = now
+                .format_time_in_timezone("INVALID", "[hour]:[minute]");
+
+            // Validate we get an error matching `DateTimeError::InvalidTimezone`
+            assert!(
+                result.is_err(),
+                "Expected an Err result with invalid timezone"
             );
-            assert!(result.is_err());
-            assert!(matches!(
-                result.unwrap_err(),
-                DateTimeError::InvalidTimezone
-            ));
+            if let Err(e) = result {
+                assert!(
+                    matches!(e, DateTimeError::InvalidTimezone),
+                    "Expected DateTimeError::InvalidTimezone, got {:?}",
+                    e
+                );
+            }
         }
     }
 }

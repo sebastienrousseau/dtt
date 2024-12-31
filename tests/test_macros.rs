@@ -1,8 +1,12 @@
 // test_macros.rs
 //
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+
+//! # Macro Tests for DTT
+//!
+//! This file contains unit tests validating the macros provided by the `dtt` crate.
+//! It ensures that each macro—such as `dtt_print!`, `dtt_vec!`, `dtt_map!`, and others behaves as expected.
 
 #[cfg(test)]
 mod tests {

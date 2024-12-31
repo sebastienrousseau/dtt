@@ -1,6 +1,5 @@
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
 //! # DTT Library Usage Examples
 //!
@@ -173,13 +172,14 @@ fn advanced_datetime_operations() -> Result<(), AppError> {
 
     // Timezone formatting
     println!("\n🌍 Timezone Formatting:");
-    let la_time = DateTime::format_time_in_timezone(
+    let la_time = DateTime::new().format_time_in_timezone(
         "PST",
         "[hour repr:12]:[minute] [period]",
     )?;
     println!("Current time in Los Angeles: ✅ {}", la_time);
 
     let tokyo_time = DateTime::format_time_in_timezone(
+        &DateTime::new(),
         "JST",
         "[year]-[month]-[day] [hour]:[minute]",
     )?;

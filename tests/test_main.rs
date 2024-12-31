@@ -1,8 +1,13 @@
 // test_main.rs
 //
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+
+//! # Integration Tests for the `dtt` Binary
+//!
+//! This file executes end-to-end integration tests against the `dtt` binary,
+//! verifying command-line behaviour, environment variables, and expected output
+//! messages when run with and without `DTT_TEST_MODE` set.
 
 #[cfg(test)]
 mod tests {

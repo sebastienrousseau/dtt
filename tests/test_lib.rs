@@ -1,8 +1,13 @@
 // test_lib.rs
 //
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+
+//! # DTT Integration Tests
+//!
+//! This file contains integration and high-level unit tests for the DateTime (DTT) library.
+//! It verifies the main library entry points and various public functionalities, ensuring
+//! that core operations behave as expected across modules.
 
 /// Unit tests for the `DateTime (DTT)` library.
 ///
