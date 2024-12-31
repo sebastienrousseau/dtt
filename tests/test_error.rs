@@ -461,10 +461,13 @@ mod tests {
         }
 
         #[test]
-        fn test_error_deserialization() {
+        fn test_error_deserialization(
+        ) -> Result<(), Box<dyn std::error::Error>> {
             let deserialized: DateTimeError =
-                serde_json::from_str("\"InvalidDate\"").unwrap();
+                serde_json::from_str("\"InvalidDate\"")?;
             assert_eq!(deserialized, DateTimeError::InvalidDate);
+
+            Ok(())
         }
     }
 

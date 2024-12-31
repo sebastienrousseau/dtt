@@ -81,19 +81,18 @@ mod tests {
     }
 
     #[test]
-    fn test_dtt_parse() {
+    fn test_dtt_parse() -> Result<(), Box<dyn std::error::Error>> {
         let input = "2022-01-01T12:00:00+01:00";
-        match dtt_parse!(input) {
-            Ok(date) => {
-                assert_eq!(date.year(), 2022);
-                assert_eq!(date.month(), Month::January);
-                assert_eq!(date.day(), 1);
-                assert_eq!(date.hour(), 12);
-                assert_eq!(date.minute(), 0);
-                assert_eq!(date.second(), 0);
-            }
-            Err(err) => panic!("Parsing failed: {}", err),
-        }
+        let date = dtt_parse!(input)?; // Propagate error if parsing fails
+
+        assert_eq!(date.year(), 2022);
+        assert_eq!(date.month(), Month::January);
+        assert_eq!(date.day(), 1);
+        assert_eq!(date.hour(), 12);
+        assert_eq!(date.minute(), 0);
+        assert_eq!(date.second(), 0);
+
+        Ok(())
     }
 
     #[test]
@@ -136,16 +135,6 @@ mod tests {
         let days_difference = dtt_diff_days!(dt1, dt2);
         assert_eq!(days_difference, 1i64);
     }
-
-    // #[test]
-    // fn test_dtt_diff_invalid_input() {
-    //     let dt1 = "invalid";
-    //     let dt2 = "1609459230";
-
-    //     let result =
-    //         panic::catch_unwind(|| dtt_diff_seconds!(dt1, dt2));
-    //     assert!(result.is_err(), "Expected panic for invalid input");
-    // }
 
     #[test]
     fn test_dtt_format() {
@@ -204,17 +193,6 @@ mod tests {
         assert_eq!(dt.second(), cloned.second());
     }
 
-    // #[test]
-    // fn test_dtt_diff_seconds_error() {
-    //     let dt1 = "invalid";
-    //     let dt2 = "1640995230";
-
-    //     let result =
-    //         panic::catch_unwind(|| dtt_diff_seconds!(dt1, dt2));
-
-    //     assert!(result.is_err(), "Expected panic for invalid input");
-    // }
-
     #[test]
     #[should_panic(expected = "Error: Invalid input")]
     fn test_dtt_diff_days_error() {
@@ -235,11 +213,16 @@ mod tests {
     }
 
     #[test]
-    fn test_dtt_now_macro() {
+    fn test_dtt_now_macro() -> Result<(), Box<dyn std::error::Error>> {
         let now = dtt_now!();
-        // You can't test the exact time, but you can check if it's recent
-        let five_minutes_ago = now.add_days(-5).unwrap();
+
+        // Subtract 5 days from now
+        let five_minutes_ago = now.add_days(-5)?;
+
+        // Assert that `now` is after `five_minutes_ago`
         assert!(now > five_minutes_ago);
+
+        Ok(())
     }
 
     #[test]
