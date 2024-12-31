@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0-nightly (7f75bfa1a 2024-12-30)" data-channel="nightly" data-search-js="search-036cda7a.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dtt/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -210,278 +211,217 @@
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-</pre></div><pre class="rust"><code><span class="comment">// lib.rs
-//
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+<a href="#213" id="213">213</a></pre></div><pre class="rust"><code><span class="comment">// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
-</span><span class="doccomment">//!
-//! # A Rust library for parsing, validating, manipulating, and formatting dates and times.
+</span><span class="doccomment">//! DateTime (DTT) is a comprehensive library for date and time manipulation.
 //!
-//! [![DTT Banner](https://kura.pro/dtt/images/banners/banner-dtt.svg)](https://dttlib.com)
+//! # Overview
 //!
-//! [![Made With Love][made-with-rust]][14] [![Crates.io][crates-badge]][08] [![lib.rs][libs-badge]][10] [![Docs.rs][docs-badge]][09] [![Codecov][codecov-badge]][15] [![Build Status][build-badge]][16]
+//! This crate provides robust tools for handling dates, times, and timezones in Rust,
+//! with a focus on correctness, ergonomics, and performance.
 //!
-//! &lt;!-- markdownlint-disable MD033 MD041 --&gt;
-//! &lt;center&gt;
-//! &lt;!-- markdownlint-enable MD033 MD041 --&gt;
+//! # Features
 //!
-//! • [Website][01] • [Documentation][09] • [Report Bug][04] • [Request Feature][04] • [Contributing Guidelines][05]
+//! - Create and parse dates in multiple formats
+//! - Timezone conversions and handling
+//! - Date and time arithmetic
+//! - Formatting and serialization
 //!
-//! &lt;!-- markdownlint-disable MD033 MD041 --&gt;
-//! &lt;/center&gt;
-//! &lt;!-- markdownlint-enable MD033 MD041 --&gt;
+//! # Error Handling
 //!
-//! ## Overview
+//! This crate uses the `thiserror` crate for error handling. All errors are
+//! properly typed and implement standard error traits. Operations that may fail
+//! return `Result&lt;T, AppError&gt;`.
 //!
-//! The `DateTime (DTT)` library is a comprehensive and flexible tool that enables developers to manage dates and times with ease. It offers a wide range of functions, macros, and data structures for performing date and time operations, such as creating, parsing, validating, and formatting date-time objects.
+//! # Examples
 //!
-//! The library supports the creation of new `DateTime` objects with either UTC or custom timezone specifications, providing accurate and relevant date and time information. Additionally, it offers mechanisms for validating input dates and times, ensuring reliable and precise operations.
+//! ```rust
+//! use dtt::DateTime;
 //!
-//! ## Features
-//!
-//! The `DateTime (DTT)` library offers the following features:
-//!
-//! - **Core Fields**:
-//!   - `datetime`: The date and time in UTC (`PrimitiveDateTime`).
-//!   - `offset`: The timezone offset in UTC (`UtcOffset`).
-//!
-//! - **Core Methods**:
-//!   - `new()`: Creates a new `DateTime` instance with the current UTC time.
-//!   - `new_with_tz(tz: &amp;str)`: Creates a new `DateTime` object with the specified timezone.
-//!   - `new_with_custom_offset(hours: i8, minutes: i8)`: Creates a `DateTime` object with a custom UTC offset.
-//!   - `from_components(year: i32, month: u8, day: u8, hour: u8, minute: u8, second: u8, offset: UtcOffset)`: Creates a `DateTime` object from individual date and time components.
-//!   - `update(&amp;self)`: Updates the `DateTime` object to the current date and time.
-//!   - `now()`: Returns the current `DateTime`.
-//!   - `from_str(s: &amp;str)`: Parses a string into a `DateTime` instance (implementation of `FromStr` trait).
-//!   - `default()`: Returns the current UTC time as the default value for `DateTime`.
-//!
-//! - **Parsing and Formatting**:
-//!   - `parse(input: &amp;str)`: Parses a date-time string into a `DateTime` object.
-//!   - `parse_custom_format(input: &amp;str, format: &amp;str)`: Parses a date-time string using a custom format.
-//!   - `format(&amp;self, format_str: &amp;str)`: Formats the `DateTime` object as a string using the specified format.
-//!   - `format_rfc3339(&amp;self)`: Formats the `DateTime` as an RFC 3339 string.
-//!   - `format_iso8601(&amp;self)`: Formats the `DateTime` as an ISO 8601 string.
-//!
-//! - **Date-Time Manipulation**:
-//!   - `convert_to_tz(&amp;self, new_tz: &amp;str)`: Converts the `DateTime` object to a different timezone.
-//!   - `unix_timestamp(&amp;self)`: Returns the Unix timestamp of the `DateTime` object.
-//!   - `add_days(&amp;self, days: i64)`: Adds a specified number of days to the `DateTime`.
-//!   - `add_months(&amp;self, months: i32)`: Adds a specified number of months to the `DateTime`.
-//!   - `add_years(&amp;self, years: i32)`: Adds a specified number of years to the `DateTime`.
-//!   - `sub_months(&amp;self, months: i32)`: Subtracts a specified number of months from the `DateTime`.
-//!   - `sub_years(&amp;self, years: i32)`: Subtracts a specified number of years from the `DateTime`.
-//!   - `next_day(&amp;self)`: Returns a new `DateTime` instance representing the next day.
-//!   - `previous_day(&amp;self)`: Returns a new `DateTime` instance representing the previous day.
-//!   - `start_of_week(&amp;self)`: Returns a new `DateTime` instance at the start of the week.
-//!   - `end_of_week(&amp;self)`: Returns a new `DateTime` instance at the end of the week.
-//!   - `start_of_month(&amp;self)`: Returns a new `DateTime` instance at the start of the month.
-//!   - `end_of_month(&amp;self)`: Returns a new `DateTime` instance at the end of the month.
-//!   - `start_of_year(&amp;self)`: Returns a new `DateTime` instance at the start of the year.
-//!   - `end_of_year(&amp;self)`: Returns a new `DateTime` instance at the end of the year.
-//!   - `is_within_range(&amp;self, start: &amp;Self, end: &amp;Self)`: Checks if the `DateTime` falls within a specific range.
-//!   - `duration_since(&amp;self, other: &amp;Self)`: Calculates the duration between two `DateTime` instances.
-//!
-//! - **Getters**:
-//!   - `year(&amp;self)`: Returns the year.
-//!   - `month(&amp;self)`: Returns the month.
-//!   - `day(&amp;self)`: Returns the day of the month.
-//!   - `hour(&amp;self)`: Returns the hour.
-//!   - `minute(&amp;self)`: Returns the minute.
-//!   - `second(&amp;self)`: Returns the second.
-//!   - `microsecond(&amp;self)`: Returns the microsecond.
-//!   - `weekday(&amp;self)`: Returns the weekday.
-//!   - `ordinal(&amp;self)`: Returns the day of the year (ordinal).
-//!   - `iso_week(&amp;self)`: Returns the ISO week number.
-//!   - `offset(&amp;self)`: Returns the UTC offset.
-//!
-//! - **Setters**:
-//!   - `set_date(&amp;self, year: i32, month: u8, day: u8)`: Sets a new date for the `DateTime` instance.
-//!   - `set_time(&amp;self, hour: u8, minute: u8, second: u8)`: Sets a new time for the `DateTime` instance.
-//!
-//! - **Validation**:
-//!   - `is_valid_day(day: &amp;str)`: Checks if the input represents a valid day of the month.
-//!   - `is_valid_hour(hour: &amp;str)`: Checks if the input represents a valid hour of the day.
-//!   - `is_valid_minute(minute: &amp;str)`: Checks if the input represents a valid minute of the hour.
-//!   - `is_valid_second(second: &amp;str)`: Checks if the input represents a valid second of the minute.
-//!   - `is_valid_month(month: &amp;str)`: Checks if the input represents a valid month of the year.
-//!   - `is_valid_year(year: &amp;str)`: Checks if the input represents a valid year.
-//!   - `is_valid_microsecond(microsecond: &amp;str)`: Checks if the input represents a valid microsecond.
-//!   - `is_valid_ordinal(ordinal: &amp;str)`: Checks if the input represents a valid ordinal day of the year.
-//!   - `is_valid_iso_week(week: &amp;str)`: Checks if the input represents a valid ISO week number.
-//!   - `is_valid_time(time: &amp;str)`: Checks if the input represents a valid time in `HH:MM:SS` format.
-//!   - `is_valid_iso_8601(date: &amp;str)`: Checks if the input represents a valid ISO 8601 formatted date.
-//!
-//! - **Utility Functions**:
-//!   - `format_time_in_timezone(tz: &amp;str, format: &amp;str)`: Formats the current time for a specific timezone.
-//!
-//! - **Arithmetic Operations**:
-//!   - `Add&lt;Duration&gt;`: Adds a `Duration` to the `DateTime` instance.
-//!   - `Sub&lt;Duration&gt;`: Subtracts a `Duration` from the `DateTime` instance.
-//!
-//! - **Comparison Operations**:
-//!   - `PartialOrd`: Allows partial ordering comparisons between `DateTime` instances.
-//!   - `Ord`: Allows total ordering comparisons between `DateTime` instances.
-//!
-//! - **Hashing**:
-//!   - `Hash`: Allows `DateTime` instances to be used as keys in hash-based collections.
-//!
-//! - **Macros**:
-//!   - `dtt_now!()`: Generates the current date and time.
-//!   - `dtt_parse!(input)`: Parses a date-time string into a `DateTime` object.
-//!   - `dtt_print!(datetime)`: Prints a `DateTime` object.
-//!   - `dtt_vec![]`: Creates a vector.
-//!   - `dtt_map!{}`: Creates a map.
-//!   - `dtt_assert!`: Asserts conditions during testing.
-//!   - `is_valid!`: Checks the validity of various date-time components.
-//!   - `dtt_is_valid_function!(func_name)`: Defines a custom validation function.
-//!   - `dtt_new_with_tz!(tz)`: Creates a new `DateTime` object with a specified timezone.
-//!   - `dtt_add_days!(datetime, days)`: Adds days to a `DateTime` object.
-//!   - `dtt_sub_days!(datetime, days)`: Subtracts days from a `DateTime` object.
-//!   - `dtt_diff_seconds!(datetime1, datetime2)`: Calculates the difference in seconds between two `DateTime` objects.
-//!   - `dtt_diff_days!(datetime1, datetime2)`: Calculates the difference in days between two `DateTime` objects.
-//!   - `dtt_clone!`: Creates a deep copy of a `DateTime` object.
-//!   - `dtt_format!`: Formats a `DateTime` object using a provided format string.
-//!   - `dtt_create_vec!`: Creates a new vector containing provided elements.
-//!   - `dtt_min!`: Returns the minimum of given values.
-//!   - `dtt_max!`: Returns the maximum of given values.
-//!   - `dtt_join!`: Joins a vector of strings into a single string.
-//!   - `dtt_print_vec!`: Prints a vector of elements to the console.
-//!
-//! - **Helper Functions**:
-//!   - `days_in_month(year: i32, month: u8)`: Determines the number of days in a given month and year.
-//!   - `is_leap_year(year: i32)`: Determines if a year is a leap year.
-//!
-//! - **Error Handling**:
-//!   The library provides comprehensive error handling through the `DateTimeError` enum, allowing for robust error management in date and time operations.
-//!
-//! - **Timezone Support**:
-//!   DateTime (DTT) offers extensive timezone support, allowing for creation and manipulation of date-time objects across different timezones.
-//!
-//! - **Serialization and Deserialization**:
-//!   The library supports serialization and deserialization of `DateTime` objects using `serde`, facilitating easy integration with various data formats.
-//!
-//! ## Documentation
-//!
-//! For full API documentation, please visit [https://doc.dttlib.com/][17] or [https://docs.rs/dtt][09].
-//!
-//! ## Rust Version Compatibility
-//!
-//! Compiler support: requires rustc 1.56.0+
-//!
-//! ## License
-//!
-//! Licensed under either of the [Apache License][02] or the
-//! [MIT license][03] at your option.
-//!
-//! Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this crate by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
-//!
-//! [01]: https://dttlib.com "DateTime (DTT) Library Website"
-//! [02]: https://opensource.org/license/apache-2-0/ "Apache License, Version 2.0"
-//! [03]: https://opensource.org/licenses/MIT "MIT license"
-//! [04]: https://github.com/sebastienrousseau/dtt/issues "Issues"
-//! [05]: https://github.com/sebastienrousseau/dtt/blob/main/CONTRIBUTING.md "Contributing Instructions"
-//! [08]: https://crates.io/crates/dtt "Crates.io"
-//! [09]: https://docs.rs/dtt "Docs.rs"
-//! [10]: https://lib.rs/crates/dtt "Lib.rs"
-//! [14]: https://www.rust-lang.org "The Rust Programming Language"
-//! [15]: https://codecov.io/gh/sebastienrousseau/dtt "Codecov"
-//! [16]: https://github.com/sebastienrousseau/dtt/actions?query=branch%3Amain "Build Status"
-//! [17]: https://doc.dttlib.com/ "DateTime (DTT) Library Documentation"
-//!
-//! [build-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/dtt/release.yml?branch=main&amp;style=for-the-badge&amp;logo=github "Build Status"
-//! [codecov-badge]: https://img.shields.io/codecov/c/github/sebastienrousseau/dtt?style=for-the-badge&amp;token=X3ZP0K1SGI 'Codecov'
-//! [crates-badge]: https://img.shields.io/crates/v/dtt.svg?style=for-the-badge 'Crates.io badge'
-//! [docs-badge]: https://img.shields.io/docsrs/dtt.svg?style=for-the-badge 'Docs.rs badge'
-//! [libs-badge]: https://img.shields.io/badge/lib.rs-v0.0.8-orange.svg?style=for-the-badge 'Lib.rs badge'
-//! [made-with-rust]: https://img.shields.io/badge/rust-f04041?style=for-the-badge&amp;labelColor=c0282d&amp;logo=rust 'Made With Rust badge'
+//! let now = DateTime::new();
+//! println!("Current time: {}", now);
+//! ```
 
-</span><span class="attr">#![doc(
+</span><span class="attr">#![doc = <span class="macro">include_str!</span>(<span class="string">"../README.md"</span>)]
+#![doc(
     html_favicon_url = <span class="string">"https://kura.pro/dtt/images/favicon.ico"</span>,
     html_logo_url = <span class="string">"https://kura.pro/dtt/images/logos/dtt.svg"</span>,
     html_root_url = <span class="string">"https://docs.rs/dtt"
 </span>)]
-#![crate_name = <span class="string">"dtt"</span>]
-#![crate_type = <span class="string">"lib"</span>]
+</span><span class="comment">// Linting configuration
+</span><span class="attr">#![deny(
+    clippy::all,
+    clippy::pedantic,
+    clippy::cargo,
+    clippy::nursery,
+    rustdoc::broken_intra_doc_links,
+    missing_docs,
+    unsafe_code
+)]
+#![allow(clippy::module_name_repetitions)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
-</span><span class="doccomment">/// The `datetime` module contains the `DateTime` struct and its associated methods.
+</span><span class="comment">// Standard library imports
+</span><span class="kw">use </span>std::env;
+
+<span class="doccomment">/// Library constants and configuration values
+</span><span class="kw">pub mod </span>constants {
+    <span class="doccomment">/// Current version of the library from Cargo.toml
+    </span><span class="kw">pub const </span>VERSION: <span class="kw-2">&amp;</span>str = <span class="macro">env!</span>(<span class="string">"CARGO_PKG_VERSION"</span>);
+
+    <span class="doccomment">/// Environment variable controlling test mode
+    </span><span class="kw">pub const </span>TEST_MODE_ENV: <span class="kw-2">&amp;</span>str = <span class="string">"DTT_TEST_MODE"</span>;
+
+    <span class="doccomment">/// Value indicating test mode is enabled
+    </span><span class="kw">pub const </span>TEST_MODE_ENABLED: <span class="kw-2">&amp;</span>str = <span class="string">"1"</span>;
+
+    <span class="doccomment">/// Welcome message displayed during initialization
+    </span><span class="kw">pub const </span>WELCOME_MSG: <span class="kw-2">&amp;</span>str = <span class="string">"Welcome to `DTT` 👋!"</span>;
+
+    <span class="doccomment">/// Library description displayed during initialization
+    </span><span class="kw">pub const </span>DESCRIPTION: <span class="kw-2">&amp;</span>str = <span class="string">"A Rust library for parsing, validating,manipulating, and formatting dates and times."</span>;
+}
+
+<span class="comment">// Re-exports with inline documentation
+</span><span class="attr">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::datetime::DateTime;
+<span class="attr">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::error::AppError;
+
+<span class="doccomment">/// Core datetime functionality and operations.
+///
+/// This module contains the primary `DateTime` type and associated functionality
+/// for date and time manipulation.
 </span><span class="kw">pub mod </span>datetime;
 
-<span class="doccomment">/// The `error` module contains custom error types for DateTime parsing.
+<span class="doccomment">/// Error handling types and implementations.
+///
+/// Provides custom error types for handling various error conditions that may
+/// occur during datetime operations.
 </span><span class="kw">pub mod </span>error;
 
-<span class="doccomment">/// The `macros` module contains functions for generating macros.
+<span class="doccomment">/// Macro definitions for common operations.
+///
+/// Contains utility macros to simplify common datetime operations and reduce
+/// boilerplate code.
 </span><span class="kw">pub mod </span>macros;
 
-<span class="kw">use </span>error::AppError;
-<span class="kw">use </span>std::env;
+<span class="doccomment">/// Commonly used types and traits.
+///
+/// Provides a convenient way to import commonly used types with a single use statement.
+</span><span class="kw">pub mod </span>prelude {
+    <span class="kw">pub use </span><span class="kw">crate</span>::datetime::DateTime;
+    <span class="kw">pub use </span><span class="kw">crate</span>::error::{AppError, DateTimeError};
+}
 
-<span class="doccomment">/// Runs the main logic of the application.
+<span class="doccomment">/// Runs the main library functionality with proper error handling.
+///
+/// This function initializes the library and performs basic setup operations.
+/// It checks for test mode and returns appropriate results based on the
+/// environment configuration.
 ///
 /// # Errors
 ///
-/// This function will return an error in the following situations:
-/// - If the `DTT_TEST_MODE` environment variable is set to `1`, an `AppError::SimulatedError` is returned.
-/// - If there is an issue retrieving an environment variable, an `AppError::EnvVarError` is returned.
+/// Returns `AppError::SimulatedError` in the following cases:
+/// - When the `DTT_TEST_MODE` environment variable is set to "1"
+/// - When environment variable access fails
 ///
 /// # Examples
 ///
 /// ```rust
-/// use dtt::run;
-/// use dtt::error::AppError;
+/// use dtt::prelude::*;
+///
 /// fn main() -&gt; Result&lt;(), AppError&gt; {
-///     if std::env::var("DTT_TEST_MODE").unwrap_or_default() == "1" {
-///         // This will return a SimulatedError.
-///         return Err(AppError::SimulatedError);
+///     match dtt::run() {
+///         Ok(()) =&gt; println!("Library initialized successfully"),
+///         Err(e) =&gt; eprintln!("Error during initialization: {}", e),
 ///     }
-///
-///     // Your main application logic here
-///
 ///     Ok(())
 /// }
 /// ```
 </span><span class="kw">pub fn </span>run() -&gt; <span class="prelude-ty">Result</span>&lt;(), AppError&gt; {
-    <span class="comment">// Check if the test mode is enabled via the environment variable
-    </span><span class="kw">if </span>env::var(<span class="string">"DTT_TEST_MODE"</span>).unwrap_or_default() == <span class="string">"1" </span>{
+    <span class="kw">if </span>is_test_mode() {
         <span class="kw">return </span><span class="prelude-val">Err</span>(AppError::SimulatedError);
     }
-    <span class="kw">let </span>name = <span class="string">"dtt"</span>;
-    <span class="macro">println!</span>(<span class="string">"Welcome to `{}` 👋!"</span>, { name }.to_uppercase());
-    <span class="macro">println!</span>(
-        <span class="string">"A Rust library for parsing, validating, manipulating, and formatting dates and times."
-    </span>);
+
+    display_welcome_message();
     <span class="prelude-val">Ok</span>(())
+}
+
+<span class="doccomment">/// Checks if the library is running in test mode.
+///
+/// Examines the environment variable `DTT_TEST_MODE` to determine if the library
+/// should operate in test mode.
+</span><span class="kw">fn </span>is_test_mode() -&gt; bool {
+    env::var(constants::TEST_MODE_ENV)
+        .map(|val| val == constants::TEST_MODE_ENABLED)
+        .unwrap_or(<span class="bool-val">false</span>)
+}
+
+<span class="doccomment">/// Displays the welcome message with library information.
+///
+/// Prints a welcome message along with the library description and current version.
+</span><span class="kw">fn </span>display_welcome_message() {
+    <span class="macro">println!</span>(<span class="string">"{}"</span>, constants::WELCOME_MSG);
+    <span class="macro">println!</span>(<span class="string">"{}"</span>, constants::DESCRIPTION);
+    <span class="macro">println!</span>(<span class="string">"Version: {}"</span>, constants::VERSION);
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">mod </span>initialization {
+        <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_normal_run() {
+            env::remove_var(constants::TEST_MODE_ENV);
+            <span class="macro">assert!</span>(run().is_ok());
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_simulated_error() {
+            env::set_var(
+                constants::TEST_MODE_ENV,
+                constants::TEST_MODE_ENABLED,
+            );
+            <span class="macro">assert!</span>(<span class="macro">matches!</span>(run(), <span class="prelude-val">Err</span>(AppError::SimulatedError)));
+        }
+    }
+
+    <span class="kw">mod </span>configuration {
+        <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+        <span class="attr">#[test]
+        #[allow(clippy::const_is_empty)]
+        </span><span class="kw">fn </span>test_version_constant() {
+            <span class="macro">assert!</span>(
+                !constants::VERSION.is_empty(),
+                <span class="string">"Version string should not be empty"
+            </span>);
+        }
+
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_is_test_mode() {
+            env::remove_var(constants::TEST_MODE_ENV);
+            <span class="kw">let </span>first_check = is_test_mode();
+            <span class="macro">assert!</span>(
+                !first_check,
+                <span class="string">"Should not be in test mode by default"
+            </span>);
+
+            env::set_var(
+                constants::TEST_MODE_ENV,
+                constants::TEST_MODE_ENABLED,
+            );
+            <span class="kw">let </span>second_check = is_test_mode();
+            <span class="macro">assert!</span>(
+                second_check,
+                <span class="string">"Should be in test mode after enabling it"
+            </span>);
+        }
+    }
 }
 </code></pre></div></section></main></body></html>

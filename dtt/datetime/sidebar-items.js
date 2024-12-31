@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["DateTime"]};
+window.SIDEBAR_ITEMS = {"fn":["days_in_month","is_leap_year"],"struct":["DateTime","DateTimeBuilder"]};

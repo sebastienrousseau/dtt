@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/datetime.rs`."><title>datetime.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.1 (3f5fd8dd4 2024-08-06)" data-channel="1.80.1" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/datetime.rs`."><title>datetime.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-46132b98.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dtt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.85.0-nightly (7f75bfa1a 2024-12-30)" data-channel="nightly" data-search-js="search-036cda7a.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="icon" href="https://kura.pro/dtt/images/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dtt/</div>datetime.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1411,19 +1412,773 @@
 <a href="#1411" id="1411">1411</a>
 <a href="#1412" id="1412">1412</a>
 <a href="#1413" id="1413">1413</a>
-</pre></div><pre class="rust"><code><span class="comment">// datetime.rs
+<a href="#1414" id="1414">1414</a>
+<a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
+<a href="#1417" id="1417">1417</a>
+<a href="#1418" id="1418">1418</a>
+<a href="#1419" id="1419">1419</a>
+<a href="#1420" id="1420">1420</a>
+<a href="#1421" id="1421">1421</a>
+<a href="#1422" id="1422">1422</a>
+<a href="#1423" id="1423">1423</a>
+<a href="#1424" id="1424">1424</a>
+<a href="#1425" id="1425">1425</a>
+<a href="#1426" id="1426">1426</a>
+<a href="#1427" id="1427">1427</a>
+<a href="#1428" id="1428">1428</a>
+<a href="#1429" id="1429">1429</a>
+<a href="#1430" id="1430">1430</a>
+<a href="#1431" id="1431">1431</a>
+<a href="#1432" id="1432">1432</a>
+<a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+<a href="#1447" id="1447">1447</a>
+<a href="#1448" id="1448">1448</a>
+<a href="#1449" id="1449">1449</a>
+<a href="#1450" id="1450">1450</a>
+<a href="#1451" id="1451">1451</a>
+<a href="#1452" id="1452">1452</a>
+<a href="#1453" id="1453">1453</a>
+<a href="#1454" id="1454">1454</a>
+<a href="#1455" id="1455">1455</a>
+<a href="#1456" id="1456">1456</a>
+<a href="#1457" id="1457">1457</a>
+<a href="#1458" id="1458">1458</a>
+<a href="#1459" id="1459">1459</a>
+<a href="#1460" id="1460">1460</a>
+<a href="#1461" id="1461">1461</a>
+<a href="#1462" id="1462">1462</a>
+<a href="#1463" id="1463">1463</a>
+<a href="#1464" id="1464">1464</a>
+<a href="#1465" id="1465">1465</a>
+<a href="#1466" id="1466">1466</a>
+<a href="#1467" id="1467">1467</a>
+<a href="#1468" id="1468">1468</a>
+<a href="#1469" id="1469">1469</a>
+<a href="#1470" id="1470">1470</a>
+<a href="#1471" id="1471">1471</a>
+<a href="#1472" id="1472">1472</a>
+<a href="#1473" id="1473">1473</a>
+<a href="#1474" id="1474">1474</a>
+<a href="#1475" id="1475">1475</a>
+<a href="#1476" id="1476">1476</a>
+<a href="#1477" id="1477">1477</a>
+<a href="#1478" id="1478">1478</a>
+<a href="#1479" id="1479">1479</a>
+<a href="#1480" id="1480">1480</a>
+<a href="#1481" id="1481">1481</a>
+<a href="#1482" id="1482">1482</a>
+<a href="#1483" id="1483">1483</a>
+<a href="#1484" id="1484">1484</a>
+<a href="#1485" id="1485">1485</a>
+<a href="#1486" id="1486">1486</a>
+<a href="#1487" id="1487">1487</a>
+<a href="#1488" id="1488">1488</a>
+<a href="#1489" id="1489">1489</a>
+<a href="#1490" id="1490">1490</a>
+<a href="#1491" id="1491">1491</a>
+<a href="#1492" id="1492">1492</a>
+<a href="#1493" id="1493">1493</a>
+<a href="#1494" id="1494">1494</a>
+<a href="#1495" id="1495">1495</a>
+<a href="#1496" id="1496">1496</a>
+<a href="#1497" id="1497">1497</a>
+<a href="#1498" id="1498">1498</a>
+<a href="#1499" id="1499">1499</a>
+<a href="#1500" id="1500">1500</a>
+<a href="#1501" id="1501">1501</a>
+<a href="#1502" id="1502">1502</a>
+<a href="#1503" id="1503">1503</a>
+<a href="#1504" id="1504">1504</a>
+<a href="#1505" id="1505">1505</a>
+<a href="#1506" id="1506">1506</a>
+<a href="#1507" id="1507">1507</a>
+<a href="#1508" id="1508">1508</a>
+<a href="#1509" id="1509">1509</a>
+<a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
+<a href="#1530" id="1530">1530</a>
+<a href="#1531" id="1531">1531</a>
+<a href="#1532" id="1532">1532</a>
+<a href="#1533" id="1533">1533</a>
+<a href="#1534" id="1534">1534</a>
+<a href="#1535" id="1535">1535</a>
+<a href="#1536" id="1536">1536</a>
+<a href="#1537" id="1537">1537</a>
+<a href="#1538" id="1538">1538</a>
+<a href="#1539" id="1539">1539</a>
+<a href="#1540" id="1540">1540</a>
+<a href="#1541" id="1541">1541</a>
+<a href="#1542" id="1542">1542</a>
+<a href="#1543" id="1543">1543</a>
+<a href="#1544" id="1544">1544</a>
+<a href="#1545" id="1545">1545</a>
+<a href="#1546" id="1546">1546</a>
+<a href="#1547" id="1547">1547</a>
+<a href="#1548" id="1548">1548</a>
+<a href="#1549" id="1549">1549</a>
+<a href="#1550" id="1550">1550</a>
+<a href="#1551" id="1551">1551</a>
+<a href="#1552" id="1552">1552</a>
+<a href="#1553" id="1553">1553</a>
+<a href="#1554" id="1554">1554</a>
+<a href="#1555" id="1555">1555</a>
+<a href="#1556" id="1556">1556</a>
+<a href="#1557" id="1557">1557</a>
+<a href="#1558" id="1558">1558</a>
+<a href="#1559" id="1559">1559</a>
+<a href="#1560" id="1560">1560</a>
+<a href="#1561" id="1561">1561</a>
+<a href="#1562" id="1562">1562</a>
+<a href="#1563" id="1563">1563</a>
+<a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a>
+<a href="#1608" id="1608">1608</a>
+<a href="#1609" id="1609">1609</a>
+<a href="#1610" id="1610">1610</a>
+<a href="#1611" id="1611">1611</a>
+<a href="#1612" id="1612">1612</a>
+<a href="#1613" id="1613">1613</a>
+<a href="#1614" id="1614">1614</a>
+<a href="#1615" id="1615">1615</a>
+<a href="#1616" id="1616">1616</a>
+<a href="#1617" id="1617">1617</a>
+<a href="#1618" id="1618">1618</a>
+<a href="#1619" id="1619">1619</a>
+<a href="#1620" id="1620">1620</a>
+<a href="#1621" id="1621">1621</a>
+<a href="#1622" id="1622">1622</a>
+<a href="#1623" id="1623">1623</a>
+<a href="#1624" id="1624">1624</a>
+<a href="#1625" id="1625">1625</a>
+<a href="#1626" id="1626">1626</a>
+<a href="#1627" id="1627">1627</a>
+<a href="#1628" id="1628">1628</a>
+<a href="#1629" id="1629">1629</a>
+<a href="#1630" id="1630">1630</a>
+<a href="#1631" id="1631">1631</a>
+<a href="#1632" id="1632">1632</a>
+<a href="#1633" id="1633">1633</a>
+<a href="#1634" id="1634">1634</a>
+<a href="#1635" id="1635">1635</a>
+<a href="#1636" id="1636">1636</a>
+<a href="#1637" id="1637">1637</a>
+<a href="#1638" id="1638">1638</a>
+<a href="#1639" id="1639">1639</a>
+<a href="#1640" id="1640">1640</a>
+<a href="#1641" id="1641">1641</a>
+<a href="#1642" id="1642">1642</a>
+<a href="#1643" id="1643">1643</a>
+<a href="#1644" id="1644">1644</a>
+<a href="#1645" id="1645">1645</a>
+<a href="#1646" id="1646">1646</a>
+<a href="#1647" id="1647">1647</a>
+<a href="#1648" id="1648">1648</a>
+<a href="#1649" id="1649">1649</a>
+<a href="#1650" id="1650">1650</a>
+<a href="#1651" id="1651">1651</a>
+<a href="#1652" id="1652">1652</a>
+<a href="#1653" id="1653">1653</a>
+<a href="#1654" id="1654">1654</a>
+<a href="#1655" id="1655">1655</a>
+<a href="#1656" id="1656">1656</a>
+<a href="#1657" id="1657">1657</a>
+<a href="#1658" id="1658">1658</a>
+<a href="#1659" id="1659">1659</a>
+<a href="#1660" id="1660">1660</a>
+<a href="#1661" id="1661">1661</a>
+<a href="#1662" id="1662">1662</a>
+<a href="#1663" id="1663">1663</a>
+<a href="#1664" id="1664">1664</a>
+<a href="#1665" id="1665">1665</a>
+<a href="#1666" id="1666">1666</a>
+<a href="#1667" id="1667">1667</a>
+<a href="#1668" id="1668">1668</a>
+<a href="#1669" id="1669">1669</a>
+<a href="#1670" id="1670">1670</a>
+<a href="#1671" id="1671">1671</a>
+<a href="#1672" id="1672">1672</a>
+<a href="#1673" id="1673">1673</a>
+<a href="#1674" id="1674">1674</a>
+<a href="#1675" id="1675">1675</a>
+<a href="#1676" id="1676">1676</a>
+<a href="#1677" id="1677">1677</a>
+<a href="#1678" id="1678">1678</a>
+<a href="#1679" id="1679">1679</a>
+<a href="#1680" id="1680">1680</a>
+<a href="#1681" id="1681">1681</a>
+<a href="#1682" id="1682">1682</a>
+<a href="#1683" id="1683">1683</a>
+<a href="#1684" id="1684">1684</a>
+<a href="#1685" id="1685">1685</a>
+<a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+<a href="#1712" id="1712">1712</a>
+<a href="#1713" id="1713">1713</a>
+<a href="#1714" id="1714">1714</a>
+<a href="#1715" id="1715">1715</a>
+<a href="#1716" id="1716">1716</a>
+<a href="#1717" id="1717">1717</a>
+<a href="#1718" id="1718">1718</a>
+<a href="#1719" id="1719">1719</a>
+<a href="#1720" id="1720">1720</a>
+<a href="#1721" id="1721">1721</a>
+<a href="#1722" id="1722">1722</a>
+<a href="#1723" id="1723">1723</a>
+<a href="#1724" id="1724">1724</a>
+<a href="#1725" id="1725">1725</a>
+<a href="#1726" id="1726">1726</a>
+<a href="#1727" id="1727">1727</a>
+<a href="#1728" id="1728">1728</a>
+<a href="#1729" id="1729">1729</a>
+<a href="#1730" id="1730">1730</a>
+<a href="#1731" id="1731">1731</a>
+<a href="#1732" id="1732">1732</a>
+<a href="#1733" id="1733">1733</a>
+<a href="#1734" id="1734">1734</a>
+<a href="#1735" id="1735">1735</a>
+<a href="#1736" id="1736">1736</a>
+<a href="#1737" id="1737">1737</a>
+<a href="#1738" id="1738">1738</a>
+<a href="#1739" id="1739">1739</a>
+<a href="#1740" id="1740">1740</a>
+<a href="#1741" id="1741">1741</a>
+<a href="#1742" id="1742">1742</a>
+<a href="#1743" id="1743">1743</a>
+<a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
+<a href="#1755" id="1755">1755</a>
+<a href="#1756" id="1756">1756</a>
+<a href="#1757" id="1757">1757</a>
+<a href="#1758" id="1758">1758</a>
+<a href="#1759" id="1759">1759</a>
+<a href="#1760" id="1760">1760</a>
+<a href="#1761" id="1761">1761</a>
+<a href="#1762" id="1762">1762</a>
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
+<a href="#1769" id="1769">1769</a>
+<a href="#1770" id="1770">1770</a>
+<a href="#1771" id="1771">1771</a>
+<a href="#1772" id="1772">1772</a>
+<a href="#1773" id="1773">1773</a>
+<a href="#1774" id="1774">1774</a>
+<a href="#1775" id="1775">1775</a>
+<a href="#1776" id="1776">1776</a>
+<a href="#1777" id="1777">1777</a>
+<a href="#1778" id="1778">1778</a>
+<a href="#1779" id="1779">1779</a>
+<a href="#1780" id="1780">1780</a>
+<a href="#1781" id="1781">1781</a>
+<a href="#1782" id="1782">1782</a>
+<a href="#1783" id="1783">1783</a>
+<a href="#1784" id="1784">1784</a>
+<a href="#1785" id="1785">1785</a>
+<a href="#1786" id="1786">1786</a>
+<a href="#1787" id="1787">1787</a>
+<a href="#1788" id="1788">1788</a>
+<a href="#1789" id="1789">1789</a>
+<a href="#1790" id="1790">1790</a>
+<a href="#1791" id="1791">1791</a>
+<a href="#1792" id="1792">1792</a>
+<a href="#1793" id="1793">1793</a>
+<a href="#1794" id="1794">1794</a>
+<a href="#1795" id="1795">1795</a>
+<a href="#1796" id="1796">1796</a>
+<a href="#1797" id="1797">1797</a>
+<a href="#1798" id="1798">1798</a>
+<a href="#1799" id="1799">1799</a>
+<a href="#1800" id="1800">1800</a>
+<a href="#1801" id="1801">1801</a>
+<a href="#1802" id="1802">1802</a>
+<a href="#1803" id="1803">1803</a>
+<a href="#1804" id="1804">1804</a>
+<a href="#1805" id="1805">1805</a>
+<a href="#1806" id="1806">1806</a>
+<a href="#1807" id="1807">1807</a>
+<a href="#1808" id="1808">1808</a>
+<a href="#1809" id="1809">1809</a>
+<a href="#1810" id="1810">1810</a>
+<a href="#1811" id="1811">1811</a>
+<a href="#1812" id="1812">1812</a>
+<a href="#1813" id="1813">1813</a>
+<a href="#1814" id="1814">1814</a>
+<a href="#1815" id="1815">1815</a>
+<a href="#1816" id="1816">1816</a>
+<a href="#1817" id="1817">1817</a>
+<a href="#1818" id="1818">1818</a>
+<a href="#1819" id="1819">1819</a>
+<a href="#1820" id="1820">1820</a>
+<a href="#1821" id="1821">1821</a>
+<a href="#1822" id="1822">1822</a>
+<a href="#1823" id="1823">1823</a>
+<a href="#1824" id="1824">1824</a>
+<a href="#1825" id="1825">1825</a>
+<a href="#1826" id="1826">1826</a>
+<a href="#1827" id="1827">1827</a>
+<a href="#1828" id="1828">1828</a>
+<a href="#1829" id="1829">1829</a>
+<a href="#1830" id="1830">1830</a>
+<a href="#1831" id="1831">1831</a>
+<a href="#1832" id="1832">1832</a>
+<a href="#1833" id="1833">1833</a>
+<a href="#1834" id="1834">1834</a>
+<a href="#1835" id="1835">1835</a>
+<a href="#1836" id="1836">1836</a>
+<a href="#1837" id="1837">1837</a>
+<a href="#1838" id="1838">1838</a>
+<a href="#1839" id="1839">1839</a>
+<a href="#1840" id="1840">1840</a>
+<a href="#1841" id="1841">1841</a>
+<a href="#1842" id="1842">1842</a>
+<a href="#1843" id="1843">1843</a>
+<a href="#1844" id="1844">1844</a>
+<a href="#1845" id="1845">1845</a>
+<a href="#1846" id="1846">1846</a>
+<a href="#1847" id="1847">1847</a>
+<a href="#1848" id="1848">1848</a>
+<a href="#1849" id="1849">1849</a>
+<a href="#1850" id="1850">1850</a>
+<a href="#1851" id="1851">1851</a>
+<a href="#1852" id="1852">1852</a>
+<a href="#1853" id="1853">1853</a>
+<a href="#1854" id="1854">1854</a>
+<a href="#1855" id="1855">1855</a>
+<a href="#1856" id="1856">1856</a>
+<a href="#1857" id="1857">1857</a>
+<a href="#1858" id="1858">1858</a>
+<a href="#1859" id="1859">1859</a>
+<a href="#1860" id="1860">1860</a>
+<a href="#1861" id="1861">1861</a>
+<a href="#1862" id="1862">1862</a>
+<a href="#1863" id="1863">1863</a>
+<a href="#1864" id="1864">1864</a>
+<a href="#1865" id="1865">1865</a>
+<a href="#1866" id="1866">1866</a>
+<a href="#1867" id="1867">1867</a>
+<a href="#1868" id="1868">1868</a>
+<a href="#1869" id="1869">1869</a>
+<a href="#1870" id="1870">1870</a>
+<a href="#1871" id="1871">1871</a>
+<a href="#1872" id="1872">1872</a>
+<a href="#1873" id="1873">1873</a>
+<a href="#1874" id="1874">1874</a>
+<a href="#1875" id="1875">1875</a>
+<a href="#1876" id="1876">1876</a>
+<a href="#1877" id="1877">1877</a>
+<a href="#1878" id="1878">1878</a>
+<a href="#1879" id="1879">1879</a>
+<a href="#1880" id="1880">1880</a>
+<a href="#1881" id="1881">1881</a>
+<a href="#1882" id="1882">1882</a>
+<a href="#1883" id="1883">1883</a>
+<a href="#1884" id="1884">1884</a>
+<a href="#1885" id="1885">1885</a>
+<a href="#1886" id="1886">1886</a>
+<a href="#1887" id="1887">1887</a>
+<a href="#1888" id="1888">1888</a>
+<a href="#1889" id="1889">1889</a>
+<a href="#1890" id="1890">1890</a>
+<a href="#1891" id="1891">1891</a>
+<a href="#1892" id="1892">1892</a>
+<a href="#1893" id="1893">1893</a>
+<a href="#1894" id="1894">1894</a>
+<a href="#1895" id="1895">1895</a>
+<a href="#1896" id="1896">1896</a>
+<a href="#1897" id="1897">1897</a>
+<a href="#1898" id="1898">1898</a>
+<a href="#1899" id="1899">1899</a>
+<a href="#1900" id="1900">1900</a>
+<a href="#1901" id="1901">1901</a>
+<a href="#1902" id="1902">1902</a>
+<a href="#1903" id="1903">1903</a>
+<a href="#1904" id="1904">1904</a>
+<a href="#1905" id="1905">1905</a>
+<a href="#1906" id="1906">1906</a>
+<a href="#1907" id="1907">1907</a>
+<a href="#1908" id="1908">1908</a>
+<a href="#1909" id="1909">1909</a>
+<a href="#1910" id="1910">1910</a>
+<a href="#1911" id="1911">1911</a>
+<a href="#1912" id="1912">1912</a>
+<a href="#1913" id="1913">1913</a>
+<a href="#1914" id="1914">1914</a>
+<a href="#1915" id="1915">1915</a>
+<a href="#1916" id="1916">1916</a>
+<a href="#1917" id="1917">1917</a>
+<a href="#1918" id="1918">1918</a>
+<a href="#1919" id="1919">1919</a>
+<a href="#1920" id="1920">1920</a>
+<a href="#1921" id="1921">1921</a>
+<a href="#1922" id="1922">1922</a>
+<a href="#1923" id="1923">1923</a>
+<a href="#1924" id="1924">1924</a>
+<a href="#1925" id="1925">1925</a>
+<a href="#1926" id="1926">1926</a>
+<a href="#1927" id="1927">1927</a>
+<a href="#1928" id="1928">1928</a>
+<a href="#1929" id="1929">1929</a>
+<a href="#1930" id="1930">1930</a>
+<a href="#1931" id="1931">1931</a>
+<a href="#1932" id="1932">1932</a>
+<a href="#1933" id="1933">1933</a>
+<a href="#1934" id="1934">1934</a>
+<a href="#1935" id="1935">1935</a>
+<a href="#1936" id="1936">1936</a>
+<a href="#1937" id="1937">1937</a>
+<a href="#1938" id="1938">1938</a>
+<a href="#1939" id="1939">1939</a>
+<a href="#1940" id="1940">1940</a>
+<a href="#1941" id="1941">1941</a>
+<a href="#1942" id="1942">1942</a>
+<a href="#1943" id="1943">1943</a>
+<a href="#1944" id="1944">1944</a>
+<a href="#1945" id="1945">1945</a>
+<a href="#1946" id="1946">1946</a>
+<a href="#1947" id="1947">1947</a>
+<a href="#1948" id="1948">1948</a>
+<a href="#1949" id="1949">1949</a>
+<a href="#1950" id="1950">1950</a>
+<a href="#1951" id="1951">1951</a>
+<a href="#1952" id="1952">1952</a>
+<a href="#1953" id="1953">1953</a>
+<a href="#1954" id="1954">1954</a>
+<a href="#1955" id="1955">1955</a>
+<a href="#1956" id="1956">1956</a>
+<a href="#1957" id="1957">1957</a>
+<a href="#1958" id="1958">1958</a>
+<a href="#1959" id="1959">1959</a>
+<a href="#1960" id="1960">1960</a>
+<a href="#1961" id="1961">1961</a>
+<a href="#1962" id="1962">1962</a>
+<a href="#1963" id="1963">1963</a>
+<a href="#1964" id="1964">1964</a>
+<a href="#1965" id="1965">1965</a>
+<a href="#1966" id="1966">1966</a>
+<a href="#1967" id="1967">1967</a>
+<a href="#1968" id="1968">1968</a>
+<a href="#1969" id="1969">1969</a>
+<a href="#1970" id="1970">1970</a>
+<a href="#1971" id="1971">1971</a>
+<a href="#1972" id="1972">1972</a>
+<a href="#1973" id="1973">1973</a>
+<a href="#1974" id="1974">1974</a>
+<a href="#1975" id="1975">1975</a>
+<a href="#1976" id="1976">1976</a>
+<a href="#1977" id="1977">1977</a>
+<a href="#1978" id="1978">1978</a>
+<a href="#1979" id="1979">1979</a>
+<a href="#1980" id="1980">1980</a>
+<a href="#1981" id="1981">1981</a>
+<a href="#1982" id="1982">1982</a>
+<a href="#1983" id="1983">1983</a>
+<a href="#1984" id="1984">1984</a>
+<a href="#1985" id="1985">1985</a>
+<a href="#1986" id="1986">1986</a>
+<a href="#1987" id="1987">1987</a>
+<a href="#1988" id="1988">1988</a>
+<a href="#1989" id="1989">1989</a>
+<a href="#1990" id="1990">1990</a>
+<a href="#1991" id="1991">1991</a>
+<a href="#1992" id="1992">1992</a>
+<a href="#1993" id="1993">1993</a>
+<a href="#1994" id="1994">1994</a>
+<a href="#1995" id="1995">1995</a>
+<a href="#1996" id="1996">1996</a>
+<a href="#1997" id="1997">1997</a>
+<a href="#1998" id="1998">1998</a>
+<a href="#1999" id="1999">1999</a>
+<a href="#2000" id="2000">2000</a>
+<a href="#2001" id="2001">2001</a>
+<a href="#2002" id="2002">2002</a>
+<a href="#2003" id="2003">2003</a>
+<a href="#2004" id="2004">2004</a>
+<a href="#2005" id="2005">2005</a>
+<a href="#2006" id="2006">2006</a>
+<a href="#2007" id="2007">2007</a>
+<a href="#2008" id="2008">2008</a>
+<a href="#2009" id="2009">2009</a>
+<a href="#2010" id="2010">2010</a>
+<a href="#2011" id="2011">2011</a>
+<a href="#2012" id="2012">2012</a>
+<a href="#2013" id="2013">2013</a>
+<a href="#2014" id="2014">2014</a>
+<a href="#2015" id="2015">2015</a>
+<a href="#2016" id="2016">2016</a>
+<a href="#2017" id="2017">2017</a>
+<a href="#2018" id="2018">2018</a>
+<a href="#2019" id="2019">2019</a>
+<a href="#2020" id="2020">2020</a>
+<a href="#2021" id="2021">2021</a>
+<a href="#2022" id="2022">2022</a>
+<a href="#2023" id="2023">2023</a>
+<a href="#2024" id="2024">2024</a>
+<a href="#2025" id="2025">2025</a>
+<a href="#2026" id="2026">2026</a>
+<a href="#2027" id="2027">2027</a>
+<a href="#2028" id="2028">2028</a>
+<a href="#2029" id="2029">2029</a>
+<a href="#2030" id="2030">2030</a>
+<a href="#2031" id="2031">2031</a>
+<a href="#2032" id="2032">2032</a>
+<a href="#2033" id="2033">2033</a>
+<a href="#2034" id="2034">2034</a>
+<a href="#2035" id="2035">2035</a>
+<a href="#2036" id="2036">2036</a>
+<a href="#2037" id="2037">2037</a>
+<a href="#2038" id="2038">2038</a>
+<a href="#2039" id="2039">2039</a>
+<a href="#2040" id="2040">2040</a>
+<a href="#2041" id="2041">2041</a>
+<a href="#2042" id="2042">2042</a>
+<a href="#2043" id="2043">2043</a>
+<a href="#2044" id="2044">2044</a>
+<a href="#2045" id="2045">2045</a>
+<a href="#2046" id="2046">2046</a>
+<a href="#2047" id="2047">2047</a>
+<a href="#2048" id="2048">2048</a>
+<a href="#2049" id="2049">2049</a>
+<a href="#2050" id="2050">2050</a>
+<a href="#2051" id="2051">2051</a>
+<a href="#2052" id="2052">2052</a>
+<a href="#2053" id="2053">2053</a>
+<a href="#2054" id="2054">2054</a>
+<a href="#2055" id="2055">2055</a>
+<a href="#2056" id="2056">2056</a>
+<a href="#2057" id="2057">2057</a>
+<a href="#2058" id="2058">2058</a>
+<a href="#2059" id="2059">2059</a>
+<a href="#2060" id="2060">2060</a>
+<a href="#2061" id="2061">2061</a>
+<a href="#2062" id="2062">2062</a>
+<a href="#2063" id="2063">2063</a>
+<a href="#2064" id="2064">2064</a>
+<a href="#2065" id="2065">2065</a>
+<a href="#2066" id="2066">2066</a>
+<a href="#2067" id="2067">2067</a>
+<a href="#2068" id="2068">2068</a>
+<a href="#2069" id="2069">2069</a>
+<a href="#2070" id="2070">2070</a>
+<a href="#2071" id="2071">2071</a>
+<a href="#2072" id="2072">2072</a>
+<a href="#2073" id="2073">2073</a>
+<a href="#2074" id="2074">2074</a>
+<a href="#2075" id="2075">2075</a>
+<a href="#2076" id="2076">2076</a>
+<a href="#2077" id="2077">2077</a>
+<a href="#2078" id="2078">2078</a>
+<a href="#2079" id="2079">2079</a>
+<a href="#2080" id="2080">2080</a>
+<a href="#2081" id="2081">2081</a>
+<a href="#2082" id="2082">2082</a>
+<a href="#2083" id="2083">2083</a>
+<a href="#2084" id="2084">2084</a>
+<a href="#2085" id="2085">2085</a>
+<a href="#2086" id="2086">2086</a>
+<a href="#2087" id="2087">2087</a>
+<a href="#2088" id="2088">2088</a>
+<a href="#2089" id="2089">2089</a>
+<a href="#2090" id="2090">2090</a>
+<a href="#2091" id="2091">2091</a>
+<a href="#2092" id="2092">2092</a>
+<a href="#2093" id="2093">2093</a>
+<a href="#2094" id="2094">2094</a>
+<a href="#2095" id="2095">2095</a>
+<a href="#2096" id="2096">2096</a>
+<a href="#2097" id="2097">2097</a>
+<a href="#2098" id="2098">2098</a>
+<a href="#2099" id="2099">2099</a>
+<a href="#2100" id="2100">2100</a>
+<a href="#2101" id="2101">2101</a>
+<a href="#2102" id="2102">2102</a>
+<a href="#2103" id="2103">2103</a>
+<a href="#2104" id="2104">2104</a>
+<a href="#2105" id="2105">2105</a>
+<a href="#2106" id="2106">2106</a>
+<a href="#2107" id="2107">2107</a>
+<a href="#2108" id="2108">2108</a>
+<a href="#2109" id="2109">2109</a>
+<a href="#2110" id="2110">2110</a>
+<a href="#2111" id="2111">2111</a>
+<a href="#2112" id="2112">2112</a>
+<a href="#2113" id="2113">2113</a>
+<a href="#2114" id="2114">2114</a>
+<a href="#2115" id="2115">2115</a>
+<a href="#2116" id="2116">2116</a>
+<a href="#2117" id="2117">2117</a>
+<a href="#2118" id="2118">2118</a>
+<a href="#2119" id="2119">2119</a>
+<a href="#2120" id="2120">2120</a>
+<a href="#2121" id="2121">2121</a>
+<a href="#2122" id="2122">2122</a>
+<a href="#2123" id="2123">2123</a>
+<a href="#2124" id="2124">2124</a>
+<a href="#2125" id="2125">2125</a>
+<a href="#2126" id="2126">2126</a>
+<a href="#2127" id="2127">2127</a>
+<a href="#2128" id="2128">2128</a>
+<a href="#2129" id="2129">2129</a>
+<a href="#2130" id="2130">2130</a>
+<a href="#2131" id="2131">2131</a>
+<a href="#2132" id="2132">2132</a>
+<a href="#2133" id="2133">2133</a>
+<a href="#2134" id="2134">2134</a></pre></div><pre class="rust"><code><span class="comment">// datetime.rs
 //
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
-</span><span class="doccomment">//! A DateTime module for handling dates, times, and timezones.
+</span><span class="doccomment">//! DateTime module for managing dates, times, and timezones in Rust.
 //!
-//! This module provides a `DateTime` struct and associated methods for
-//! creating, manipulating, and formatting date and time information.
-//! It supports various timezones using fixed UTC offsets, but does not
-//! automatically adjust for daylight saving time (DST). Users must manually
-//! manage any necessary DST adjustments by selecting the correct timezone offset.
+//! # Overview
+//!
+//! This module provides a comprehensive datetime manipulation API that includes:
+//! - Fixed offset timezone support
+//! - Date and time creation and parsing
+//! - Format conversion (RFC 3339, ISO 8601)
+//! - Date arithmetic and comparison operations  
+//! - Validation utilities
+//!
+//! **Note**: Daylight Saving Time (DST) is **not automatically handled**. Users must
+//! manually manage DST transitions by selecting appropriate timezone offsets.
+//!
+//! # Examples
+//!
+//! ```rust
+//! use dtt::datetime::DateTime;
+//!
+//! // Create current UTC time
+//! let now = DateTime::new();
+//!
+//! // Parse specific datetime
+//! let maybe_dt = DateTime::parse("2024-01-01T12:00:00Z");
+//! if let Ok(dt) = maybe_dt {
+//!     // Convert timezone
+//!     let est = dt.convert_to_tz("EST");
+//!     if let Ok(est_dt) = est {
+//!         // ...
+//!     }
+//! }
+//! ```
+
+</span><span class="attr">#![deny(
+    missing_docs,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::result_unit_err,
+    clippy::clone_on_ref_ptr
+)]
+#![warn(clippy::pedantic, clippy::nursery, clippy::cargo)]
 
 </span><span class="kw">use </span><span class="kw">crate</span>::error::DateTimeError;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -1440,64 +2195,440 @@
     PrimitiveDateTime, Time, UtcOffset, Weekday,
 };
 
-<span class="doccomment">/// A structure representing a date and time with timezone information.
+<span class="doccomment">/// Maximum valid hour value (0-23)
+</span><span class="kw">const </span>MAX_HOUR: u8 = <span class="number">23</span>;
+
+<span class="doccomment">/// Maximum valid minute/second value (0-59)
+</span><span class="kw">const </span>MAX_MIN_SEC: u8 = <span class="number">59</span>;
+
+<span class="doccomment">/// Maximum valid day value (1-31)
+</span><span class="kw">const </span>MAX_DAY: u8 = <span class="number">31</span>;
+
+<span class="doccomment">/// Maximum valid month value (1-12)
+</span><span class="kw">const </span>MAX_MONTH: u8 = <span class="number">12</span>;
+
+<span class="doccomment">/// Maximum valid microsecond value (0-999_999)
+</span><span class="kw">const </span>MAX_MICROSECOND: u32 = <span class="number">999_999</span>;
+
+<span class="doccomment">/// Maximum valid ISO week number (1-53)
+</span><span class="kw">const </span>MAX_ISO_WEEK: u8 = <span class="number">53</span>;
+
+<span class="doccomment">/// Maximum valid ordinal day (1-366)
+</span><span class="kw">const </span>MAX_ORDINAL_DAY: u16 = <span class="number">366</span>;
+
+<span class="doccomment">/// Represents a date and time with timezone offset support.
+///
+/// This struct combines a UTC datetime with a timezone offset, allowing for
+/// timezone-aware datetime operations. While it supports fixed offsets,
+/// it does **not** automatically handle DST transitions.
+///
+/// # Examples
+///
+/// ```
+/// use dtt::datetime::DateTime;
+///
+/// let utc = DateTime::new();
+/// let maybe_est = utc.convert_to_tz("EST");
+/// if let Ok(est) = maybe_est {
+///     // ...
+/// }
+/// ```
 </span><span class="attr">#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>DateTime {
-    <span class="doccomment">/// The date and time in UTC.
+    <span class="doccomment">/// The date and time in UTC (when offset = `UtcOffset::UTC`) or a
+    /// user-chosen offset if `offset != UtcOffset::UTC`.
     </span><span class="kw">pub </span>datetime: PrimitiveDateTime,
-    <span class="doccomment">/// The timezone offset in UTC.
+    <span class="doccomment">/// The timezone offset from UTC.
     </span><span class="kw">pub </span>offset: UtcOffset,
 }
 
-<span class="comment">// A static HashMap containing timezone abbreviations and their UTC offsets.
-</span><span class="macro">lazy_static::lazy_static!</span> {
-    <span class="kw">static </span><span class="kw-2">ref </span>TIMEZONE_OFFSETS: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, <span class="prelude-ty">Result</span>&lt;UtcOffset, DateTimeError&gt;&gt; = {
+<span class="macro">lazy_static::lazy_static!</span> {
+    <span class="doccomment">/// Static mapping of timezone abbreviations to their `UtcOffset`.
+    ///
+    /// # Note
+    ///
+    /// This is not an exhaustive list of timezones. It is a convenient subset
+    /// for demonstration purposes. Real-world usage might integrate a
+    /// more robust timezone library or database.
+    </span><span class="kw">static </span><span class="kw-2">ref </span>TIMEZONE_OFFSETS: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, <span class="prelude-ty">Result</span>&lt;UtcOffset, DateTimeError&gt;&gt; = {
         <span class="kw">let </span><span class="kw-2">mut </span>m = HashMap::new();
-        <span class="kw">let _ </span>= m.insert(<span class="string">"ACDT"</span>, UtcOffset::from_hms(<span class="number">10</span>, <span class="number">30</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"ACST"</span>, UtcOffset::from_hms(<span class="number">9</span>, <span class="number">30</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"ADT"</span>, UtcOffset::from_hms(-<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"AEDT"</span>, UtcOffset::from_hms(<span class="number">11</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"AEST"</span>, UtcOffset::from_hms(<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"AKDT"</span>, UtcOffset::from_hms(-<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"AKST"</span>, UtcOffset::from_hms(-<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"AST"</span>, UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"AWST"</span>, UtcOffset::from_hms(<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"BST"</span>, UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"CDT"</span>, UtcOffset::from_hms(-<span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"CEST"</span>, UtcOffset::from_hms(<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"CET"</span>, UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"CST"</span>, UtcOffset::from_hms(-<span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"ECT"</span>, UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"EDT"</span>, UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"EEST"</span>, UtcOffset::from_hms(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"EET"</span>, UtcOffset::from_hms(<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"EST"</span>, UtcOffset::from_hms(-<span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"GMT"</span>, <span class="prelude-val">Ok</span>(UtcOffset::UTC));
         <span class="kw">let _ </span>= m.insert(<span class="string">"UTC"</span>, <span class="prelude-val">Ok</span>(UtcOffset::UTC));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"HADT"</span>, UtcOffset::from_hms(-<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"HAST"</span>, UtcOffset::from_hms(-<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"HKT"</span>, UtcOffset::from_hms(<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"IST"</span>, UtcOffset::from_hms(<span class="number">5</span>, <span class="number">30</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"IDT"</span>, UtcOffset::from_hms(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"JST"</span>, UtcOffset::from_hms(<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"KST"</span>, UtcOffset::from_hms(<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"MDT"</span>, UtcOffset::from_hms(-<span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"GMT"</span>, <span class="prelude-val">Ok</span>(UtcOffset::UTC));
+
+        <span class="comment">// North American time zones
+        </span><span class="kw">let _ </span>= m.insert(<span class="string">"EST"</span>, UtcOffset::from_hms(-<span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"EDT"</span>, UtcOffset::from_hms(-<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"CST"</span>, UtcOffset::from_hms(-<span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"CDT"</span>, UtcOffset::from_hms(-<span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
         <span class="kw">let _ </span>= m.insert(<span class="string">"MST"</span>, UtcOffset::from_hms(-<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"NZDT"</span>, UtcOffset::from_hms(<span class="number">13</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"NZST"</span>, UtcOffset::from_hms(<span class="number">12</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"PDT"</span>, UtcOffset::from_hms(-<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"MDT"</span>, UtcOffset::from_hms(-<span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
         <span class="kw">let _ </span>= m.insert(<span class="string">"PST"</span>, UtcOffset::from_hms(-<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"WADT"</span>, UtcOffset::from_hms(<span class="number">8</span>, <span class="number">45</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"WAST"</span>, UtcOffset::from_hms(<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"WEDT"</span>, UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"WEST"</span>, UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
-        <span class="kw">let _ </span>= m.insert(<span class="string">"WET"</span>, <span class="prelude-val">Ok</span>(UtcOffset::UTC));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"PDT"</span>, UtcOffset::from_hms(-<span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+
+        <span class="comment">// European time zones
+        </span><span class="kw">let _ </span>= m.insert(<span class="string">"CET"</span>, UtcOffset::from_hms(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"CEST"</span>, UtcOffset::from_hms(<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"EET"</span>, UtcOffset::from_hms(<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"EEST"</span>, UtcOffset::from_hms(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+
+        <span class="comment">// Asian time zones
+        </span><span class="kw">let _ </span>= m.insert(<span class="string">"JST"</span>, UtcOffset::from_hms(<span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"IST"</span>, UtcOffset::from_hms(<span class="number">5</span>, <span class="number">30</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"HKT"</span>, UtcOffset::from_hms(<span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+
+        <span class="comment">// Australian time zones
+        </span><span class="kw">let _ </span>= m.insert(<span class="string">"AEDT"</span>, UtcOffset::from_hms(<span class="number">11</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(<span class="string">"AEST"</span>, UtcOffset::from_hms(<span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>).map_err(DateTimeError::from));
+        <span class="kw">let _ </span>= m.insert(
+            <span class="string">"WADT"</span>,
+            UtcOffset::from_hms(<span class="number">8</span>, <span class="number">45</span>, <span class="number">0</span>)
+                .map_err(DateTimeError::from)
+        );
+
         m
     };
 }
 
-<span class="kw">impl </span>DateTime {
-    <span class="doccomment">/// Creates a new `DateTime` instance with the current date and time in UTC.
+<span class="comment">// -----------------------------------------------------------------------------
+// Builder Pattern
+// -----------------------------------------------------------------------------
+
+</span><span class="doccomment">/// A builder for [`DateTime`] objects, allowing more ergonomic creation of
+/// datetimes with customized year, month, day, hour, minute, second, and offset.
+///
+/// # Examples
+///
+/// ```
+/// use dtt::datetime::{DateTime, DateTimeBuilder};
+/// use time::UtcOffset;
+///
+/// let builder = DateTimeBuilder::new()
+///     .year(2024)
+///     .month(1)
+///     .day(1)
+///     .hour(12)
+///     .minute(30)
+///     .second(45)
+///     .offset(UtcOffset::UTC);
+///
+/// let dt = builder.build();
+/// assert!(dt.is_ok());
+///
+/// let dt_unwrapped = dt.unwrap();
+/// assert_eq!(dt_unwrapped.year(), 2024);
+/// assert_eq!(dt_unwrapped.month().to_string(), "January");
+/// assert_eq!(dt_unwrapped.day(), 1);
+/// assert_eq!(dt_unwrapped.hour(), 12);
+/// assert_eq!(dt_unwrapped.minute(), 30);
+/// assert_eq!(dt_unwrapped.second(), 45);
+/// assert_eq!(dt_unwrapped.offset(), UtcOffset::UTC);
+/// ```
+</span><span class="attr">#[derive(
+    Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize,
+)]
+</span><span class="kw">pub struct </span>DateTimeBuilder {
+    <span class="doccomment">/// Calendar year, e.g. 2024.
+    </span>year: i32,
+    <span class="doccomment">/// Month (1-12).
+    </span>month: u8,
+    <span class="doccomment">/// Day of the month (1-31, depends on month).
+    </span>day: u8,
+    <span class="doccomment">/// Hour of the day (0-23).
+    </span>hour: u8,
+    <span class="doccomment">/// Minute of the hour (0-59).
+    </span>minute: u8,
+    <span class="doccomment">/// Second of the minute (0-59).
+    </span>second: u8,
+    <span class="doccomment">/// The time zone offset from UTC.
+    </span>offset: UtcOffset,
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>DateTimeBuilder {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            year: <span class="number">1970</span>,
+            month: <span class="number">1</span>,
+            day: <span class="number">1</span>,
+            hour: <span class="number">0</span>,
+            minute: <span class="number">0</span>,
+            second: <span class="number">0</span>,
+            offset: UtcOffset::UTC,
+        }
+    }
+}
+
+<span class="kw">impl </span>DateTimeBuilder {
+    <span class="doccomment">/// Creates a new `DateTimeBuilder` with default values set to
+    /// midnight, January 1, 1970 (UTC).
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            year: <span class="number">1970</span>,
+            month: <span class="number">1</span>,
+            day: <span class="number">1</span>,
+            hour: <span class="number">0</span>,
+            minute: <span class="number">0</span>,
+            second: <span class="number">0</span>,
+            offset: UtcOffset::UTC,
+        }
+    }
+
+    <span class="doccomment">/// Sets the year component.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>year(<span class="kw-2">mut </span><span class="self">self</span>, year: i32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.year = year;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the month component.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>month(<span class="kw-2">mut </span><span class="self">self</span>, month: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.month = month;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the day component.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>day(<span class="kw-2">mut </span><span class="self">self</span>, day: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.day = day;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the hour component.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>hour(<span class="kw-2">mut </span><span class="self">self</span>, hour: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.hour = hour;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the minute component.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>minute(<span class="kw-2">mut </span><span class="self">self</span>, minute: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.minute = minute;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the second component.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>second(<span class="kw-2">mut </span><span class="self">self</span>, second: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.second = second;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the time zone offset component.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>offset(<span class="kw-2">mut </span><span class="self">self</span>, offset: UtcOffset) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.offset = offset;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Builds the final [`DateTime`] from the builder state.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if any of the date components are invalid
+    /// (e.g., `month = 13` or `day = 32`).
+    </span><span class="kw">pub fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;DateTime, DateTimeError&gt; {
+        DateTime::from_components(
+            <span class="self">self</span>.year,
+            <span class="self">self</span>.month,
+            <span class="self">self</span>.day,
+            <span class="self">self</span>.hour,
+            <span class="self">self</span>.minute,
+            <span class="self">self</span>.second,
+            <span class="self">self</span>.offset,
+        )
+    }
+}
+
+<span class="comment">// -----------------------------------------------------------------------------
+// Core Implementations
+// -----------------------------------------------------------------------------
+
+</span><span class="kw">impl </span>DateTime {
+    <span class="comment">// -------------------------------------------------------------------------
+    // Creation Methods
+    // -------------------------------------------------------------------------
+
+    </span><span class="doccomment">/// Creates a new `DateTime` instance representing the current UTC time.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let now = DateTime::new();
+    /// ```
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="comment">// Directly obtain the current UTC time.
+        </span><span class="kw">let </span>now = OffsetDateTime::now_utc();
+        <span class="self">Self </span>{
+            datetime: PrimitiveDateTime::new(now.date(), now.time()),
+            offset: UtcOffset::UTC,
+        }
+    }
+
+    <span class="doccomment">/// Creates a new `DateTime` instance with the current time in the specified timezone.
+    ///
+    /// # Arguments
+    ///
+    /// * `tz` - A timezone abbreviation (e.g., "UTC", "EST", "PST")
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the new `DateTime` instance or a `DateTimeError`
+    /// if the timezone is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let maybe_est_time = DateTime::new_with_tz("EST");
+    /// if let Ok(est_time) = maybe_est_time {
+    ///     // ...
+    /// }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the timezone is invalid.
+    ///
+    </span><span class="kw">pub fn </span>new_with_tz(tz: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="kw">let </span>offset = TIMEZONE_OFFSETS
+            .get(tz)
+            .ok_or(DateTimeError::InvalidTimezone)<span class="question-mark">?
+            </span>.as_ref()
+            .map_err(Clone::clone)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>now_utc = OffsetDateTime::now_utc();
+        <span class="kw">let </span>now_local = now_utc.to_offset(<span class="kw-2">*</span>offset);
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            datetime: PrimitiveDateTime::new(
+                now_local.date(),
+                now_local.time(),
+            ),
+            offset: <span class="kw-2">*</span>offset,
+        })
+    }
+
+    <span class="doccomment">/// Creates a new `DateTime` instance with a custom UTC offset.
+    ///
+    /// # Arguments
+    ///
+    /// * `hours` - Hour offset from UTC (-23 to +23)
+    /// * `minutes` - Minute offset from UTC (-59 to +59)
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the offset is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// // Create time with UTC+5:30 offset (e.g., for India)
+    /// let maybe_ist = DateTime::new_with_custom_offset(5, 30);
+    /// if let Ok(ist) = maybe_ist {
+    ///     // ...
+    /// }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the timezone is invalid.
+    ///
+    </span><span class="kw">pub fn </span>new_with_custom_offset(
+        hours: i8,
+        minutes: i8,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="comment">// Direct numeric checks (no casts needed)
+        </span><span class="kw">if </span>hours.abs() &gt; <span class="number">23 </span>|| minutes.abs() &gt; <span class="number">59 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(DateTimeError::InvalidTimezone);
+        }
+
+        <span class="kw">let </span>offset = UtcOffset::from_hms(hours, minutes, <span class="number">0</span>)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidTimezone)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>now_utc = OffsetDateTime::now_utc();
+        <span class="kw">let </span>now_local = now_utc.to_offset(offset);
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            datetime: PrimitiveDateTime::new(
+                now_local.date(),
+                now_local.time(),
+            ),
+            offset,
+        })
+    }
+
+    <span class="doccomment">/// Returns a new `DateTime` which is exactly one day earlier.
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing the new `DateTime` or a `DateTimeError`
+    /// if subtracting one day would result in an invalid date.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let now = DateTime::new();
+    /// let maybe_yesterday = now.previous_day();
+    /// assert!(maybe_yesterday.is_ok());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the resulting date would be invalid.
+    ///
+    </span><span class="kw">pub fn </span>previous_day(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="self">self</span>.add_days(-<span class="number">1</span>)
+    }
+
+    <span class="doccomment">/// Returns a new `DateTime` which is exactly one day later.
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing the new `DateTime` or a `DateTimeError`
+    /// if adding one day would result in an invalid date.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let now = DateTime::new();
+    /// let maybe_tomorrow = now.next_day();
+    /// assert!(maybe_tomorrow.is_ok());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the resulting date would be invalid.
+    ///
+    </span><span class="kw">pub fn </span>next_day(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="self">self</span>.add_days(<span class="number">1</span>)
+    }
+
+    <span class="doccomment">/// Sets the time components (hour, minute, second) while preserving the current date
+    /// and timezone offset.
+    ///
+    /// # Arguments
+    ///
+    /// * `hour` - Hour (0-23)
+    /// * `minute` - Minute (0-59)
+    /// * `second` - Second (0-59)
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the time components are invalid.
     ///
     /// # Examples
     ///
@@ -1505,109 +2636,181 @@
     /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
-    /// println!("Current UTC time: {}", dt);
+    /// // Attempt to set the time to 10:30:45
+    /// let updated_dt = dt.set_time(10, 30, 45);
+    /// assert!(updated_dt.is_ok());
+    /// if let Ok(new_val) = updated_dt {
+    ///     assert_eq!(new_val.hour(), 10);
+    ///     assert_eq!(new_val.minute(), 30);
+    ///     assert_eq!(new_val.second(), 45);
+    /// }
     /// ```
-    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new_with_tz(<span class="string">"UTC"</span>).expect(<span class="string">"UTC is always valid"</span>)
-    }
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the resulting time would be invalid.
+    ///
+    </span><span class="kw">pub fn </span>set_time(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        hour: u8,
+        minute: u8,
+        second: u8,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="comment">// Construct a new time; returns an error if invalid
+        </span><span class="kw">let </span>new_time = Time::from_hms(hour, minute, second)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidTime)<span class="question-mark">?</span>;
 
-    <span class="doccomment">/// Creates a new `DateTime` instance with the current date and time in the specified timezone.
-    ///
-    /// # Arguments
-    ///
-    /// * `tz` - A string slice that holds the timezone abbreviation (e.g., "UTC", "EST", "PST").
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - The new `DateTime` instance or an error if the timezone is invalid.
-    ///
-    /// # Note
-    ///
-    /// This function supports only fixed UTC offsets. Daylight Saving Time (DST) is not automatically
-    /// adjusted. If DST adjustments are needed, they must be handled manually by choosing the correct
-    /// timezone offset.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::new_with_tz("EST").expect("EST is a valid timezone");
-    /// println!("Current time in EST: {}", dt);
-    /// ```
-    </span><span class="kw">pub fn </span>new_with_tz(tz: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>offset = <span class="kw-2">*</span>TIMEZONE_OFFSETS
-            .get(tz)
-            .ok_or(DateTimeError::InvalidTimezone)<span class="question-mark">?</span>;
-
-        <span class="kw">let </span>now_utc = OffsetDateTime::now_utc();
-        <span class="kw">let </span>now_with_offset = now_utc.to_offset(offset<span class="question-mark">?</span>);
-
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+        <span class="comment">// Preserve the existing date
+        </span><span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             datetime: PrimitiveDateTime::new(
-                now_with_offset.date(),
-                now_with_offset.time(),
+                <span class="self">self</span>.datetime.date(),
+                new_time,
             ),
-            offset: offset<span class="question-mark">?</span>,
+            offset: <span class="self">self</span>.offset,
         })
     }
 
-    <span class="doccomment">/// Creates a new `DateTime` instance with the current date and time in a custom timezone offset.
+    <span class="doccomment">/// Subtracts a specified number of years from the `DateTime`.
+    ///
+    /// Handles leap year transitions appropriately (e.g., if subtracting a year from
+    /// Feb 29 results in Feb 28).
     ///
     /// # Arguments
     ///
-    /// * `hours` - The hour component of the offset.
-    /// * `minutes` - The minute component of the offset.
+    /// * `years` - Number of years to subtract
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - The new `DateTime` instance or an error if the offset is invalid.
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the resulting date would be invalid.
     ///
     /// # Examples
     ///
     /// ```
     /// use dtt::datetime::DateTime;
     ///
-    /// let dt = DateTime::new_with_custom_offset(5, 30).expect("Valid custom offset");
-    /// println!("Current time with custom offset: {}", dt);
+    /// let dt = DateTime::new();
+    /// let maybe_past = dt.sub_years(1);
+    /// assert!(maybe_past.is_ok());
     /// ```
-    </span><span class="kw">pub fn </span>new_with_custom_offset(
-        hours: i8,
-        minutes: i8,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">if </span>hours.abs() &gt; <span class="number">23 </span>|| minutes.abs() &gt; <span class="number">59 </span>{
-            <span class="kw">return </span><span class="prelude-val">Err</span>(DateTimeError::InvalidTimezone);
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the resulting date would be invalid.
+    ///
+    </span><span class="kw">pub fn </span>sub_years(<span class="kw-2">&amp;</span><span class="self">self</span>, years: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="self">self</span>.add_years(-years)
+    }
+
+    <span class="doccomment">/// Converts this `DateTime` to another timezone, then formats it
+    /// using the provided `format_str`.
+    ///
+    /// # Arguments
+    ///
+    /// * `tz` - Target timezone abbreviation (e.g., "UTC", "EST", "PST").
+    /// * `format_str` - A format description (see the `time` crate documentation
+    ///   for the supported syntax).
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result&lt;String, DateTimeError&gt;` containing either
+    /// the formatted datetime string or an error if conversion or
+    /// formatting fails.
+    ///
+    /// # Errors
+    ///
+    /// This function will return a [`DateTimeError`] if:
+    /// - The specified timezone is not recognized or invalid.
+    /// - The formatting operation fails due to an invalid `format_str`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let result = dt.format_time_in_timezone("EST", "[hour]:[minute]:[second]");
+    /// if let Ok(formatted_str) = result {
+    ///     println!("Time in EST: {}", formatted_str);
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>format_time_in_timezone(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        tz: <span class="kw-2">&amp;</span>str,
+        format_str: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;String, DateTimeError&gt; {
+        <span class="comment">// 1. Convert this DateTime to the specified timezone
+        </span><span class="kw">let </span>dt_tz = <span class="self">self</span>.convert_to_tz(tz)<span class="question-mark">?</span>;
+
+        <span class="comment">// 2. Format the timezone-adjusted DateTime using the provided format string
+        </span>dt_tz.format(format_str)
+    }
+
+    <span class="doccomment">/// Returns `true` if the input string is a valid ISO 8601 or RFC 3339–like datetime/date.
+    ///
+    /// # Arguments
+    ///
+    /// * `input` - A string that might represent a date or datetime in ISO 8601/RFC 3339 format.
+    ///
+    /// # Returns
+    ///
+    /// `true` if the string can be successfully parsed as either:
+    ///   - RFC 3339 datetime (e.g., "2024-01-01T12:00:00Z"), or
+    ///   - ISO 8601 date (e.g., "2024-01-01")
+    ///     `false` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// assert!(DateTime::is_valid_iso_8601("2024-01-01T12:00:00Z"));
+    /// assert!(DateTime::is_valid_iso_8601("2024-01-01"));
+    /// assert!(!DateTime::is_valid_iso_8601("2024-13-01")); // invalid month
+    /// assert!(!DateTime::is_valid_iso_8601("not a date"));
+    /// ```
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_iso_8601(input: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="comment">// 1. Try parsing the string as RFC 3339 (a strict subset of ISO 8601).
+        </span><span class="kw">if </span>PrimitiveDateTime::parse(
+            input,
+            <span class="kw-2">&amp;</span>format_description::well_known::Rfc3339,
+        )
+        .is_ok()
+        {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="kw">let </span>offset = UtcOffset::from_hms(hours, minutes, <span class="number">0</span>)
-            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidTimezone)<span class="question-mark">?</span>;
-        <span class="kw">let </span>now_utc = OffsetDateTime::now_utc();
-        <span class="kw">let </span>now_with_offset = now_utc.to_offset(offset);
+        <span class="comment">// 2. Otherwise, try parsing as just the date portion of ISO 8601 (yyyy-mm-dd).
+        </span><span class="kw">if </span>Date::parse(
+            input,
+            <span class="kw-2">&amp;</span>format_description::well_known::Iso8601::DATE,
+        )
+        .is_ok()
+        {
+            <span class="kw">return </span><span class="bool-val">true</span>;
+        }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            datetime: PrimitiveDateTime::new(
-                now_with_offset.date(),
-                now_with_offset.time(),
-            ),
-            offset,
-        })
-    }
+        <span class="comment">// 3. If both attempts fail, it's not a valid ISO 8601 or RFC 3339 datetime/date.
+        </span><span class="bool-val">false
+    </span>}
 
     <span class="doccomment">/// Creates a `DateTime` instance from individual components.
     ///
     /// # Arguments
     ///
-    /// * `year` - The year to set.
-    /// * `month` - The month to set (1-12).
-    /// * `day` - The day of the month to set.
-    /// * `hour` - The hour to set (0-23).
-    /// * `minute` - The minute to set (0-59).
-    /// * `second` - The second to set (0-59).
-    /// * `offset` - The `UtcOffset` to set.
+    /// * `year` - Calendar year
+    /// * `month` - Month (1-12)
+    /// * `day` - Day of month (1-31, depending on month)
+    /// * `hour` - Hour (0-23)
+    /// * `minute` - Minute (0-59)
+    /// * `second` - Second (0-59)
+    /// * `offset` - Timezone offset from UTC
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance created from the specified components, or an error if any component is invalid.
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if any component is invalid.
     ///
     /// # Examples
     ///
@@ -1615,9 +2818,14 @@
     /// use dtt::datetime::DateTime;
     /// use time::UtcOffset;
     ///
-    /// let dt = DateTime::from_components(2023, 5, 20, 15, 30, 0, UtcOffset::UTC).expect("Valid date components");
-    /// println!("Created date: {}", dt);
+    /// let dt = DateTime::from_components(2024, 1, 1, 12, 0, 0, UtcOffset::UTC);
+    /// assert!(dt.is_ok());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if any component is invalid.
+    ///
     </span><span class="kw">pub fn </span>from_components(
         year: i32,
         month: u8,
@@ -1627,89 +2835,185 @@
         second: u8,
         offset: UtcOffset,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>date = Date::from_calendar_date(
-            year,
-            Month::try_from(month)
-                .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>,
-            day,
-        )
-        .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>;
+        <span class="kw">let </span>month = Month::try_from(month)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>;
+        <span class="kw">let </span>date = Date::from_calendar_date(year, month, day)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>;
         <span class="kw">let </span>time = Time::from_hms(hour, minute, second)
             .map_err(|<span class="kw">_</span>| DateTimeError::InvalidTime)<span class="question-mark">?</span>;
+
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             datetime: PrimitiveDateTime::new(date, time),
             offset,
         })
     }
 
-    <span class="doccomment">/// Parses a string into a `DateTime` instance.
+    <span class="comment">// -------------------------------------------------------------------------
+    // Getter Methods
+    // -------------------------------------------------------------------------
+
+    </span><span class="doccomment">/// Returns the year component of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>year(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.datetime.date().year()
+    }
+
+    <span class="doccomment">/// Returns the month component of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>month(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Month {
+        <span class="self">self</span>.datetime.date().month()
+    }
+
+    <span class="doccomment">/// Returns the day component of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>day(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.datetime.date().day()
+    }
+
+    <span class="doccomment">/// Returns the hour component of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>hour(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.datetime.time().hour()
+    }
+
+    <span class="doccomment">/// Returns the minute component of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>minute(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.datetime.time().minute()
+    }
+
+    <span class="doccomment">/// Returns the second component of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>second(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.datetime.time().second()
+    }
+
+    <span class="doccomment">/// Returns the microsecond component of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>microsecond(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.datetime.microsecond()
+    }
+
+    <span class="doccomment">/// Returns the ISO week component of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>iso_week(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.datetime.iso_week()
+    }
+
+    <span class="doccomment">/// Returns the ordinal day (day of year) component of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>ordinal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.datetime.ordinal()
+    }
+
+    <span class="doccomment">/// Returns the timezone offset of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UtcOffset {
+        <span class="self">self</span>.offset
+    }
+
+    <span class="doccomment">/// Returns the weekday of the `DateTime`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>weekday(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Weekday {
+        <span class="self">self</span>.datetime.date().weekday()
+    }
+
+    <span class="comment">// -------------------------------------------------------------------------
+    // Parsing Methods
+    // -------------------------------------------------------------------------
+
+    </span><span class="doccomment">/// Parses a string representation of a date and time.
     ///
-    /// This method supports RFC 3339 and ISO 8601 date formats.
+    /// Supports both RFC 3339 and ISO 8601 formats.
     ///
     /// # Arguments
     ///
-    /// * `input` - A string slice that holds the date/time to parse.
+    /// * `input` - A string slice containing the date/time to parse
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - The parsed `DateTime` instance or an error if parsing fails.
+    /// Returns a `Result` containing either the parsed `DateTime` or a `DateTimeError`
+    /// if parsing fails.
     ///
     /// # Examples
     ///
     /// ```
     /// use dtt::datetime::DateTime;
     ///
-    /// let dt = DateTime::parse("2023-05-20T15:30:00Z").expect("Valid RFC 3339 date");
-    /// println!("Parsed date: {}", dt);
+    /// // Parse RFC 3339 format
+    /// let dt1 = DateTime::parse("2024-01-01T12:00:00Z");
+    ///
+    /// // Parse ISO 8601 date
+    /// let dt2 = DateTime::parse("2024-01-01");
+    /// assert!(dt1.is_ok());
+    /// assert!(dt2.is_ok());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the input string is not a valid date/time.
+    ///
     </span><span class="kw">pub fn </span>parse(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>(datetime, offset) = <span class="kw">if let </span><span class="prelude-val">Ok</span>(dt) =
-            PrimitiveDateTime::parse(
-                input,
-                <span class="kw-2">&amp;</span>format_description::well_known::Rfc3339,
-            ) {
-            (dt, UtcOffset::UTC)
-        } <span class="kw">else if let </span><span class="prelude-val">Ok</span>(date) = Date::parse(
+        <span class="comment">// Try RFC 3339 format first
+        </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(dt) = PrimitiveDateTime::parse(
+            input,
+            <span class="kw-2">&amp;</span>format_description::well_known::Rfc3339,
+        ) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+                datetime: dt,
+                offset: UtcOffset::UTC,
+            });
+        }
+
+        <span class="comment">// Fall back to ISO 8601 date format
+        </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(date) = Date::parse(
             input,
             <span class="kw-2">&amp;</span>format_description::well_known::Iso8601::DATE,
         ) {
-            (
-                PrimitiveDateTime::new(date, Time::MIDNIGHT),
-                UtcOffset::UTC,
-            )
-        } <span class="kw">else </span>{
-            <span class="kw">return </span><span class="prelude-val">Err</span>(DateTimeError::InvalidFormat);
-        };
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+                datetime: PrimitiveDateTime::new(date, Time::MIDNIGHT),
+                offset: UtcOffset::UTC,
+            });
+        }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ datetime, offset })
+        <span class="prelude-val">Err</span>(DateTimeError::InvalidFormat)
     }
 
-    <span class="doccomment">/// Parses a string into a `DateTime` instance using a custom format.
+    <span class="doccomment">/// Parses a date/time string using a custom format specification.
     ///
     /// # Arguments
     ///
-    /// * `input` - A string slice that holds the date/time to parse.
-    /// * `format` - The format string to use for parsing.
+    /// * `input` - The date/time string to parse
+    /// * `format` - Format specification string (see `time` crate documentation)
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - The parsed `DateTime` instance or an error if parsing fails.
+    /// Returns a `Result` containing either the parsed `DateTime` or a `DateTimeError`
+    /// if parsing fails.
     ///
     /// # Examples
     ///
     /// ```
     /// use dtt::datetime::DateTime;
     ///
-    /// let dt = DateTime::parse_custom_format("2023-05-20 15:30:00", "[year]-[month]-[day] [hour]:[minute]:[second]").expect("Valid custom format");
-    /// println!("Parsed date: {}", dt);
+    /// let dt = DateTime::parse_custom_format(
+    ///     "2024-01-01 12:00:00",
+    ///     "[year]-[month]-[day] [hour]:[minute]:[second]"
+    /// );
+    /// assert!(dt.is_ok());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the input string is not a valid date/time.
+    ///
     </span><span class="kw">pub fn </span>parse_custom_format(
         input: <span class="kw-2">&amp;</span>str,
         format: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>format = format_description::parse(format)
+        <span class="kw">let </span>format_desc = format_description::parse(format)
             .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)<span class="question-mark">?</span>;
-        <span class="kw">let </span>datetime = PrimitiveDateTime::parse(input, <span class="kw-2">&amp;</span>format)
+        <span class="kw">let </span>datetime = PrimitiveDateTime::parse(input, <span class="kw-2">&amp;</span>format_desc)
             .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
@@ -1718,11 +3022,105 @@
         })
     }
 
-    <span class="doccomment">/// Updates the `DateTime` instance to the current date and time.
+    <span class="comment">// -------------------------------------------------------------------------
+    // Formatting Methods
+    // -------------------------------------------------------------------------
+
+    </span><span class="doccomment">/// Formats the `DateTime` according to the specified format string.
+    ///
+    /// # Arguments
+    ///
+    /// * `format_str` - Format specification string (see `time` crate documentation)
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - The updated `DateTime` instance or an error if the update fails.
+    /// Returns a `Result` containing either the formatted string or a `DateTimeError`
+    /// if formatting fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let formatted = dt.format("[year]-[month]-[day]");
+    /// assert!(formatted.is_ok());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the format string is invalid.
+    ///
+    </span><span class="kw">pub fn </span>format(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        format_str: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;String, DateTimeError&gt; {
+        <span class="kw">let </span>format_desc = format_description::parse(format_str)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)<span class="question-mark">?</span>;
+        <span class="self">self</span>.datetime
+            .format(<span class="kw-2">&amp;</span>format_desc)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)
+    }
+
+    <span class="doccomment">/// Formats the `DateTime` as an RFC 3339 string.
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the formatted RFC 3339 string
+    /// or a `DateTimeError` if formatting fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let maybe_rfc3339 = dt.format_rfc3339();
+    /// assert!(maybe_rfc3339.is_ok());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if formatting fails.
+    ///
+    </span><span class="kw">pub fn </span>format_rfc3339(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, DateTimeError&gt; {
+        <span class="self">self</span>.datetime
+            .assume_offset(<span class="self">self</span>.offset)
+            .format(<span class="kw-2">&amp;</span>format_description::well_known::Rfc3339)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)
+    }
+
+    <span class="doccomment">/// Formats the `DateTime` as an ISO 8601 string (YYYY-MM-DDTHH:MM:SS).
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the formatted ISO 8601 string
+    /// or a `DateTimeError` if formatting fails.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let maybe_iso8601 = dt.format_iso8601();
+    /// assert!(maybe_iso8601.is_ok());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if formatting fails.
+    ///
+    </span><span class="kw">pub fn </span>format_iso8601(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, DateTimeError&gt; {
+        <span class="self">self</span>.format(<span class="string">"[year]-[month]-[day]T[hour]:[minute]:[second]"</span>)
+    }
+
+    <span class="doccomment">/// Updates the `DateTime` to the current time while preserving the timezone offset.
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the updated `DateTime` or a `DateTimeError`
+    /// if the update fails.
     ///
     /// # Examples
     ///
@@ -1731,11 +3129,16 @@
     /// use std::thread::sleep;
     /// use std::time::Duration;
     ///
-    /// let mut dt = DateTime::new();
+    /// let dt = DateTime::new();
     /// sleep(Duration::from_secs(1));
-    /// dt = dt.update().expect("Update should succeed");
-    /// println!("Updated time: {}", dt);
+    /// let updated_dt = dt.update();
+    /// assert!(updated_dt.is_ok());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the update fails.
+    ///
     </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
         <span class="kw">let </span>now = OffsetDateTime::now_utc().to_offset(<span class="self">self</span>.offset);
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
@@ -1744,56 +3147,67 @@
         })
     }
 
-    <span class="doccomment">/// Converts the `DateTime` instance to another timezone.
+    <span class="comment">// -------------------------------------------------------------------------
+    // Timezone Conversion Method
+    // -------------------------------------------------------------------------
+
+    </span><span class="doccomment">/// Converts the current `DateTime` to another timezone.
     ///
     /// # Arguments
     ///
-    /// * `new_tz` - The timezone abbreviation to convert to.
+    /// * `new_tz` - Target timezone abbreviation (e.g., "UTC", "EST", "PST")
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance in the target timezone or an error if the conversion fails.
-    ///
-    /// # Note
-    ///
-    /// This function only supports fixed UTC offsets. If the target timezone observes DST, you will need
-    /// to handle the offset change manually.
+    /// Returns a `Result` containing either the `DateTime` in the new timezone
+    /// or a `DateTimeError` if the conversion fails.
     ///
     /// # Examples
     ///
     /// ```
     /// use dtt::datetime::DateTime;
     ///
-    /// let dt = DateTime::new_with_tz("EST").expect("Valid timezone");
-    /// let converted_dt = dt.convert_to_tz("PST").expect("Conversion to PST should succeed");
-    /// println!("Converted time: {}", converted_dt);
+    /// let utc = DateTime::new();
+    /// let maybe_est = utc.convert_to_tz("EST");
+    /// assert!(maybe_est.is_ok());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the timezone is invalid.
+    ///
     </span><span class="kw">pub fn </span>convert_to_tz(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         new_tz: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>new_offset = <span class="kw-2">*</span>TIMEZONE_OFFSETS
+        <span class="kw">let </span>new_offset = TIMEZONE_OFFSETS
             .get(new_tz)
-            .ok_or(DateTimeError::InvalidTimezone)<span class="question-mark">?</span>;
+            .ok_or(DateTimeError::InvalidTimezone)<span class="question-mark">?
+            </span>.as_ref()
+            .map_err(Clone::clone)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>new_datetime = <span class="self">self
-            </span>.datetime
-            .assume_offset(<span class="self">self</span>.offset)
-            .to_offset(new_offset<span class="question-mark">?</span>);
+        <span class="kw">let </span>datetime_with_offset =
+            <span class="self">self</span>.datetime.assume_offset(<span class="self">self</span>.offset);
+        <span class="kw">let </span>new_datetime = datetime_with_offset.to_offset(<span class="kw-2">*</span>new_offset);
+
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             datetime: PrimitiveDateTime::new(
                 new_datetime.date(),
                 new_datetime.time(),
             ),
-            offset: new_offset<span class="question-mark">?</span>,
+            offset: <span class="kw-2">*</span>new_offset,
         })
     }
 
-    <span class="doccomment">/// Returns the Unix timestamp of the `DateTime` instance.
+    <span class="comment">// -------------------------------------------------------------------------
+    // Additional Utilities
+    // -------------------------------------------------------------------------
+
+    </span><span class="doccomment">/// Gets the Unix timestamp (seconds since Unix epoch).
     ///
     /// # Returns
     ///
-    /// * `i64` - The Unix timestamp in seconds.
+    /// Returns the number of seconds from the Unix epoch (1970-01-01T00:00:00Z).
     ///
     /// # Examples
     ///
@@ -1801,161 +3215,24 @@
     /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
-    /// let timestamp = dt.unix_timestamp();
-    /// println!("Unix timestamp: {}", timestamp);
+    /// let ts = dt.unix_timestamp();
     /// ```
-    </span><span class="kw">pub fn </span>unix_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub const fn </span>unix_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
         <span class="self">self</span>.datetime.assume_offset(<span class="self">self</span>.offset).unix_timestamp()
     }
 
-    <span class="doccomment">/// Adds a specified number of days to the `DateTime` instance.
+    <span class="doccomment">/// Calculates the duration between this `DateTime` and another.
+    ///
+    /// The result can be negative if `other` is later than `self`.
     ///
     /// # Arguments
     ///
-    /// * `days` - The number of days to add (can be negative for subtraction).
+    /// * `other` - The `DateTime` to compare with
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance with the days added, or an error if the operation fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::new();
-    /// let future_dt = dt.add_days(7).expect("Adding 7 days should succeed");
-    /// println!("Date after 7 days: {}", future_dt);
-    /// ```
-    </span><span class="kw">pub fn </span>add_days(<span class="kw-2">&amp;</span><span class="self">self</span>, days: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>new_datetime = <span class="self">self
-            </span>.datetime
-            .checked_add(Duration::days(days))
-            .ok_or(DateTimeError::InvalidDate)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            datetime: new_datetime,
-            offset: <span class="self">self</span>.offset,
-        })
-    }
-
-    <span class="doccomment">/// Returns a new `DateTime` instance representing the next day.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance for the next day, or an error if the operation fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::new();
-    /// let tomorrow = dt.next_day().expect("Getting next day should succeed");
-    /// println!("Tomorrow: {}", tomorrow);
-    /// ```
-    </span><span class="kw">pub fn </span>next_day(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="self">self</span>.add_days(<span class="number">1</span>)
-    }
-
-    <span class="doccomment">/// Returns a new `DateTime` instance representing the previous day.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance for the previous day, or an error if the operation fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::new();
-    /// let yesterday = dt.previous_day().expect("Getting previous day should succeed");
-    /// println!("Yesterday: {}", yesterday);
-    /// ```
-    </span><span class="kw">pub fn </span>previous_day(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="self">self</span>.add_days(-<span class="number">1</span>)
-    }
-
-    <span class="doccomment">/// Formats the `DateTime` instance according to the specified format string.
-    ///
-    /// # Arguments
-    ///
-    /// * `format_str` - A string slice that holds the desired format.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;String, DateTimeError&gt;` - The formatted date/time string or an error if formatting fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::new();
-    /// let formatted = dt.format("[year]-[month]-[day]").expect("Format should be valid");
-    /// println!("Formatted date: {}", formatted);
-    /// ```
-    </span><span class="kw">pub fn </span>format(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        format_str: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;String, DateTimeError&gt; {
-        <span class="kw">let </span>format = format_description::parse(format_str)
-            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)<span class="question-mark">?</span>;
-        <span class="self">self</span>.datetime
-            .format(<span class="kw-2">&amp;</span>format)
-            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)
-    }
-
-    <span class="doccomment">/// Formats the `DateTime` instance as an RFC 3339 string.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;String, DateTimeError&gt;` - The formatted RFC 3339 string or an error if formatting fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::new();
-    /// let formatted = dt.format_rfc3339().expect("RFC 3339 format should succeed");
-    /// println!("RFC 3339 date: {}", formatted);
-    /// ```
-    </span><span class="kw">pub fn </span>format_rfc3339(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, DateTimeError&gt; {
-        <span class="self">self</span>.datetime
-            .assume_offset(<span class="self">self</span>.offset)
-            .format(<span class="kw-2">&amp;</span>format_description::well_known::Rfc3339)
-            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)
-    }
-
-    <span class="doccomment">/// Formats the `DateTime` instance as an ISO 8601 string.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;String, DateTimeError&gt;` - The formatted ISO 8601 string or an error if formatting fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::new();
-    /// let formatted = dt.format_iso8601().expect("ISO 8601 format should succeed");
-    /// println!("ISO 8601 date: {}", formatted);
-    /// ```
-    </span><span class="kw">pub fn </span>format_iso8601(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, DateTimeError&gt; {
-        <span class="self">self</span>.format(<span class="string">"[year]-[month]-[day]T[hour]:[minute]:[second]"</span>)
-    }
-
-    <span class="doccomment">/// Calculates the duration between this `DateTime` and another `DateTime`.
-    ///
-    /// # Arguments
-    ///
-    /// * `other` - The `DateTime` to compare with.
-    ///
-    /// # Returns
-    ///
-    /// * `Duration` - The duration between the two `DateTime` instances.
+    /// Returns a `Duration` representing the time difference.
     ///
     /// # Examples
     ///
@@ -1963,197 +3240,43 @@
     /// use dtt::datetime::DateTime;
     ///
     /// let dt1 = DateTime::new();
-    /// let dt2 = dt1.add_days(1).expect("Adding 1 day should succeed");
+    /// let dt2 = dt1.add_days(1).unwrap_or(dt1);
     /// let duration = dt1.duration_since(&amp;dt2);
-    /// println!("Duration: {:?}", duration);
+    /// // duration could be negative if dt2 &gt; dt1
     /// ```
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>duration_since(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Duration {
-        <span class="kw">let </span>self_offset_datetime =
-            <span class="self">self</span>.datetime.assume_offset(<span class="self">self</span>.offset);
-        <span class="kw">let </span>other_offset_datetime =
-            other.datetime.assume_offset(other.offset);
+        <span class="kw">let </span>self_offset = <span class="self">self</span>.datetime.assume_offset(<span class="self">self</span>.offset);
+        <span class="kw">let </span>other_offset = other.datetime.assume_offset(other.offset);
 
-        <span class="kw">let </span>seconds_difference = self_offset_datetime.unix_timestamp()
-            - other_offset_datetime.unix_timestamp();
-        <span class="kw">let </span>nanoseconds_difference = self_offset_datetime.nanosecond()
-            <span class="kw">as </span>i64
-            - other_offset_datetime.nanosecond() <span class="kw">as </span>i64;
+        <span class="kw">let </span>seconds_diff = self_offset.unix_timestamp()
+            - other_offset.unix_timestamp();
+        <span class="kw">let </span>nanos_diff = i64::from(self_offset.nanosecond())
+            - i64::from(other_offset.nanosecond());
 
-        Duration::seconds(seconds_difference)
-            + Duration::nanoseconds(nanoseconds_difference)
+        Duration::seconds(seconds_diff)
+            + Duration::nanoseconds(nanos_diff)
     }
 
-    <span class="doccomment">/// Returns the start of the week for the `DateTime` instance.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance at the start of the week.
-    </span><span class="kw">pub fn </span>start_of_week(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>days_to_subtract =
-            <span class="self">self</span>.weekday().number_days_from_monday() <span class="kw">as </span>i64;
-        <span class="self">self</span>.add_days(-days_to_subtract)
-    }
+    <span class="comment">// -------------------------------------------------------------------------
+    // Date Arithmetic Methods
+    // -------------------------------------------------------------------------
 
-    <span class="doccomment">/// Returns the end of the week for the `DateTime` instance.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance at the end of the week.
-    </span><span class="kw">pub fn </span>end_of_week(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>days_to_add =
-            <span class="number">6 </span>- <span class="self">self</span>.weekday().number_days_from_monday() <span class="kw">as </span>i64;
-        <span class="self">self</span>.add_days(days_to_add)
-    }
-
-    <span class="doccomment">/// Returns the start of the month for the `DateTime` instance.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance at the start of the month.
-    </span><span class="kw">pub fn </span>start_of_month(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="self">self</span>.set_date(<span class="self">self</span>.year(), <span class="self">self</span>.month() <span class="kw">as </span>u8, <span class="number">1</span>)
-    }
-
-    <span class="doccomment">/// Returns the end of the month for the `DateTime` instance.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance at the end of the month.
-    </span><span class="kw">pub fn </span>end_of_month(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>year = <span class="self">self</span>.year();
-        <span class="kw">let </span>month = <span class="self">self</span>.month() <span class="kw">as </span>u8;
-        <span class="kw">let </span>last_day = <span class="kw">match </span>month {
-            <span class="number">1 </span>| <span class="number">3 </span>| <span class="number">5 </span>| <span class="number">7 </span>| <span class="number">8 </span>| <span class="number">10 </span>| <span class="number">12 </span>=&gt; <span class="number">31</span>,
-            <span class="number">4 </span>| <span class="number">6 </span>| <span class="number">9 </span>| <span class="number">11 </span>=&gt; <span class="number">30</span>,
-            <span class="number">2 </span>=&gt; {
-                <span class="kw">if </span>(year % <span class="number">4 </span>== <span class="number">0 </span>&amp;&amp; year % <span class="number">100 </span>!= <span class="number">0</span>)
-                    || (year % <span class="number">400 </span>== <span class="number">0</span>)
-                {
-                    <span class="number">29 </span><span class="comment">// Leap year
-                </span>} <span class="kw">else </span>{
-                    <span class="number">28
-                </span>}
-            }
-            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(DateTimeError::InvalidDate),
-        };
-
-        <span class="self">self</span>.set_date(year, month, last_day)
-    }
-
-    <span class="doccomment">/// Returns the start of the year for the `DateTime` instance.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance at the start of the year.
-    </span><span class="kw">pub fn </span>start_of_year(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="self">self</span>.set_date(<span class="self">self</span>.year(), <span class="number">1</span>, <span class="number">1</span>)
-    }
-
-    <span class="doccomment">/// Returns the end of the year for the `DateTime` instance.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance at the end of the year.
-    </span><span class="kw">pub fn </span>end_of_year(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="self">self</span>.set_date(<span class="self">self</span>.year(), <span class="number">12</span>, <span class="number">31</span>)
-    }
-
-    <span class="doccomment">/// Checks if the `DateTime` instance falls within a specific range.
+    </span><span class="doccomment">/// Adds a specified number of days to the `DateTime`.
     ///
     /// # Arguments
     ///
-    /// * `start` - The start `DateTime` of the range.
-    /// * `end` - The end `DateTime` of the range.
+    /// * `days` - Number of days to add (can be negative for subtraction)
     ///
     /// # Returns
     ///
-    /// * `bool` - `true` if the `DateTime` falls within the range, otherwise `false`.
-    </span><span class="kw">pub fn </span>is_within_range(<span class="kw-2">&amp;</span><span class="self">self</span>, start: <span class="kw-2">&amp;</span><span class="self">Self</span>, end: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self </span>&gt;= start &amp;&amp; <span class="self">self </span>&lt;= end
-    }
-
-    <span class="comment">// Getter methods
-
-    </span><span class="doccomment">/// Returns the year of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>year(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
-        <span class="self">self</span>.datetime.year()
-    }
-
-    <span class="doccomment">/// Returns the month of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>month(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Month {
-        <span class="self">self</span>.datetime.month()
-    }
-
-    <span class="doccomment">/// Returns the day of the month of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>day(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.datetime.day()
-    }
-
-    <span class="doccomment">/// Returns the hour of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>hour(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.datetime.hour()
-    }
-
-    <span class="doccomment">/// Returns the minute of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>minute(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.datetime.minute()
-    }
-
-    <span class="doccomment">/// Returns the second of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>second(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.datetime.second()
-    }
-
-    <span class="doccomment">/// Returns the microsecond of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>microsecond(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
-        <span class="self">self</span>.datetime.microsecond()
-    }
-
-    <span class="doccomment">/// Returns the weekday of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>weekday(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Weekday {
-        <span class="self">self</span>.datetime.weekday()
-    }
-
-    <span class="doccomment">/// Returns the day of the year (ordinal) of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>ordinal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
-        <span class="self">self</span>.datetime.ordinal()
-    }
-
-    <span class="doccomment">/// Returns the ISO week number of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>iso_week(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
-        <span class="self">self</span>.datetime.iso_week()
-    }
-
-    <span class="doccomment">/// Returns the UTC offset of the `DateTime` instance.
-    </span><span class="kw">pub fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; UtcOffset {
-        <span class="self">self</span>.offset
-    }
-
-    <span class="doccomment">/// Returns the current `DateTime` instance.
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the operation would result in an invalid date.
     ///
-    /// # Examples
+    /// # Errors
     ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::now();
-    /// println!("Current time: {}", dt);
-    /// ```
-    </span><span class="kw">pub fn </span>now() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new()
-    }
-
-    <span class="doccomment">/// Sets a new date for the `DateTime` instance.
-    ///
-    /// # Arguments
-    ///
-    /// * `year` - The year to set.
-    /// * `month` - The month to set (1-12).
-    /// * `day` - The day of the month to set.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance with the updated date, or an error if the date is invalid.
+    /// This function returns a [`DateTimeError::InvalidDate`] if adding `days` results
+    /// in a date overflow or otherwise invalid date.
     ///
     /// # Examples
     ///
@@ -2161,42 +3284,39 @@
     /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
-    /// let new_dt = dt.set_date(2024, 1, 1).expect("Setting date to 2024-01-01 should succeed");
-    /// println!("New date: {}", new_dt);
+    /// let future = dt.add_days(7);
+    /// assert!(future.is_ok());
     /// ```
-    </span><span class="kw">pub fn </span>set_date(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        year: i32,
-        month: u8,
-        day: u8,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>new_date = Date::from_calendar_date(
-            year,
-            Month::try_from(month)
-                .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>,
-            day,
-        )
-        .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>;
+    </span><span class="kw">pub fn </span>add_days(<span class="kw-2">&amp;</span><span class="self">self</span>, days: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="kw">let </span>new_datetime = <span class="self">self
+            </span>.datetime
+            .checked_add(Duration::days(days))
+            .ok_or(DateTimeError::InvalidDate)<span class="question-mark">?</span>;
+
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            datetime: PrimitiveDateTime::new(
-                new_date,
-                <span class="self">self</span>.datetime.time(),
-            ),
+            datetime: new_datetime,
             offset: <span class="self">self</span>.offset,
         })
     }
 
-    <span class="doccomment">/// Sets a new time for the `DateTime` instance.
+    <span class="doccomment">/// Adds a specified number of months to the `DateTime`.
+    ///
+    /// Handles month-end dates and leap years appropriately.
     ///
     /// # Arguments
     ///
-    /// * `hour` - The hour to set (0-23).
-    /// * `minute` - The minute to set (0-59).
-    /// * `second` - The second to set (0-59).
+    /// * `months` - Number of months to add (can be negative for subtraction)
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance with the updated time, or an error if the time is invalid.
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the operation would result in an invalid date.
+    ///
+    /// # Errors
+    ///
+    /// This function returns a [`DateTimeError`] if:
+    /// - The calculated year, month, or day is invalid (e.g., out of range).
+    /// - The underlying date library fails to construct a valid date.
     ///
     /// # Examples
     ///
@@ -2204,307 +3324,9 @@
     /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
-    /// let new_dt = dt.set_time(12, 0, 0).expect("Setting time to 12:00:00 should succeed");
-    /// println!("New time: {}", new_dt);
+    /// let future = dt.add_months(3);
+    /// assert!(future.is_ok());
     /// ```
-    </span><span class="kw">pub fn </span>set_time(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        hour: u8,
-        minute: u8,
-        second: u8,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="kw">let </span>new_time = Time::from_hms(hour, minute, second)
-            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidTime)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            datetime: PrimitiveDateTime::new(
-                <span class="self">self</span>.datetime.date(),
-                new_time,
-            ),
-            offset: <span class="self">self</span>.offset,
-        })
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid day of the month.
-    ///
-    /// # Arguments
-    ///
-    /// * `day` - A string slice representing the day (expected in "1" to "31").
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the day is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_day("15"));
-    /// assert!(!DateTime::is_valid_day("32"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_day(day: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(d) = day.parse::&lt;u8&gt;() {
-            (<span class="number">1</span>..=<span class="number">31</span>).contains(<span class="kw-2">&amp;</span>d)
-        } <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid hour of the day.
-    ///
-    /// # Arguments
-    ///
-    /// * `hour` - A string slice representing the hour (expected in "0" to "23").
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the hour is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_hour("23"));
-    /// assert!(!DateTime::is_valid_hour("24"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_hour(hour: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(h) = hour.parse::&lt;u8&gt;() {
-            h &lt; <span class="number">24
-        </span>} <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid minute of the hour.
-    ///
-    /// # Arguments
-    ///
-    /// * `minute` - A string slice representing the minute (expected in "0" to "59").
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the minute is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_minute("59"));
-    /// assert!(!DateTime::is_valid_minute("60"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_minute(minute: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(m) = minute.parse::&lt;u8&gt;() {
-            m &lt; <span class="number">60
-        </span>} <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid second of the minute.
-    ///
-    /// # Arguments
-    ///
-    /// * `second` - A string slice representing the second (expected in "0" to "59").
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the second is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_second("59"));
-    /// assert!(!DateTime::is_valid_second("60"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_second(second: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(s) = second.parse::&lt;u8&gt;() {
-            s &lt; <span class="number">60
-        </span>} <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid month of the year.
-    ///
-    /// # Arguments
-    ///
-    /// * `month` - A string slice representing the month (expected in "1" to "12").
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the month is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_month("12"));
-    /// assert!(!DateTime::is_valid_month("13"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_month(month: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(m) = month.parse::&lt;u8&gt;() {
-            (<span class="number">1</span>..=<span class="number">12</span>).contains(<span class="kw-2">&amp;</span>m)
-        } <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid year.
-    ///
-    /// # Arguments
-    ///
-    /// * `year` - A string slice representing the year.
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the year is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_year("2023"));
-    /// assert!(!DateTime::is_valid_year("abcd"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_year(year: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        year.parse::&lt;i32&gt;().is_ok()
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid microsecond.
-    ///
-    /// # Arguments
-    ///
-    /// * `microsecond` - A string slice representing the microsecond (expected in "0" to "999999").
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the microsecond is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_microsecond("123456"));
-    /// assert!(!DateTime::is_valid_microsecond("1000000"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_microsecond(microsecond: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(ms) = microsecond.parse::&lt;u32&gt;() {
-            ms &lt; <span class="number">1_000_000
-        </span>} <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid ordinal day of the year.
-    ///
-    /// # Arguments
-    ///
-    /// * `ordinal` - A string slice representing the ordinal day (expected in "1" to "366").
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the ordinal is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_ordinal("200"));
-    /// assert!(!DateTime::is_valid_ordinal("400"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_ordinal(ordinal: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(o) = ordinal.parse::&lt;u16&gt;() {
-            (<span class="number">1</span>..=<span class="number">366</span>).contains(<span class="kw-2">&amp;</span>o)
-        } <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid ISO week number.
-    ///
-    /// # Arguments
-    ///
-    /// * `week` - A string slice representing the ISO week number (expected in "1" to "53").
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the ISO week number is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_iso_week("10"));
-    /// assert!(!DateTime::is_valid_iso_week("54"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_iso_week(week: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(w) = week.parse::&lt;u8&gt;() {
-            (<span class="number">1</span>..=<span class="number">53</span>).contains(<span class="kw-2">&amp;</span>w)
-        } <span class="kw">else </span>{
-            <span class="bool-val">false
-        </span>}
-    }
-
-    <span class="doccomment">/// Validates whether the provided string represents a valid time in `HH:MM:SS` format.
-    ///
-    /// # Arguments
-    ///
-    /// * `time` - A string slice representing the time in `HH:MM:SS` format.
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the time is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_time("12:30:45"));
-    /// assert!(!DateTime::is_valid_time("24:00:00"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_time(time: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        <span class="kw">let </span>parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = time.split(<span class="string">':'</span>).collect();
-        <span class="kw">if </span>parts.len() != <span class="number">3 </span>{
-            <span class="kw">return </span><span class="bool-val">false</span>;
-        }
-        <span class="self">Self</span>::is_valid_hour(parts[<span class="number">0</span>])
-            &amp;&amp; <span class="self">Self</span>::is_valid_minute(parts[<span class="number">1</span>])
-            &amp;&amp; <span class="self">Self</span>::is_valid_second(parts[<span class="number">2</span>])
-    }
-
-    <span class="doccomment">/// Validates whether the provided string is a valid ISO 8601 formatted date.
-    ///
-    /// # Arguments
-    ///
-    /// * `date` - A string slice representing the ISO 8601 date.
-    ///
-    /// # Returns
-    ///
-    /// * `bool` - Returns `true` if the date is valid, otherwise `false`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// assert!(DateTime::is_valid_iso_8601("2023-01-01T12:00:00Z"));
-    /// assert!(!DateTime::is_valid_iso_8601("2023-13-01T12:00:00Z"));
-    /// ```
-    </span><span class="kw">pub fn </span>is_valid_iso_8601(date: <span class="kw-2">&amp;</span>str) -&gt; bool {
-        DateTime::parse(date).is_ok()
-    }
-
-    <span class="doccomment">/// Adds a specified number of months to the `DateTime` instance.
-    ///
-    /// This method handles edge cases such as month-end dates and leap years.
-    /// It also correctly handles negative month additions (subtractions).
-    ///
-    /// # Arguments
-    ///
-    /// * `months` - The number of months to add (can be negative for subtraction).
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance with the months added, or an error if the operation fails.
     </span><span class="kw">pub fn </span>add_months(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         months: i32,
@@ -2513,17 +3335,21 @@
         <span class="kw">let </span>total_months =
             current_date.year() * <span class="number">12 </span>+ current_date.month() <span class="kw">as </span>i32 - <span class="number">1
                 </span>+ months;
-        <span class="kw">let </span>target_year = total_months / <span class="number">12</span>;
-        <span class="kw">let </span>target_month = (total_months % <span class="number">12 </span>+ <span class="number">1</span>) <span class="kw">as </span>u8;
 
+        <span class="kw">let </span>target_year = total_months / <span class="number">12</span>;
+        <span class="kw">let </span>target_month = u8::try_from((total_months % <span class="number">12</span>) + <span class="number">1</span>);
+
+        <span class="kw">let </span>target_month =
+            target_month.map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>;
         <span class="kw">let </span>days_in_target_month =
             days_in_month(target_year, target_month)<span class="question-mark">?</span>;
         <span class="kw">let </span>target_day = current_date.day().min(days_in_target_month);
 
+        <span class="kw">let </span>new_month = Month::try_from(target_month)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>;
         <span class="kw">let </span>new_date = Date::from_calendar_date(
             target_year,
-            Month::try_from(target_month)
-                .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>,
+            new_month,
             target_day,
         )
         .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>;
@@ -2537,33 +3363,22 @@
         })
     }
 
-    <span class="doccomment">/// Subtracts a specified number of months from the `DateTime` instance.
+    <span class="doccomment">/// Subtracts a specified number of months from the `DateTime`.
     ///
     /// # Arguments
     ///
-    /// * `months` - The number of months to subtract.
+    /// * `months` - Number of months to subtract
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance with the months subtracted, or an error if the operation fails.
-    </span><span class="kw">pub fn </span>sub_months(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        months: i32,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="self">self</span>.add_months(-months)
-    }
-
-    <span class="doccomment">/// Adds a specified number of years to the `DateTime` instance.
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the operation would result in an invalid date.
     ///
-    /// This method handles leap years correctly.
+    /// # Errors
     ///
-    /// # Arguments
-    ///
-    /// * `years` - The number of years to add.
-    ///
-    /// # Returns
-    ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance with the years added, or an error if the operation fails.
+    /// This function returns a [`DateTimeError::InvalidDate`] if:
+    /// - The resulting date is out of valid range.
+    /// - The underlying date library fails to construct a valid `DateTime`.
     ///
     /// # Examples
     ///
@@ -2571,12 +3386,51 @@
     /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
-    /// let future_dt = dt.add_years(5).expect("Adding 5 years should succeed");
-    /// println!("Date after 5 years: {}", future_dt);
+    /// let past = dt.sub_months(3);
+    /// assert!(past.is_ok());
+    /// ```
+    </span><span class="kw">pub fn </span>sub_months(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        months: i32,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="self">self</span>.add_months(-months)
+    }
+
+    <span class="doccomment">/// Adds a specified number of years to the `DateTime`.
+    ///
+    /// Handles leap-year transitions appropriately.
+    ///
+    /// # Arguments
+    ///
+    /// * `years` - Number of years to add (can be negative for subtraction)
+    ///
+    /// # Returns
+    ///
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the operation would result in an invalid date.
+    ///
+    /// # Errors
+    ///
+    /// This function returns a [`DateTimeError::InvalidDate`] if:
+    /// - The resulting year is out of valid range.
+    /// - A non-leap year cannot accommodate February 29th.
+    /// - Any other invalid date scenario occurs during calculation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new();
+    /// let future = dt.add_years(5);
+    /// assert!(future.is_ok());
     /// ```
     </span><span class="kw">pub fn </span>add_years(<span class="kw-2">&amp;</span><span class="self">self</span>, years: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
         <span class="kw">let </span>current_date = <span class="self">self</span>.datetime.date();
-        <span class="kw">let </span>target_year = current_date.year() + years;
+        <span class="kw">let </span>target_year = current_date
+            .year()
+            .checked_add(years)
+            .ok_or(DateTimeError::InvalidDate)<span class="question-mark">?</span>;
 
         <span class="comment">// Handle February 29th in leap years
         </span><span class="kw">let </span>new_day = <span class="kw">if </span>current_date.month() == Month::February
@@ -2604,15 +3458,97 @@
         })
     }
 
-    <span class="doccomment">/// Subtracts a specified number of years from the `DateTime` instance.
+    <span class="comment">// -------------------------------------------------------------------------
+    // Range / Boundary Helper Methods
+    // -------------------------------------------------------------------------
+
+    </span><span class="doccomment">/// Returns a new `DateTime` for the start of the current week (Monday).
+    ///
+    /// # Errors
+    ///
+    /// This function can return a [`DateTimeError`] if an overflow or
+    /// invalid date calculation occurs during date arithmetic.
+    </span><span class="kw">pub fn </span>start_of_week(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="kw">let </span>days_since_monday = i64::from(
+            <span class="self">self</span>.datetime.weekday().number_days_from_monday(),
+        );
+        <span class="self">self</span>.add_days(-days_since_monday)
+    }
+
+    <span class="doccomment">/// Returns a new `DateTime` for the end of the current week (Sunday).
+    ///
+    /// # Errors
+    ///
+    /// This function can return a [`DateTimeError`] if an overflow or
+    /// invalid date calculation occurs during date arithmetic.
+    </span><span class="kw">pub fn </span>end_of_week(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="kw">let </span>days_until_sunday = <span class="number">6 </span>- i64::from(
+            <span class="self">self</span>.datetime.weekday().number_days_from_monday(),
+        );
+        <span class="self">self</span>.add_days(days_until_sunday)
+    }
+
+    <span class="doccomment">/// Returns a new `DateTime` for the start of the current month.
+    ///
+    /// # Errors
+    ///
+    /// This function can return a [`DateTimeError`] if the date cannot be
+    /// constructed (e.g., due to an invalid year or month).
+    </span><span class="kw">pub fn </span>start_of_month(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="self">self</span>.set_date(
+            <span class="self">self</span>.datetime.year(),
+            <span class="self">self</span>.datetime.month() <span class="kw">as </span>u8,
+            <span class="number">1</span>,
+        )
+    }
+
+    <span class="doccomment">/// Returns a new `DateTime` for the end of the current month.
+    ///
+    /// # Errors
+    ///
+    /// This function can return a [`DateTimeError`] if the date cannot be
+    /// constructed (e.g., `days_in_month` fails to provide a valid day).
+    </span><span class="kw">pub fn </span>end_of_month(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="kw">let </span>year = <span class="self">self</span>.datetime.year();
+        <span class="kw">let </span>month = <span class="self">self</span>.datetime.month() <span class="kw">as </span>u8;
+        <span class="kw">let </span>last_day = days_in_month(year, month)<span class="question-mark">?</span>;
+        <span class="self">self</span>.set_date(year, month, last_day)
+    }
+
+    <span class="doccomment">/// Returns a new `DateTime` for the start of the current year.
+    ///
+    /// # Errors
+    ///
+    /// This function can return a [`DateTimeError`] if the date cannot
+    /// be constructed (e.g., invalid year).
+    </span><span class="kw">pub fn </span>start_of_year(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="self">self</span>.set_date(<span class="self">self</span>.datetime.year(), <span class="number">1</span>, <span class="number">1</span>)
+    }
+
+    <span class="doccomment">/// Returns a new `DateTime` for the end of the current year.
+    ///
+    /// # Errors
+    ///
+    /// This function can return a [`DateTimeError`] if the date cannot
+    /// be constructed (e.g., invalid year).
+    </span><span class="kw">pub fn </span>end_of_year(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="self">self</span>.set_date(<span class="self">self</span>.datetime.year(), <span class="number">12</span>, <span class="number">31</span>)
+    }
+
+    <span class="comment">// -------------------------------------------------------------------------
+    // Range Validation
+    // -------------------------------------------------------------------------
+
+    </span><span class="doccomment">/// Checks if the current `DateTime` falls within a specific date range (inclusive).
     ///
     /// # Arguments
     ///
-    /// * `years` - The number of years to subtract.
+    /// * `start` - Start of the date range (inclusive)
+    /// * `end` - End of the date range (inclusive)
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance with the years subtracted, or an error if the operation fails.
+    /// Returns `true` if the current `DateTime` falls within the range, `false` otherwise.
     ///
     /// # Examples
     ///
@@ -2620,94 +3556,183 @@
     /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
-    /// let past_dt = dt.sub_years(5).expect("Subtracting 5 years should succeed");
-    /// println!("Date 5 years ago: {}", past_dt);
+    /// let start = dt.add_days(-1).unwrap_or(dt);
+    /// let end = dt.add_days(1).unwrap_or(dt);
+    ///
+    /// assert!(dt.is_within_range(&amp;start, &amp;end));
     /// ```
-    </span><span class="kw">pub fn </span>sub_years(<span class="kw-2">&amp;</span><span class="self">self</span>, years: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
-        <span class="self">self</span>.add_years(-years)
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_within_range(<span class="kw-2">&amp;</span><span class="self">self</span>, start: <span class="kw-2">&amp;</span><span class="self">Self</span>, end: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self </span>&gt;= start &amp;&amp; <span class="self">self </span>&lt;= end
     }
 
-    <span class="doccomment">/// Formats the current time for a specific timezone.
+    <span class="comment">// -------------------------------------------------------------------------
+    // Mutation Helpers
+    // -------------------------------------------------------------------------
+
+    </span><span class="doccomment">/// Sets the date components while maintaining the current time.
     ///
     /// # Arguments
     ///
-    /// * `tz` - A string slice that holds the timezone abbreviation (e.g., "UTC", "EST", "PST").
-    /// * `format` - A string slice that specifies the desired output format.
+    /// * `year` - Calendar year
+    /// * `month` - Month (1-12)
+    /// * `day` - Day of month (1-31)
     ///
     /// # Returns
     ///
-    /// * `Result&lt;String, DateTimeError&gt;` - The formatted time string or an error if the operation fails.
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
+    /// if the date is invalid.
     ///
     /// # Examples
     ///
     /// ```
     /// use dtt::datetime::DateTime;
-    /// use time::format_description;
     ///
-    /// let formatted_time = DateTime::format_time_in_timezone("PST", "[hour repr:12]:[minute] [period]").expect("Formatting failed");
-    /// println!("Current time in Los Angeles: {}", formatted_time);
+    /// let dt = DateTime::new();
+    /// let new_dt = dt.set_date(2024, 1, 1);
+    /// assert!(new_dt.is_ok());
     /// ```
-    </span><span class="kw">pub fn </span>format_time_in_timezone(
-        tz: <span class="kw-2">&amp;</span>str,
-        format: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;String, DateTimeError&gt; {
-        <span class="comment">// Create a new DateTime instance for the current time in UTC
-        </span><span class="kw">let </span>utc_now = <span class="self">Self</span>::new();
+    ///
+    /// # Errors
+    ///
+    /// Returns a `DateTimeError` if the resulting date would be invalid.
+    ///
+    </span><span class="kw">pub fn </span>set_date(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        year: i32,
+        month: u8,
+        day: u8,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt; {
+        <span class="kw">let </span>month = Month::try_from(month)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>;
+        <span class="kw">let </span>new_date = Date::from_calendar_date(year, month, day)
+            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidDate)<span class="question-mark">?</span>;
 
-        <span class="comment">// Convert to the specified timezone
-        </span><span class="kw">let </span>time_in_tz = utc_now.convert_to_tz(tz)<span class="question-mark">?</span>;
-
-        <span class="comment">// Parse the format string
-        </span><span class="kw">let </span>format_desc = format_description::parse(format)
-            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)<span class="question-mark">?</span>;
-
-        <span class="comment">// Format the time according to the specified format
-        </span>time_in_tz
-            .datetime
-            .format(<span class="kw-2">&amp;</span>format_desc)
-            .map_err(|<span class="kw">_</span>| DateTimeError::InvalidFormat)
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            datetime: PrimitiveDateTime::new(
+                new_date,
+                <span class="self">self</span>.datetime.time(),
+            ),
+            offset: <span class="self">self</span>.offset,
+        })
     }
 }
 
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>DateTime {
-    <span class="doccomment">/// Formats the `DateTime` instance as a string using RFC 3339 format.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::new();
-    /// println!("{}", dt);
-    /// ```
+<span class="comment">// -----------------------------------------------------------------------------
+// Validation Methods
+// -----------------------------------------------------------------------------
+
+</span><span class="kw">impl </span>DateTime {
+    <span class="doccomment">/// Validates whether a string represents a valid day of the month.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_day(day: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        day.parse::&lt;u8&gt;()
+            .map(|d| (<span class="number">1</span>..=MAX_DAY).contains(<span class="kw-2">&amp;</span>d))
+            .unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// Validates whether a string represents a valid hour.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_hour(hour: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        hour.parse::&lt;u8&gt;().map(|h| h &lt;= MAX_HOUR).unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// Validates whether a string represents a valid minute.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_minute(minute: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        minute
+            .parse::&lt;u8&gt;()
+            .map(|m| m &lt;= MAX_MIN_SEC)
+            .unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// Validates whether a string represents a valid second.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_second(second: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        second
+            .parse::&lt;u8&gt;()
+            .map(|s| s &lt;= MAX_MIN_SEC)
+            .unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// Validates whether a string represents a valid month.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_month(month: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        month
+            .parse::&lt;u8&gt;()
+            .map(|m| (<span class="number">1</span>..=MAX_MONTH).contains(<span class="kw-2">&amp;</span>m))
+            .unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// Validates whether a string represents a valid year.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_year(year: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        year.parse::&lt;i32&gt;().is_ok()
+    }
+
+    <span class="doccomment">/// Validates whether a string represents a valid microsecond.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_microsecond(microsecond: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        microsecond
+            .parse::&lt;u32&gt;()
+            .map(|us| us &lt;= MAX_MICROSECOND)
+            .unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// Validates whether a string represents a valid ordinal day of the year.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_ordinal(ordinal: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        ordinal
+            .parse::&lt;u16&gt;()
+            .map(|o| (<span class="number">1</span>..=MAX_ORDINAL_DAY).contains(<span class="kw-2">&amp;</span>o))
+            .unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// Validates whether a string represents a valid ISO week number.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_iso_week(week: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        week.parse::&lt;u8&gt;()
+            .map(|w| (<span class="number">1</span>..=MAX_ISO_WEEK).contains(<span class="kw-2">&amp;</span>w))
+            .unwrap_or(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// Validates whether a string represents a valid time in `HH:MM:SS` format.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>is_valid_time(time: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">let </span>parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = time.split(<span class="string">':'</span>).collect();
+        <span class="kw">if </span>parts.len() != <span class="number">3 </span>{
+            <span class="kw">return </span><span class="bool-val">false</span>;
+        }
+
+        <span class="self">Self</span>::is_valid_hour(parts[<span class="number">0</span>])
+            &amp;&amp; <span class="self">Self</span>::is_valid_minute(parts[<span class="number">1</span>])
+            &amp;&amp; <span class="self">Self</span>::is_valid_second(parts[<span class="number">2</span>])
+    }
+}
+
+<span class="comment">// -----------------------------------------------------------------------------
+// Standard Trait Implementations
+// -----------------------------------------------------------------------------
+
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>DateTime {
+    <span class="doccomment">/// Formats the `DateTime` using RFC 3339 format.
     </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="self">self</span>.format_rfc3339().map_err(|<span class="kw">_</span>| fmt::Error)<span class="question-mark">?</span>)
+        <span class="self">self</span>.format_rfc3339()
+            .map_or(<span class="prelude-val">Err</span>(fmt::Error), |s| <span class="macro">write!</span>(f, <span class="string">"{s}"</span>))
     }
 }
 
 <span class="kw">impl </span>FromStr <span class="kw">for </span>DateTime {
     <span class="kw">type </span><span class="prelude-val">Err </span>= DateTimeError;
 
-    <span class="doccomment">/// Parses a string into a `DateTime` instance.
-    ///
-    /// This implementation uses the `DateTime::parse` method.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// use std::str::FromStr;
-    ///
-    /// let dt = DateTime::from_str("2023-05-20T15:30:00Z").expect("Valid RFC 3339 date");
-    /// println!("Parsed date: {}", dt);
-    /// ```
+    <span class="doccomment">/// Parses a string into a `DateTime` instance (RFC 3339 or ISO 8601).
     </span><span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         <span class="self">Self</span>::parse(s)
     }
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>DateTime {
-    <span class="doccomment">/// Returns the current UTC time as the default value for `DateTime`.
+    <span class="doccomment">/// Returns the current UTC time as the default `DateTime` value.
     </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new()
     }
@@ -2716,102 +3741,100 @@
 <span class="kw">impl </span>Add&lt;Duration&gt; <span class="kw">for </span>DateTime {
     <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt;;
 
-    <span class="doccomment">/// Adds a `Duration` to the `DateTime` instance.
+    <span class="doccomment">/// Adds a Duration to the `DateTime`.
     ///
     /// # Arguments
     ///
-    /// * `rhs` - The `Duration` to add.
+    /// * `rhs` - Duration to add
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance with the duration added, or an error if the operation fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// use time::Duration;
-    ///
-    /// let dt = DateTime::new();
-    /// let new_dt = (dt + Duration::hours(2)).expect("Adding 2 hours should succeed");
-    /// println!("Time after 2 hours: {}", new_dt);
-    /// ```
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`.
     </span><span class="kw">fn </span>add(<span class="self">self</span>, rhs: Duration) -&gt; <span class="self">Self</span>::Output {
-        <span class="kw">let </span>new_datetime = <span class="self">self
-            </span>.datetime
-            .checked_add(rhs)
-            .ok_or(DateTimeError::InvalidDate)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            datetime: new_datetime,
-            offset: <span class="self">self</span>.offset,
-        })
+        <span class="kw">let </span>maybe_new = <span class="self">self</span>.datetime.checked_add(rhs);
+        maybe_new.map_or(
+            <span class="prelude-val">Err</span>(DateTimeError::InvalidDate),
+            |new_datetime| {
+                <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+                    datetime: new_datetime,
+                    offset: <span class="self">self</span>.offset,
+                })
+            },
+        )
     }
 }
 
 <span class="kw">impl </span>Sub&lt;Duration&gt; <span class="kw">for </span>DateTime {
     <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DateTimeError&gt;;
 
-    <span class="doccomment">/// Subtracts a `Duration` from the `DateTime` instance.
+    <span class="doccomment">/// Subtracts a Duration from the `DateTime`.
     ///
     /// # Arguments
     ///
-    /// * `rhs` - The `Duration` to subtract.
+    /// * `rhs` - Duration to subtract
     ///
     /// # Returns
     ///
-    /// * `Result&lt;Self, DateTimeError&gt;` - A new `DateTime` instance with the duration subtracted, or an error if the operation fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    /// use time::Duration;
-    ///
-    /// let dt = DateTime::new();
-    /// let new_dt = (dt - Duration::hours(2)).expect("Subtracting 2 hours should succeed");
-    /// println!("Time 2 hours ago: {}", new_dt);
-    /// ```
+    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`.
     </span><span class="kw">fn </span>sub(<span class="self">self</span>, rhs: Duration) -&gt; <span class="self">Self</span>::Output {
-        <span class="kw">match </span><span class="self">self</span>.datetime.checked_sub(rhs) {
-            <span class="prelude-val">Some</span>(new_datetime) =&gt; {
-                <span class="comment">// Additional manual validation can be placed here if needed.
-                </span><span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+        <span class="kw">let </span>maybe_new = <span class="self">self</span>.datetime.checked_sub(rhs);
+        maybe_new.map_or(
+            <span class="prelude-val">Err</span>(DateTimeError::InvalidDate),
+            |new_datetime| {
+                <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
                     datetime: new_datetime,
                     offset: <span class="self">self</span>.offset,
                 })
-            }
-            <span class="prelude-val">None </span>=&gt; {
-                <span class="comment">// Debug output to understand why it failed, if needed.
-                </span><span class="macro">eprintln!</span>(
-                    <span class="string">"Subtraction resulted in an invalid date/time."
-                </span>);
-                <span class="prelude-val">Err</span>(DateTimeError::InvalidDate)
-            }
-        }
+            },
+        )
     }
 }
 
 <span class="kw">impl </span>PartialOrd <span class="kw">for </span>DateTime {
-    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+    <span class="doccomment">/// Compares two `DateTime` for ordering, returning `Some(Ordering)`.
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
         <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
 <span class="kw">impl </span>Ord <span class="kw">for </span>DateTime {
-    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+    <span class="doccomment">/// Compares two `DateTimes` for ordering.
+    </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
         <span class="self">self</span>.datetime.cmp(<span class="kw-2">&amp;</span>other.datetime)
     }
 }
 
 <span class="kw">impl </span>Hash <span class="kw">for </span>DateTime {
-    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+    <span class="doccomment">/// Computes a hash value for the `DateTime` based on its components.
+    </span><span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
         <span class="self">self</span>.datetime.hash(state);
         <span class="self">self</span>.offset.hash(state);
     }
 }
 
-<span class="doccomment">/// Helper function to determine the number of days in a given month and year.
-</span><span class="kw">fn </span>days_in_month(year: i32, month: u8) -&gt; <span class="prelude-ty">Result</span>&lt;u8, DateTimeError&gt; {
+<span class="comment">// -----------------------------------------------------------------------------
+// Helper Functions
+// -----------------------------------------------------------------------------
+
+</span><span class="doccomment">/// Helper function to determine the number of days in a given month and year.
+///
+/// # Arguments
+///
+/// * `year` - Calendar year
+/// * `month` - Month number (1-12)
+///
+/// # Returns
+///
+/// Returns a `Result` containing either the number of days or a `DateTimeError`.
+///
+/// # Errors
+///
+/// Returns a `DateTimeError` if the day in the month is invalid.
+///
+</span><span class="kw">pub const fn </span>days_in_month(
+    year: i32,
+    month: u8,
+) -&gt; <span class="prelude-ty">Result</span>&lt;u8, DateTimeError&gt; {
     <span class="kw">match </span>month {
         <span class="number">1 </span>| <span class="number">3 </span>| <span class="number">5 </span>| <span class="number">7 </span>| <span class="number">8 </span>| <span class="number">10 </span>| <span class="number">12 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="number">31</span>),
         <span class="number">4 </span>| <span class="number">6 </span>| <span class="number">9 </span>| <span class="number">11 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="number">30</span>),
@@ -2821,7 +3844,426 @@
 }
 
 <span class="doccomment">/// Helper function to determine if a year is a leap year.
-</span><span class="kw">fn </span>is_leap_year(year: i32) -&gt; bool {
+///
+/// # Arguments
+///
+/// * `year` - Calendar year to check
+///
+/// # Returns
+///
+/// Returns `true` if the year is a leap year, `false` otherwise.
+///
+/// # Examples
+///
+/// ```
+/// use dtt::datetime::is_leap_year;
+///
+/// assert!(is_leap_year(2024));
+/// assert!(!is_leap_year(2023));
+/// assert!(is_leap_year(2000));
+/// assert!(!is_leap_year(1900));
+/// ```
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub const fn </span>is_leap_year(year: i32) -&gt; bool {
     (year % <span class="number">4 </span>== <span class="number">0 </span>&amp;&amp; year % <span class="number">100 </span>!= <span class="number">0</span>) || (year % <span class="number">400 </span>== <span class="number">0</span>)
+}
+
+<span class="comment">// -----------------------------------------------------------------------------
+// Tests
+// -----------------------------------------------------------------------------
+
+</span><span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::str::FromStr;
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_new() {
+        <span class="kw">let </span>dt = DateTime::new();
+        <span class="macro">assert_eq!</span>(dt.offset(), UtcOffset::UTC);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_new_with_tz() {
+        <span class="kw">let </span>est = DateTime::new_with_tz(<span class="string">"EST"</span>);
+        <span class="macro">assert!</span>(est.is_ok());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(est_dt) = est {
+            <span class="macro">assert_eq!</span>(est_dt.offset().whole_hours(), -<span class="number">5</span>);
+        }
+
+        <span class="kw">let </span>invalid = DateTime::new_with_tz(<span class="string">"INVALID"</span>);
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(invalid, <span class="prelude-val">Err</span>(DateTimeError::InvalidTimezone)));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_new_with_custom_offset() {
+        <span class="kw">let </span>offset = DateTime::new_with_custom_offset(<span class="number">5</span>, <span class="number">30</span>);
+        <span class="macro">assert!</span>(offset.is_ok());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(dt) = offset {
+            <span class="macro">assert_eq!</span>(dt.offset().whole_hours(), <span class="number">5</span>);
+            <span class="macro">assert_eq!</span>(dt.offset().minutes_past_hour(), <span class="number">30</span>);
+        }
+
+        <span class="comment">// Test invalid offsets
+        </span><span class="kw">let </span>too_large_hours = DateTime::new_with_custom_offset(<span class="number">24</span>, <span class="number">0</span>);
+        <span class="macro">assert!</span>(too_large_hours.is_err());
+        <span class="kw">let </span>too_large_minutes = DateTime::new_with_custom_offset(<span class="number">0</span>, <span class="number">60</span>);
+        <span class="macro">assert!</span>(too_large_minutes.is_err());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_from_components() {
+        <span class="kw">let </span>dt = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">1</span>,
+            <span class="number">12</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="macro">assert!</span>(dt.is_ok());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(dt_val) = dt {
+            <span class="macro">assert_eq!</span>(dt_val.year(), <span class="number">2024</span>);
+            <span class="macro">assert_eq!</span>(dt_val.month(), Month::January);
+            <span class="macro">assert_eq!</span>(dt_val.day(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(dt_val.hour(), <span class="number">12</span>);
+            <span class="macro">assert_eq!</span>(dt_val.minute(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(dt_val.second(), <span class="number">0</span>);
+        }
+
+        <span class="comment">// Test invalid dates
+        </span><span class="kw">let </span>invalid_month = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">13</span>,
+            <span class="number">1</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="macro">assert!</span>(invalid_month.is_err());
+
+        <span class="kw">let </span>invalid_day = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">2</span>,
+            <span class="number">30</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="macro">assert!</span>(invalid_day.is_err());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_parse() {
+        <span class="comment">// Test RFC 3339 format
+        </span><span class="kw">let </span>dt = DateTime::parse(<span class="string">"2024-01-01T12:00:00Z"</span>);
+        <span class="macro">assert!</span>(dt.is_ok());
+
+        <span class="comment">// Test ISO 8601 date
+        </span><span class="kw">let </span>dt = DateTime::parse(<span class="string">"2024-01-01"</span>);
+        <span class="macro">assert!</span>(dt.is_ok());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(dt_val) = dt {
+            <span class="macro">assert_eq!</span>(dt_val.hour(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(dt_val.minute(), <span class="number">0</span>);
+        }
+
+        <span class="comment">// Test invalid formats
+        </span><span class="kw">let </span>invalid1 = DateTime::parse(<span class="string">"invalid"</span>);
+        <span class="macro">assert!</span>(invalid1.is_err());
+        <span class="kw">let </span>invalid2 = DateTime::parse(<span class="string">"2024-13-01"</span>);
+        <span class="macro">assert!</span>(invalid2.is_err());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_format() {
+        <span class="kw">let </span>dt = DateTime::new();
+        <span class="kw">let </span>maybe_formatted = dt.format(<span class="string">"[year]-[month]-[day]"</span>);
+        <span class="macro">assert!</span>(maybe_formatted.is_ok());
+
+        <span class="kw">let </span>invalid_format = dt.format(<span class="string">"[invalid]"</span>);
+        <span class="macro">assert!</span>(invalid_format.is_err());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_timezone_conversion() {
+        <span class="kw">let </span>utc = DateTime::new();
+        <span class="kw">let </span>est = utc.convert_to_tz(<span class="string">"EST"</span>);
+        <span class="macro">assert!</span>(est.is_ok());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(est_val) = est {
+            <span class="macro">assert_eq!</span>(est_val.offset().whole_hours(), -<span class="number">5</span>);
+        }
+
+        <span class="kw">let </span>invalid = utc.convert_to_tz(<span class="string">"INVALID"</span>);
+        <span class="macro">assert!</span>(invalid.is_err());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_arithmetic() {
+        <span class="kw">let </span>dt = DateTime::new();
+
+        <span class="comment">// Test adding days
+        </span><span class="kw">let </span>future = dt.add_days(<span class="number">7</span>);
+        <span class="macro">assert!</span>(future.is_ok());
+
+        <span class="comment">// Test subtracting days (negative)
+        </span><span class="kw">let </span>past = dt.add_days(-<span class="number">7</span>);
+        <span class="macro">assert!</span>(past.is_ok());
+
+        <span class="comment">// Test adding months
+        </span><span class="kw">let </span>next_month = dt.add_months(<span class="number">1</span>);
+        <span class="macro">assert!</span>(next_month.is_ok());
+
+        <span class="comment">// Test month edge cases
+        </span><span class="kw">let </span>jan31 = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">31</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="macro">assert!</span>(jan31.is_ok());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(jan31_dt) = jan31 {
+            <span class="kw">let </span>feb = jan31_dt.add_months(<span class="number">1</span>);
+            <span class="macro">assert!</span>(feb.is_ok());
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(feb_dt) = feb {
+                <span class="comment">// 2024 is a leap year =&gt; Feb has 29 days
+                </span><span class="macro">assert_eq!</span>(feb_dt.day(), <span class="number">29</span>);
+            }
+        }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_leap_year() {
+        <span class="macro">assert!</span>(is_leap_year(<span class="number">2024</span>));
+        <span class="macro">assert!</span>(!is_leap_year(<span class="number">2023</span>));
+        <span class="macro">assert!</span>(is_leap_year(<span class="number">2000</span>));
+        <span class="macro">assert!</span>(!is_leap_year(<span class="number">1900</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_validation() {
+        <span class="comment">// Test day validation
+        </span><span class="macro">assert!</span>(DateTime::is_valid_day(<span class="string">"1"</span>));
+        <span class="macro">assert!</span>(DateTime::is_valid_day(<span class="string">"31"</span>));
+        <span class="macro">assert!</span>(!DateTime::is_valid_day(<span class="string">"0"</span>));
+        <span class="macro">assert!</span>(!DateTime::is_valid_day(<span class="string">"32"</span>));
+        <span class="macro">assert!</span>(!DateTime::is_valid_day(<span class="string">"abc"</span>));
+
+        <span class="comment">// Test hour validation
+        </span><span class="macro">assert!</span>(DateTime::is_valid_hour(<span class="string">"0"</span>));
+        <span class="macro">assert!</span>(DateTime::is_valid_hour(<span class="string">"23"</span>));
+        <span class="macro">assert!</span>(!DateTime::is_valid_hour(<span class="string">"24"</span>));
+
+        <span class="comment">// Test minute validation
+        </span><span class="macro">assert!</span>(DateTime::is_valid_minute(<span class="string">"0"</span>));
+        <span class="macro">assert!</span>(DateTime::is_valid_minute(<span class="string">"59"</span>));
+        <span class="macro">assert!</span>(!DateTime::is_valid_minute(<span class="string">"60"</span>));
+
+        <span class="comment">// Test time string validation
+        </span><span class="macro">assert!</span>(DateTime::is_valid_time(<span class="string">"00:00:00"</span>));
+        <span class="macro">assert!</span>(DateTime::is_valid_time(<span class="string">"23:59:59"</span>));
+        <span class="macro">assert!</span>(!DateTime::is_valid_time(<span class="string">"24:00:00"</span>));
+        <span class="macro">assert!</span>(!DateTime::is_valid_time(<span class="string">"23:60:00"</span>));
+        <span class="macro">assert!</span>(!DateTime::is_valid_time(<span class="string">"23:59:60"</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_range_operations() {
+        <span class="kw">let </span>dt = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">15</span>,
+            <span class="number">12</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="macro">assert!</span>(dt.is_ok());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(dt_val) = dt {
+            <span class="comment">// Test week ranges
+            </span><span class="kw">let </span>week_start = dt_val.start_of_week();
+            <span class="macro">assert!</span>(week_start.is_ok());
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(ws) = week_start {
+                <span class="macro">assert_eq!</span>(ws.weekday(), Weekday::Monday);
+            }
+
+            <span class="kw">let </span>week_end = dt_val.end_of_week();
+            <span class="macro">assert!</span>(week_end.is_ok());
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(we) = week_end {
+                <span class="macro">assert_eq!</span>(we.weekday(), Weekday::Sunday);
+            }
+
+            <span class="comment">// Test month ranges
+            </span><span class="kw">let </span>month_start = dt_val.start_of_month();
+            <span class="macro">assert!</span>(month_start.is_ok());
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(ms) = month_start {
+                <span class="macro">assert_eq!</span>(ms.day(), <span class="number">1</span>);
+            }
+
+            <span class="kw">let </span>month_end = dt_val.end_of_month();
+            <span class="macro">assert!</span>(month_end.is_ok());
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(me) = month_end {
+                <span class="macro">assert_eq!</span>(me.day(), <span class="number">31</span>);
+            }
+
+            <span class="comment">// Test year ranges
+            </span><span class="kw">let </span>year_start = dt_val.start_of_year();
+            <span class="macro">assert!</span>(year_start.is_ok());
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(ys) = year_start {
+                <span class="macro">assert_eq!</span>(ys.month(), Month::January);
+                <span class="macro">assert_eq!</span>(ys.day(), <span class="number">1</span>);
+            }
+
+            <span class="kw">let </span>year_end = dt_val.end_of_year();
+            <span class="macro">assert!</span>(year_end.is_ok());
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(ye) = year_end {
+                <span class="macro">assert_eq!</span>(ye.month(), Month::December);
+                <span class="macro">assert_eq!</span>(ye.day(), <span class="number">31</span>);
+            }
+        }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_ordering() {
+        <span class="kw">let </span>dt1 = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">1</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="kw">let </span>dt2 = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">2</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+
+        <span class="macro">assert!</span>(dt1.is_ok());
+        <span class="macro">assert!</span>(dt2.is_ok());
+        <span class="kw">if let </span>(<span class="prelude-val">Ok</span>(a), <span class="prelude-val">Ok</span>(b)) = (dt1, dt2) {
+            <span class="macro">assert!</span>(a &lt; b);
+            <span class="macro">assert!</span>(b &gt; a);
+            <span class="macro">assert_ne!</span>(a, b);
+        }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_duration() {
+        <span class="kw">let </span>dt1 = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">1</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="kw">let </span>dt2 = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">2</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+
+        <span class="kw">if let </span>(<span class="prelude-val">Ok</span>(a), <span class="prelude-val">Ok</span>(b)) = (dt1, dt2) {
+            <span class="kw">let </span>duration = b.duration_since(<span class="kw-2">&amp;</span>a);
+            <span class="macro">assert_eq!</span>(duration.whole_days(), <span class="number">1</span>);
+        }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_from_str() {
+        <span class="kw">let </span>dt = DateTime::from_str(<span class="string">"2024-01-01T00:00:00Z"</span>);
+        <span class="macro">assert!</span>(dt.is_ok());
+        <span class="kw">let </span>invalid = DateTime::from_str(<span class="string">"invalid"</span>);
+        <span class="macro">assert!</span>(invalid.is_err());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_display() {
+        <span class="kw">let </span>dt = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">1</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="macro">assert!</span>(dt.is_ok());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(dt_val) = dt {
+            <span class="macro">assert_eq!</span>(dt_val.to_string(), <span class="string">"2024-01-01T00:00:00Z"</span>);
+        }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_hash() {
+        <span class="kw">use </span>std::collections::HashSet;
+        <span class="kw">let </span>dt1 = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">1</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="kw">let </span>dt2 = DateTime::from_components(
+            <span class="number">2024</span>,
+            <span class="number">1</span>,
+            <span class="number">1</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            UtcOffset::UTC,
+        );
+        <span class="macro">assert!</span>(dt1.is_ok());
+        <span class="macro">assert!</span>(dt2.is_ok());
+        <span class="kw">if let </span>(<span class="prelude-val">Ok</span>(a), <span class="prelude-val">Ok</span>(b)) = (dt1, dt2) {
+            <span class="kw">let </span><span class="kw-2">mut </span>set = HashSet::new();
+            <span class="macro">assert!</span>(
+                set.insert(a),
+                <span class="string">"The set should not have contained `a` before"
+            </span>);
+            <span class="macro">assert!</span>(set.contains(<span class="kw-2">&amp;</span>b));
+        }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_builder_pattern() {
+        <span class="kw">let </span>builder = DateTimeBuilder::new()
+            .year(<span class="number">2024</span>)
+            .month(<span class="number">1</span>)
+            .day(<span class="number">1</span>)
+            .hour(<span class="number">12</span>)
+            .minute(<span class="number">30</span>)
+            .second(<span class="number">45</span>)
+            .offset(UtcOffset::UTC);
+
+        <span class="kw">let </span>dt = builder.build();
+        <span class="macro">assert!</span>(dt.is_ok());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(value) = dt {
+            <span class="macro">assert_eq!</span>(value.year(), <span class="number">2024</span>);
+            <span class="macro">assert_eq!</span>(value.month(), Month::January);
+            <span class="macro">assert_eq!</span>(value.day(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(value.hour(), <span class="number">12</span>);
+            <span class="macro">assert_eq!</span>(value.minute(), <span class="number">30</span>);
+            <span class="macro">assert_eq!</span>(value.second(), <span class="number">45</span>);
+        }
+    }
 }
 </code></pre></div></section></main></body></html>
