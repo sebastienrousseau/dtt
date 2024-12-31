@@ -67,8 +67,7 @@ pub mod constants {
     pub const WELCOME_MSG: &str = "Welcome to `DTT` 👋!";
 
     /// Library description displayed during initialization
-    pub const DESCRIPTION: &str = 
-        "A Rust library for parsing, validating, manipulating, and formatting dates and times.";
+    pub const DESCRIPTION: &str = "A Rust library for parsing, validating,manipulating, and formatting dates and times.";
 }
 
 // Re-exports with inline documentation

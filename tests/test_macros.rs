@@ -72,12 +72,14 @@ mod tests {
     }
 
     #[test]
-    fn test_dtt_now() {
+    fn test_dtt_now() -> Result<(), Box<dyn std::error::Error>> {
         let now = dtt_now!();
-        let formatted_now = now
-            .format("%Y-%m-%d %H:%M:%S")
-            .expect("Failed to format DateTime");
-        assert!(!formatted_now.is_empty()); // Check that now() returns a valid formatted string
+        let formatted_now = now.format("%Y-%m-%d %H:%M:%S")?;
+        assert!(
+            !formatted_now.is_empty(),
+            "Formatted string should not be empty"
+        );
+        Ok(())
     }
 
     #[test]

@@ -25,7 +25,7 @@ fn bench_get_day(c: &mut Criterion) {
     let _ = c.bench_function("get day", |b| {
         b.iter(|| {
             let _ = date.day();
-        })
+        });
     });
 }
 
@@ -35,7 +35,7 @@ fn bench_get_hour(c: &mut Criterion) {
     let _ = c.bench_function("get hour", |b| {
         b.iter(|| {
             let _ = date.hour();
-        })
+        });
     });
 }
 
@@ -47,7 +47,7 @@ fn bench_format_iso_8601(c: &mut Criterion) {
             if let Ok(output) = date.format_iso8601() {
                 let _ = output;
             }
-        })
+        });
     });
 }
 
@@ -59,7 +59,7 @@ fn bench_parse_iso_8601(c: &mut Criterion) {
             if let Ok(date) = DateTime::parse(date_str) {
                 let _ = date;
             }
-        })
+        });
     });
 }
 
@@ -75,7 +75,7 @@ fn bench_parse_custom_format(c: &mut Criterion) {
             {
                 let _ = date;
             }
-        })
+        });
     });
 }
 
@@ -87,7 +87,7 @@ fn bench_add_days(c: &mut Criterion) {
             if let Ok(new_date) = date.add_days(30) {
                 let _ = new_date;
             }
-        })
+        });
     });
 }
 
@@ -99,7 +99,7 @@ fn bench_sub_days(c: &mut Criterion) {
             if let Ok(new_date) = date.add_days(-30) {
                 let _ = new_date;
             }
-        })
+        });
     });
 }
 
@@ -112,7 +112,7 @@ fn bench_add_duration(c: &mut Criterion) {
             if let Ok(new_date) = date + duration {
                 let _ = new_date;
             }
-        })
+        });
     });
 }
 
@@ -126,7 +126,7 @@ fn bench_compare_datetimes(c: &mut Criterion) {
     let _ = c.bench_function("compare datetimes", |b| {
         b.iter(|| {
             let _ = date1.cmp(&date2);
-        })
+        });
     });
 }
 
@@ -145,7 +145,7 @@ fn bench_extreme_date_future(c: &mut Criterion) {
             ) {
                 let _ = date;
             }
-        })
+        });
     });
 }
 
@@ -164,7 +164,7 @@ fn bench_extreme_date_past(c: &mut Criterion) {
             ) {
                 let _ = date;
             }
-        })
+        });
     });
 }
 
@@ -179,7 +179,7 @@ fn bench_convert_timezone(c: &mut Criterion) {
             if let Ok(new_date) = date.convert_to_tz("EST") {
                 let _ = new_date;
             }
-        })
+        });
     });
 }
 

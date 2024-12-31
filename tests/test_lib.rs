@@ -5,9 +5,8 @@
 
 //! # DTT Integration Tests
 //!
-//! This file contains integration and high-level unit tests for the DateTime (DTT) library.
-//! It verifies the main library entry points and various public functionalities, ensuring
-//! that core operations behave as expected across modules.
+//! This file contains integration and high-level unit tests for the `DateTime` (DTT) library.
+//! It verifies the main library entry points and various public functionalities, ensuring that core operations behave as expected across modules.
 
 /// Unit tests for the `DateTime (DTT)` library.
 ///
@@ -34,8 +33,14 @@ mod tests {
     fn test_run_test_mode_error() {
         std::env::set_var("DTT_TEST_MODE", "1");
         let result = run();
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), "Simulated error");
+        assert!(
+            result.is_err(),
+            "Expected `run` to return an error in test mode"
+        );
+
+        if let Err(err) = result {
+            assert_eq!(err.to_string(), "Simulated error");
+        }
     }
 
     /// Tests the `datetime` module's functionality.
@@ -45,7 +50,10 @@ mod tests {
     fn test_datetime_module() {
         use dtt::datetime::DateTime;
         let dt = DateTime::new();
-        assert!(dt.to_string().contains("T"));
+        assert!(
+            dt.to_string().contains('T'),
+            "Expected the string representation to contain 'T'"
+        );
     }
 
     /// Tests the `error` module's functionality.
