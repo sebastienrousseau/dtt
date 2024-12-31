@@ -1,8 +1,7 @@
 // macros.rs
 //
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
 //! # Macros for the DTT Crate
 //!
@@ -499,10 +498,7 @@ macro_rules! dtt_diff_days {
 macro_rules! dtt_clone {
     ($dt:expr) => {{
         let dt = $dt;
-        $crate::datetime::DateTime {
-            datetime: dt.datetime,
-            offset: dt.offset,
-        }
+        dt.clone()
     }};
 }
 

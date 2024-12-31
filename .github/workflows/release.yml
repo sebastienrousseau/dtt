@@ -2,250 +2,136 @@ name: 🧪 Release
 
 on:
   push:
-    branches:
-      - main
-      - feat/dtt
+    branches: [main, feat/dtt]
   pull_request:
-    branches:
-      - feat/dtt
+    branches: [feat/dtt]
   release:
     types: [created]
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CARGO_TERM_COLOR: always
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_TOKEN }}
+
 jobs:
-  # Build the project for all the targets and generate artifacts.
   build:
-    # This job builds the project for all the targets and generates a
-    # release artifact that contains the binaries for all the targets.
-    name: ❯ Build 🛠
-
-    # Only run this job on the main branch when a commit is pushed.
+    name: Build & Test 🛠
+    # Only build/test if pushing to `main`; adjust if needed
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    # Set up the job environment variables.
-    env:
-      BUILD_ID: ${{ github.run_id }}
-      CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      OS: ${{ matrix.platform.os }}
-      TARGET: ${{ matrix.platform.target }}
-
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - target: x86_64-pc-windows-msvc
-            os: windows-latest
-          - target: aarch64-pc-windows-msvc
-            os: windows-latest
-          - target: x86_64-apple-darwin
-            os: macos-latest
-          - target: aarch64-apple-darwin
-            os: macos-latest
-          - target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
-
-    runs-on: ${{ matrix.platform.os }}
-
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      # Check out the repository code.
-      - name: Checkout sources
-        id: checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Install the stable Rust toolchain.
-      - name: Install stable toolchain
-        id: install-toolchain
-        uses: actions-rs/toolchain@v1
+      # Install Rust stable on the runner
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
 
-      # Cache dependencies to speed up subsequent builds.
-      - name: Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v4
+      # Cache cargo artifacts to speed up builds
+      - uses: actions/cache@v4
         with:
-          path: ~/.cargo
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
 
-      # Install the targets for the cross-compilation toolchain
-      - name: Install target
-        id: install-target
-        run: rustup target add ${{ env.TARGET }}
+      # Test on the specified OS
+      - name: Test
+        run: cargo test --verbose
 
-      # Build the targets
-      - name: Build targets
-        id: build-targets
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --verbose --workspace --release --target ${{ env.TARGET }}
+      # Build on the specified OS (release mode)
+      - name: Build
+        run: cargo build --verbose --release
 
-      # Package the binary for each target
-      - name: Package the binary
-        id: package-binary
+      # Package artifacts (Unix)
+      - name: Package (Unix)
+        if: matrix.os != 'windows-latest'
         run: |
           mkdir -p target/package
-          tar czf target/package/${{ env.TARGET }}.tar.gz -C target/${{ env.TARGET }}/release .
-          echo "${{ env.TARGET }}.tar.gz=target/package/${{ env.TARGET }}.tar.gz" >> $GITHUB_ENV
+          cd target/release
+          tar czf ../../package/${{ matrix.os }}.tar.gz *
 
-      # Upload the binary for each target
-      - name: Upload the binary
-        id: upload-binary
-        uses: actions/upload-artifact@v4
+      # Package artifacts (Windows)
+      - name: Package (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          if (!(Test-Path "target/package")) {
+            mkdir target/package
+          }
+          cd target/release
+          tar -czf ../../package/${{ matrix.os }}.tar.gz *
+
+      # Upload artifacts for each OS
+      - uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.TARGET }}.tar.gz
-          path: target/package/${{ env.TARGET }}.tar.gz
+          name: ${{ matrix.os }}
+          path: target/package/${{ matrix.os }}.tar.gz
 
-  # Release the binary to GitHub Releases
   release:
-    name: ❯ Release 🚀
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    name: Release 🚀
     needs: build
+    # Only release if we're pushing to `main`; adjust as you see fit
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      # Check out the repository code
-      - name: Checkout sources
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Install the stable Rust toolchain
-      - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+      - name: Set version
+        run: echo "VERSION=$(grep -m 1 '^version =' Cargo.toml | cut -d '\"' -f 2)" >> $GITHUB_ENV
+
+      - uses: actions/download-artifact@v4
         with:
-          toolchain: stable
-          override: true
+          path: artifacts
 
-      # Update the version number based on the Cargo.toml file
-      - name: Update version number
-        run: |
-          NEW_VERSION=$(grep version Cargo.toml | sed -n 2p | cut -d '"' -f 2)
-          echo "VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
-        shell: /bin/bash -e {0}
-
-      # Cache dependencies to speed up subsequent builds
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
-
-      # Download the artifacts from the build job
-      - name: Download artifacts
-        run: |
-          for target in ${{ env.TARGET }}; do
-            echo "Downloading $target artifact"
-            name="${target}.tar.gz"
-            echo "Artifact name: $name"
-            mkdir -p target/package
-            curl -sSL -H "Authorization: token ${GITHUB_TOKEN}" -H "Accept: application/vnd.github.v3+json" -L "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${BUILD_ID}/artifacts/${name}" -o "target/package/${name}"
-          done
-
-        env:
-          VERSION: ${{ env.VERSION }}
-          TARGET: ${{ env.TARGET }}
-          OS: ${{ env.OS }}
-
-      # Generate the changelog based on the git log
       - name: Generate Changelog
-        id: generate-changelog
-        env:
-          BUILD_ID: ${{ github.run_id }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_URL: https://github.com/sebastienrousseau/dtt/releases
-          TARGET: ${{ env.TARGET }}
-
         run: |
-          if [[ ! -f CHANGELOG.md ]]; then
-            # Set path to changelog file
-            changelog_file="${{ github.workspace }}/CHANGELOG.md"
+          echo "## Release v${VERSION} - $(date +'%Y-%m-%d')" > CHANGELOG.md
+          cat TEMPLATE.md >> CHANGELOG.md
+          git log --pretty=format:'%s' --reverse HEAD >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
 
-            # Get version from Cargo.toml
-            version=$(grep version Cargo.toml | sed -n 2p | cut -d '"' -f 2)
-
-            # Append version information to changelog
-            echo "## Release v${version} - $(date +'%Y-%m-%d')" >> "${changelog_file}"
-
-            # Copy content of template file to changelog
-            cat TEMPLATE.md >> "${changelog_file}"
-
-            # Append git log to changelog
-            echo "$(git log --pretty=format:'%s' --reverse HEAD)" >> "${changelog_file}"
-
-            # Append empty line to changelog
-            echo "" >> "${changelog_file}"
-
-          fi
-        shell: bash
-
-      # Create the release on GitHub releases
-      - name: Create Release
-        id: create-release
-        uses: actions/create-release@v1
+      - uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
         with:
           tag_name: v${{ env.VERSION }}
-          release_name: DateTime (DTT) 🦀 v${{ env.VERSION }}
-          body_path: ${{ github.workspace }}/CHANGELOG.md
+          release_name: "DateTime (DTT) 🦀 v${{ env.VERSION }}"
+          body_path: CHANGELOG.md
           draft: true
           prerelease: false
 
-  # Publish the release to Crates.io automatically
+      - name: Upload Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for asset in artifacts/*/*; do
+            gh release upload v${{ env.VERSION }} "$asset" --clobber
+          done
+
   crate:
-    name: ❯ Crate.io 🦀
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    name: Publish to Crates.io 🦀
     needs: release
     runs-on: ubuntu-latest
-
     steps:
-      # Check out the repository code
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Install the stable Rust toolchain
-      - name: Install stable toolchain
-        id: install-toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
 
-      # Cache dependencies to speed up subsequent builds
-      - name: Cache dependencies
-        id: cache-dependencies
-        uses: actions/cache@v4
-        with:
-          path: /home/runner/.cargo/registry/index/
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-index-
-
-      # Update the version number based on the Cargo.toml file
-      - name: Update version number
-        id: update-version
-        run: |
-          NEW_VERSION=$(grep version Cargo.toml | sed -n 2p | cut -d '"' -f 2)
-          echo "VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
-        shell: /bin/bash -e {0}
-
-      # Log in to crates.io
-      - name: Log in to crates.io
-        id: login-crate-io
-        run: cargo login ${{ secrets.CARGO_API_TOKEN }}
-
-      # Publish the Rust library to Crate.io
-      - name: Publish Library to Crate.io
-        id: publish-library
-        uses: actions-rs/cargo@v1
+      - name: Publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_TOKEN }}
-        with:
-          command: publish
-          args: "--no-verify --allow-dirty"
-          use-cross: false
+        run: cargo publish --token "${{ env.CARGO_REGISTRY_TOKEN }}"

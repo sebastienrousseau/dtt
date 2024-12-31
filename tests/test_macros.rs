@@ -1,8 +1,12 @@
 // test_macros.rs
 //
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
+
+//! # Macro Tests for DTT
+//!
+//! This file contains unit tests validating the macros provided by the `dtt` crate.
+//! It ensures that each macro—such as `dtt_print!`, `dtt_vec!`, `dtt_map!`, and others behaves as expected.
 
 #[cfg(test)]
 mod tests {
@@ -68,28 +72,29 @@ mod tests {
     }
 
     #[test]
-    fn test_dtt_now() {
+    fn test_dtt_now() -> Result<(), Box<dyn std::error::Error>> {
         let now = dtt_now!();
-        let formatted_now = now
-            .format("%Y-%m-%d %H:%M:%S")
-            .expect("Failed to format DateTime");
-        assert!(!formatted_now.is_empty()); // Check that now() returns a valid formatted string
+        let formatted_now = now.format("%Y-%m-%d %H:%M:%S")?;
+        assert!(
+            !formatted_now.is_empty(),
+            "Formatted string should not be empty"
+        );
+        Ok(())
     }
 
     #[test]
-    fn test_dtt_parse() {
+    fn test_dtt_parse() -> Result<(), Box<dyn std::error::Error>> {
         let input = "2022-01-01T12:00:00+01:00";
-        match dtt_parse!(input) {
-            Ok(date) => {
-                assert_eq!(date.year(), 2022);
-                assert_eq!(date.month(), Month::January);
-                assert_eq!(date.day(), 1);
-                assert_eq!(date.hour(), 12);
-                assert_eq!(date.minute(), 0);
-                assert_eq!(date.second(), 0);
-            }
-            Err(err) => panic!("Parsing failed: {}", err),
-        }
+        let date = dtt_parse!(input)?; // Propagate error if parsing fails
+
+        assert_eq!(date.year(), 2022);
+        assert_eq!(date.month(), Month::January);
+        assert_eq!(date.day(), 1);
+        assert_eq!(date.hour(), 12);
+        assert_eq!(date.minute(), 0);
+        assert_eq!(date.second(), 0);
+
+        Ok(())
     }
 
     #[test]
@@ -132,16 +137,6 @@ mod tests {
         let days_difference = dtt_diff_days!(dt1, dt2);
         assert_eq!(days_difference, 1i64);
     }
-
-    // #[test]
-    // fn test_dtt_diff_invalid_input() {
-    //     let dt1 = "invalid";
-    //     let dt2 = "1609459230";
-
-    //     let result =
-    //         panic::catch_unwind(|| dtt_diff_seconds!(dt1, dt2));
-    //     assert!(result.is_err(), "Expected panic for invalid input");
-    // }
 
     #[test]
     fn test_dtt_format() {
@@ -200,17 +195,6 @@ mod tests {
         assert_eq!(dt.second(), cloned.second());
     }
 
-    // #[test]
-    // fn test_dtt_diff_seconds_error() {
-    //     let dt1 = "invalid";
-    //     let dt2 = "1640995230";
-
-    //     let result =
-    //         panic::catch_unwind(|| dtt_diff_seconds!(dt1, dt2));
-
-    //     assert!(result.is_err(), "Expected panic for invalid input");
-    // }
-
     #[test]
     #[should_panic(expected = "Error: Invalid input")]
     fn test_dtt_diff_days_error() {
@@ -231,11 +215,16 @@ mod tests {
     }
 
     #[test]
-    fn test_dtt_now_macro() {
+    fn test_dtt_now_macro() -> Result<(), Box<dyn std::error::Error>> {
         let now = dtt_now!();
-        // You can't test the exact time, but you can check if it's recent
-        let five_minutes_ago = now.add_days(-5).unwrap();
+
+        // Subtract 5 days from now
+        let five_minutes_ago = now.add_days(-5)?;
+
+        // Assert that `now` is after `five_minutes_ago`
         assert!(now > five_minutes_ago);
+
+        Ok(())
     }
 
     #[test]

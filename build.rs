@@ -1,6 +1,7 @@
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// build.rs
+//
+// Copyright © 2025 DateTime (DTT) library.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
 //! This build script checks if the current Rustc version is at least the
 //! minimum required version.
@@ -50,11 +51,9 @@ use std::process;
 fn main() {
     let min_version = "1.56";
 
-    match version_check::is_min_version(min_version) {
-        Some(true) => {}
-        _ => {
-            eprintln!("'fd' requires Rustc version >= {}", min_version);
-            process::exit(1);
-        }
+    if version_check::is_min_version(min_version) == Some(true) {
+    } else {
+        eprintln!("'fd' requires Rustc version >= {}", min_version);
+        process::exit(1);
     }
 }

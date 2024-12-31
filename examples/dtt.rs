@@ -1,13 +1,9 @@
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 `DateTime` (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
 //! # DTT Library Usage Examples
 //!
-//! This program demonstrates the comprehensive usage of the DateTime (DTT) library, covering basic
-//! and advanced DateTime operations, macro usage, date component handling, error handling
-//! scenarios, serialization, and performance considerations. Each function provides examples with
-//! explanatory output.
+//! This program demonstrates the comprehensive usage of the `DateTime` (DTT) library, covering basic and advanced `DateTime` operations, macro usage, date component handling, error handling scenarios, serialization, and performance considerations. Each function provides examples with explanatory output.
 
 #![allow(missing_docs)]
 
@@ -19,32 +15,9 @@ use dtt::{
 };
 use std::time::Instant;
 
-// /// Custom error type for the DTT examples.
-// ///
-// /// This error type encapsulates all possible errors that might occur during the execution of the examples.
-// #[derive(Error, Debug)]
-// pub enum AppError {
-//     /// Error that occurs during datetime operations.
-//     #[error("DateTime operation error: {0}")]
-//     DateTimeError(#[from] dtt::datetime::DateTimeError),
-
-//     /// Error that occurs during serialization.
-//     #[error("Serialization error: {0}")]
-//     SerializationError(#[from] serde_json::Error),
-
-//     /// General I/O or parsing error.
-//     #[error("General I/O or parsing error: {0}")]
-//     GeneralError(#[from] std::io::Error),
-
-//     /// Error that occurs during other operations.
-//     #[error("Other error: {0}")]
-//     Other(String),
-// }
-
 /// Entry point for the DTT library usage examples.
 ///
-/// This function orchestrates the execution of various example functions that demonstrate
-/// the capabilities of the DTT library.
+/// This function orchestrates the execution of various example functions that demonstrate the capabilities of the DTT library.
 ///
 /// # Errors
 ///
@@ -54,8 +27,8 @@ fn main() -> Result<(), AppError> {
 
     basic_datetime_examples()?;
     advanced_datetime_operations()?;
-    macro_usage_examples()?;
-    date_component_examples()?;
+    macro_usage_examples();
+    date_component_examples();
     error_handling_examples()?;
     serialization_examples()?;
     performance_examples()?;
@@ -68,11 +41,11 @@ fn main() -> Result<(), AppError> {
 
 /// Demonstrates basic usage of the `DateTime` struct and associated methods.
 ///
-/// This function covers creating DateTime objects, parsing dates, and formatting.
+/// This function covers creating `DateTime` objects, parsing dates, and formatting.
 ///
 /// # Errors
 ///
-/// Returns an `AppError` if any DateTime parsing or creation fails.
+/// Returns an `AppError` if any `DateTime` parsing or creation fails.
 fn basic_datetime_examples() -> Result<(), AppError> {
     println!("🦀 Basic DateTime Examples 🦀");
 
@@ -110,8 +83,7 @@ fn basic_datetime_examples() -> Result<(), AppError> {
 
 /// Demonstrates advanced operations using the `DateTime` struct.
 ///
-/// This function includes examples of adding and subtracting days, working with durations,
-/// and formatting dates in various formats.
+/// This function includes examples of adding and subtracting days, working with durations, and formatting dates in various formats.
 ///
 /// # Errors
 ///
@@ -173,13 +145,14 @@ fn advanced_datetime_operations() -> Result<(), AppError> {
 
     // Timezone formatting
     println!("\n🌍 Timezone Formatting:");
-    let la_time = DateTime::format_time_in_timezone(
+    let la_time = DateTime::new().format_time_in_timezone(
         "PST",
         "[hour repr:12]:[minute] [period]",
     )?;
     println!("Current time in Los Angeles: ✅ {}", la_time);
 
     let tokyo_time = DateTime::format_time_in_timezone(
+        &DateTime::new(),
         "JST",
         "[year]-[month]-[day] [hour]:[minute]",
     )?;
@@ -213,7 +186,7 @@ fn advanced_datetime_operations() -> Result<(), AppError> {
 ///
 /// Returns an `AppError` if any macro operation fails.
 #[allow(clippy::eq_op)]
-fn macro_usage_examples() -> Result<(), AppError> {
+fn macro_usage_examples() {
     println!("\n🦀 Macro Usage Examples 🦀");
 
     let vec = dtt_vec![1, 2, 3, 4, 5];
@@ -236,8 +209,6 @@ fn macro_usage_examples() -> Result<(), AppError> {
 
     println!("Printing vector using dtt_print_vec!:");
     dtt_print_vec!([1, 2, 3, 4, 5]);
-
-    Ok(())
 }
 
 /// Demonstrates accessing and validating various components of a `DateTime` object.
@@ -247,7 +218,7 @@ fn macro_usage_examples() -> Result<(), AppError> {
 /// # Errors
 ///
 /// Returns an `AppError` if any date component retrieval fails.
-fn date_component_examples() -> Result<(), AppError> {
+fn date_component_examples() {
     println!("\n🦀 Date Component Examples 🦀");
 
     let date = DateTime::new();
@@ -300,8 +271,6 @@ fn date_component_examples() -> Result<(), AppError> {
         "Is 12:34:56 a valid time? {}",
         DateTime::is_valid_time("12:34:56")
     );
-
-    Ok(())
 }
 
 /// Demonstrates error handling using the `DateTime` struct and associated methods.
@@ -318,7 +287,7 @@ fn error_handling_examples() -> Result<(), AppError> {
     match DateTime::new_with_tz("InvalidTZ") {
         Ok(_) => println!("Unexpected: InvalidTZ was accepted"),
         Err(e) => {
-            println!("Expected error with invalid timezone: {}", e)
+            println!("Expected error with invalid timezone: {}", e);
         }
     }
 
@@ -332,7 +301,7 @@ fn error_handling_examples() -> Result<(), AppError> {
     match DateTime::parse("not-a-date") {
         Ok(_) => println!("Unexpected: Invalid date string was parsed"),
         Err(e) => {
-            println!("Expected error parsing invalid date: {}", e)
+            println!("Expected error parsing invalid date: {}", e);
         }
     }
 
@@ -380,9 +349,9 @@ fn error_handling_examples() -> Result<(), AppError> {
     Ok(())
 }
 
-/// Demonstrates serialization and deserialization of DateTime objects.
+/// Demonstrates serialization and deserialization of `DateTime` objects.
 ///
-/// This function shows how to convert DateTime objects to and from JSON representations.
+/// This function shows how to convert `DateTime` objects to and from JSON representations.
 ///
 /// # Errors
 ///
@@ -409,9 +378,9 @@ fn serialization_examples() -> Result<(), AppError> {
     Ok(())
 }
 
-/// Demonstrates performance considerations when using the DateTime library.
+/// Demonstrates performance considerations when using the `DateTime` library.
 ///
-/// This function includes examples of measuring the performance of various DateTime operations.
+/// This function includes examples of measuring the performance of various `DateTime` operations.
 ///
 /// # Errors
 ///

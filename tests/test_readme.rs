@@ -1,14 +1,11 @@
 // test_readme.rs
 //
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
-//! # Test Suite for DateTime (DTT) Library
+//! # Test Suite for `DateTime` (DTT) Library
 //!
-//! This module contains a series of unit tests that demonstrate and verify the functionality
-//! of the DateTime (DTT) library. The tests cover various aspects of date and time manipulation,
-//! validation, and parsing using the `DateTime` struct.
+//! This module contains a series of unit tests that demonstrate and verify the functionality of the `DateTime` (DTT) library. The tests cover various aspects of date and time manipulation, validation, and parsing using the `DateTime` struct.
 
 #[cfg(test)]
 mod tests {
@@ -75,20 +72,21 @@ mod tests {
     /// and that the resulting `DateTime` object has the expected year, month, day, hour, minute,
     /// second, ISO week, ordinal day, and microsecond values.
     #[test]
-    fn example_3() {
+    fn example_3() -> Result<(), Box<dyn std::error::Error>> {
         let date_str = "2022-01-01T12:00:00+01:00";
-        let mut result: Result<DateTime, dtt::error::DateTimeError> =
-            DateTime::from_str(date_str);
+        let result: DateTime = DateTime::from_str(date_str)?;
 
         // Assert the parsed components of the `DateTime` object
-        assert_eq!(result.as_mut().unwrap().year(), 2022);
-        assert_eq!(result.as_mut().unwrap().month(), Month::January);
-        assert_eq!(result.as_mut().unwrap().day(), 1);
-        assert_eq!(result.as_mut().unwrap().hour(), 12);
-        assert_eq!(result.as_mut().unwrap().minute(), 0);
-        assert_eq!(result.as_mut().unwrap().second(), 0);
-        assert_eq!(result.as_mut().unwrap().iso_week(), 52);
-        assert_eq!(result.as_mut().unwrap().ordinal(), 1);
-        assert_eq!(result.as_mut().unwrap().microsecond(), 0);
+        assert_eq!(result.year(), 2022);
+        assert_eq!(result.month(), Month::January);
+        assert_eq!(result.day(), 1);
+        assert_eq!(result.hour(), 12);
+        assert_eq!(result.minute(), 0);
+        assert_eq!(result.second(), 0);
+        assert_eq!(result.iso_week(), 52);
+        assert_eq!(result.ordinal(), 1);
+        assert_eq!(result.microsecond(), 0);
+
+        Ok(())
     }
 }

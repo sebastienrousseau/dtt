@@ -1,8 +1,7 @@
 // error.rs
 //
-// Copyright © 2023-2024 DateTime (DTT) library. All rights reserved.
+// Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// See LICENSE-APACHE.md and LICENSE-MIT.md in the repository root for full license information.
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json;
@@ -44,10 +43,10 @@ pub enum AppError {
     EnvVarError(#[from] env::VarError),
 }
 
-/// Custom error type for the DateTime library.
+/// Custom error type for the `DateTime` library.
 ///
 /// This enum represents various errors that can occur when working with
-/// DateTime objects, such as invalid formats, timezones, and component ranges.
+/// `DateTime` objects, such as invalid formats, timezones, and component ranges.
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Error)]
 pub enum DateTimeError {
     /// The provided date format is invalid.
@@ -100,22 +99,22 @@ impl Serialize for DateTimeError {
         S: Serializer,
     {
         match self {
-            DateTimeError::InvalidFormat => {
+            Self::InvalidFormat => {
                 serializer.serialize_str("InvalidFormat")
             }
-            DateTimeError::InvalidTimezone => {
+            Self::InvalidTimezone => {
                 serializer.serialize_str("InvalidTimezone")
             }
-            DateTimeError::InvalidDate => {
+            Self::InvalidDate => {
                 serializer.serialize_str("InvalidDate")
             }
-            DateTimeError::InvalidTime => {
+            Self::InvalidTime => {
                 serializer.serialize_str("InvalidTime")
             }
-            DateTimeError::ParseError(_) => {
+            Self::ParseError(_) => {
                 serializer.serialize_str("ParseError")
             }
-            DateTimeError::ComponentRange(_) => {
+            Self::ComponentRange(_) => {
                 serializer.serialize_str("ComponentRange")
             }
         }
@@ -139,10 +138,10 @@ impl<'de> Deserialize<'de> for DateTimeError {
     {
         let s: &str = Deserialize::deserialize(deserializer)?;
         match s {
-            "InvalidFormat" => Ok(DateTimeError::InvalidFormat),
-            "InvalidTimezone" => Ok(DateTimeError::InvalidTimezone),
-            "InvalidDate" => Ok(DateTimeError::InvalidDate),
-            "InvalidTime" => Ok(DateTimeError::InvalidTime),
+            "InvalidFormat" => Ok(Self::InvalidFormat),
+            "InvalidTimezone" => Ok(Self::InvalidTimezone),
+            "InvalidDate" => Ok(Self::InvalidDate),
+            "InvalidTime" => Ok(Self::InvalidTime),
             "ParseError" => Err(serde::de::Error::custom(
                 "Cannot deserialize ParseError directly",
             )),
@@ -178,6 +177,6 @@ impl Default for DateTimeError {
     /// assert_eq!(error, DateTimeError::InvalidFormat);
     /// ```
     fn default() -> Self {
-        DateTimeError::InvalidFormat
+        Self::InvalidFormat
     }
 }
