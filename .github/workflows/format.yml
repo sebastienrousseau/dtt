@@ -9,16 +9,24 @@ on:
     branches:
       - feat/dtt
   release:
-    types: [created]
+    types:
+      - created
 
 jobs:
-  all:
+  format:
     name: Format
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        rust: [stable, nightly]
+
     steps:
+      - uses: actions/checkout@v4
+
       - uses: hecrj/setup-rust-action@v2
         with:
           components: clippy
-      - uses: actions/checkout@v4
+
       - name: Check format
-        run: cargo fmt --all -- --check --verbose
+        run: cargo fmt --all -- --verbose
