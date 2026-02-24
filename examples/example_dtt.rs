@@ -1,5 +1,4 @@
-// Copyright © 2025 `DateTime` (DTT) library. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
 //! # DTT Library Usage Examples
 //!

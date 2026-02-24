@@ -1,7 +1,4 @@
-// test_datetime.rs
-//
-// Copyright © 2025 DateTime (DTT) library. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
 //! Unit tests for the `DateTime` module.
 
@@ -1855,10 +1852,10 @@ mod tests {
                 UtcOffset::from_hms(0, 0, 0).map_err(|err| {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
-            let dt = DateTime { datetime, offset };
+            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
 
-            assert_eq!(dt.datetime, datetime);
-            assert_eq!(dt.offset, offset);
+            assert_eq!(dt.unix_seconds, datetime.assume_offset(offset).unix_timestamp());
+            assert_eq!(dt.offset(), offset);
             Ok(())
         }
 
@@ -1878,7 +1875,7 @@ mod tests {
                 UtcOffset::from_hms(0, 0, 0).map_err(|err| {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
-            let dt = DateTime { datetime, offset };
+            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
 
             let serialized =
                 serde_json::to_string(&dt).map_err(|err| {
@@ -1910,8 +1907,9 @@ mod tests {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
             let dt1 = DateTime {
-                datetime: datetime1,
-                offset: offset1,
+                unix_seconds: datetime1.assume_offset(offset1).unix_timestamp(),
+                nanoseconds: datetime1.nanosecond(),
+                utc_offset_minutes: (offset1.whole_seconds() / 60) as i16,
             };
 
             let date2 =
@@ -1928,8 +1926,7 @@ mod tests {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
             let dt2 = DateTime {
-                datetime: datetime2,
-                offset: offset2,
+                unix_seconds: datetime2.assume_offset(offset2).unix_timestamp(), nanoseconds: datetime2.nanosecond(), utc_offset_minutes: (offset2.whole_seconds() / 60) as i16,
             };
 
             assert_ne!(dt1, dt2);
@@ -1953,9 +1950,9 @@ mod tests {
                 UtcOffset::from_hms(2, 0, 0).map_err(|err| {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
-            let dt = DateTime { datetime, offset };
+            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
 
-            assert_eq!(dt.offset, offset);
+            assert_eq!(dt.offset(), offset);
             Ok(())
         }
 
@@ -1975,7 +1972,7 @@ mod tests {
                 UtcOffset::from_hms(0, 0, 0).map_err(|err| {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
-            let dt = DateTime { datetime, offset };
+            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
 
             let dt_copy = dt;
 
@@ -2016,12 +2013,12 @@ mod tests {
                     );
                     return;
                 };
-            let dt = DateTime { datetime, offset };
+            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
 
             let debug_output = format!("{:?}", dt);
             assert!(debug_output.contains("DateTime"));
-            assert!(debug_output.contains("datetime"));
-            assert!(debug_output.contains("offset"));
+            assert!(debug_output.contains("unix_seconds"));
+            assert!(debug_output.contains("utc_offset_minutes"));
         }
 
         #[test]

@@ -1,7 +1,4 @@
-// build.rs
-//
-// Copyright © 2025 DateTime (DTT) library.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
 //! This build script checks if the current Rustc version is at least the
 //! minimum required version.

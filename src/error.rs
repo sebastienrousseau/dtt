@@ -1,8 +1,6 @@
-// error.rs
-//
-// Copyright © 2025 DateTime (DTT) library. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
+use miette::Diagnostic;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json;
 use std::{
@@ -47,30 +45,58 @@ pub enum AppError {
 ///
 /// This enum represents various errors that can occur when working with
 /// `DateTime` objects, such as invalid formats, timezones, and component ranges.
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Error)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Error, Diagnostic)]
 pub enum DateTimeError {
     /// The provided date format is invalid.
     #[error("Invalid date format")]
+    #[diagnostic(
+        code(dtt::datetime::invalid_format),
+        help("Ensure the date adheres to ISO 8601 or RFC 3339 format strings.")
+    )]
     InvalidFormat,
 
     /// The provided timezone is invalid or not supported. DST is not supported.
     #[error("Invalid or unsupported timezone; DST not supported")]
+    #[diagnostic(
+        code(dtt::datetime::invalid_timezone),
+        help("Provide a valid POSIX timezone like 'UTC' or 'EST'.")
+    )]
     InvalidTimezone,
 
     /// The date is invalid (e.g., February 30).
     #[error("Invalid date")]
+    #[diagnostic(
+        code(dtt::datetime::invalid_date),
+        help("Check that the year, month, and day form a valid calendar date.")
+    )]
     InvalidDate,
 
     /// The time is invalid (e.g., 25:00).
     #[error("Invalid time")]
+    #[diagnostic(
+        code(dtt::datetime::invalid_time),
+        help(
+            "Time components must be valid (0-23 hours, 0-59 minutes)."
+        )
+    )]
     InvalidTime,
 
     /// An error occurred while parsing the date/time string.
     #[error("Parsing error")]
+    #[diagnostic(
+        code(dtt::datetime::parse_error),
+        help(
+            "Underlying library failed to parse the datetime string."
+        )
+    )]
     ParseError(#[from] Parse),
 
     /// A component (year, month, day, etc.) is out of the valid range.
     #[error("Component range error")]
+    #[diagnostic(
+        code(dtt::datetime::component_range),
+        help("A datetime component exceeded its maximum or minimum boundary.")
+    )]
     ComponentRange(#[from] ComponentRange),
 }
 
@@ -178,5 +204,78 @@ impl Default for DateTimeError {
     /// ```
     fn default() -> Self {
         Self::InvalidFormat
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_error_serialization() {
+        assert_eq!(
+            serde_json::to_string(&DateTimeError::InvalidFormat)
+                .unwrap(),
+            "\"InvalidFormat\""
+        );
+        assert_eq!(
+            serde_json::to_string(&DateTimeError::InvalidTimezone)
+                .unwrap(),
+            "\"InvalidTimezone\""
+        );
+        assert_eq!(
+            serde_json::to_string(&DateTimeError::InvalidDate).unwrap(),
+            "\"InvalidDate\""
+        );
+        assert_eq!(
+            serde_json::to_string(&DateTimeError::InvalidTime).unwrap(),
+            "\"InvalidTime\""
+        );
+        use time::error::Parse;
+        assert_eq!(
+            serde_json::to_string(&DateTimeError::ParseError(
+                Parse::TryFromParsed(
+                    time::error::TryFromParsed::InsufficientInformation
+                )
+            ))
+            .unwrap(),
+            "\"ParseError\""
+        );
+    }
+
+    #[test]
+    fn test_error_deserialization() {
+        assert_eq!(
+            serde_json::from_str::<DateTimeError>("\"InvalidFormat\"")
+                .unwrap(),
+            DateTimeError::InvalidFormat
+        );
+        assert_eq!(
+            serde_json::from_str::<DateTimeError>(
+                "\"InvalidTimezone\""
+            )
+            .unwrap(),
+            DateTimeError::InvalidTimezone
+        );
+        assert_eq!(
+            serde_json::from_str::<DateTimeError>("\"InvalidDate\"")
+                .unwrap(),
+            DateTimeError::InvalidDate
+        );
+        assert_eq!(
+            serde_json::from_str::<DateTimeError>("\"InvalidTime\"")
+                .unwrap(),
+            DateTimeError::InvalidTime
+        );
+        assert!(serde_json::from_str::<DateTimeError>(
+            "\"ParseError\""
+        )
+        .is_err());
+        assert!(serde_json::from_str::<DateTimeError>(
+            "\"ComponentRange\""
+        )
+        .is_err());
+        assert!(serde_json::from_str::<DateTimeError>("\"Unknown\"")
+            .is_err());
     }
 }

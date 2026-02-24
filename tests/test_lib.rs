@@ -1,7 +1,4 @@
-// test_lib.rs
-//
-// Copyright © 2025 DateTime (DTT) library. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
 //! # DTT Integration Tests
 //!
@@ -95,7 +92,7 @@ mod tests {
         assert_eq!(crate_name, "dtt");
 
         let version = env!("CARGO_PKG_VERSION");
-        assert_eq!(version, "0.0.9");
+        assert_eq!(version, "0.1.0");
 
         let homepage = env!("CARGO_PKG_HOMEPAGE");
         assert_eq!(homepage, "https://dttlib.com/");

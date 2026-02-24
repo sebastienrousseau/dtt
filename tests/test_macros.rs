@@ -1,7 +1,4 @@
-// test_macros.rs
-//
-// Copyright © 2025 DateTime (DTT) library. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
 //! # Macro Tests for DTT
 //!
@@ -183,8 +180,7 @@ mod tests {
     fn test_dtt_clone() {
         let dt = dtt_parse!("2023-01-01T12:00:00+00:00").unwrap();
         let cloned = dtt_clone!(dt);
-        assert_eq!(dt.datetime, cloned.datetime);
-        assert_eq!(dt.offset, cloned.offset);
+        assert_eq!(dt, cloned);
 
         // We can still test the individual components
         assert_eq!(dt.year(), cloned.year());

@@ -1,0 +1,63 @@
+From cf169d267141b98f7f8b1897eabb3461786a28b4 Mon Sep 17 00:00:00 2001
+From: "dependabot[bot]" <49699333+dependabot[bot]@users.noreply.github.com>
+Date: Mon, 13 Jan 2025 06:00:02 +0000
+Subject: [PATCH] build(deps): bump serde_json from 1.0.134 to 1.0.135
+
+Bumps [serde_json](https://github.com/serde-rs/json) from 1.0.134 to 1.0.135.
+- [Release notes](https://github.com/serde-rs/json/releases)
+- [Commits](https://github.com/serde-rs/json/compare/v1.0.134...v1.0.135)
+
+---
+updated-dependencies:
+- dependency-name: serde_json
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+---
+ Cargo.lock | 4 ++--
+ Cargo.toml | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Cargo.lock b/Cargo.lock
+index ec16861..e0e4524 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -510,9 +510,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "serde_json"
+-version = "1.0.134"
++version = "1.0.135"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "d00f4175c42ee48b15416f6193a959ba3a0d67fc699a0db9ad12df9f83991c7d"
++checksum = "2b0d7ba2887406110130a978386c4e1befb98c674b4fba677954e4db976630d9"
+ dependencies = [
+  "itoa",
+  "memchr",
+diff --git a/Cargo.toml b/Cargo.toml
+index 404dbb0..bd17aee 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -69,7 +69,7 @@ paste = "1.0.15"
+ regex = "1.11.1"
+ serde = { version = "1.0.217", features = ["derive"] }
+ # serde_derive = "1.0.217"
+-serde_json = "1.0.134"
++serde_json = "1.0.135"
+ time = { version = "0.3.37", features = ["serde", "formatting", "parsing", "macros"] }
+ thiserror = "2.0.11"
+ 
+@@ -79,7 +79,7 @@ thiserror = "2.0.11"
+ [dev-dependencies]
+ assert_cmd = "2.0.16"
+ criterion = "0.5.1"
+-serde_json = "1.0.134"
++serde_json = "1.0.135"
+ 
+ # -----------------------------------------------------------------------------
+ # Build Dependencies
+-- 
+2.53.0
+

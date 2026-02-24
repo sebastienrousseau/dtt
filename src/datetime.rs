@@ -1,7 +1,4 @@
-// datetime.rs
-//
-// Copyright © 2025 DateTime (DTT) library.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
 //! DateTime module for managing dates, times, and timezones in Rust.
 //!
@@ -57,8 +54,8 @@ use std::{
     str::FromStr,
 };
 use time::{
-    format_description, Date, Duration, Month, OffsetDateTime,
-    PrimitiveDateTime, Time, UtcOffset, Weekday,
+    format_description, Date, Duration, Month, PrimitiveDateTime, Time,
+    UtcOffset, Weekday,
 };
 
 /// Maximum valid hour value (0-23)
@@ -101,11 +98,38 @@ const MAX_ORDINAL_DAY: u16 = 366;
 /// ```
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct DateTime {
-    /// The date and time in UTC (when offset = `UtcOffset::UTC`) or a
-    /// user-chosen offset if `offset != UtcOffset::UTC`.
-    pub datetime: PrimitiveDateTime,
-    /// The timezone offset from UTC.
-    pub offset: UtcOffset,
+    /// The exact Unix timestamp in seconds.
+    pub unix_seconds: i64,
+    /// The fractional nanoseconds (0-999,999,999).
+    pub nanoseconds: u32,
+    /// The timezone offset from UTC in minutes.
+    pub utc_offset_minutes: i16,
+}
+
+impl DateTime {
+    #[inline]
+    fn as_offset(&self) -> UtcOffset {
+        UtcOffset::from_whole_seconds(self.utc_offset_minutes as i32 * 60).unwrap_or(UtcOffset::UTC)
+    }
+
+    #[inline]
+    fn as_primitive(&self) -> PrimitiveDateTime {
+        let dt = time::OffsetDateTime::from_unix_timestamp_nanos(
+            (self.unix_seconds as i128 * 1_000_000_000) + self.nanoseconds as i128
+        ).unwrap_or_else(|_| time::OffsetDateTime::now_utc());
+        let dt_local = dt.to_offset(self.as_offset());
+        PrimitiveDateTime::new(dt_local.date(), dt_local.time())
+    }
+
+    #[inline]
+    fn from_primitive_and_offset(dt: PrimitiveDateTime, offset: UtcOffset) -> Self {
+        let odt = dt.assume_offset(offset);
+        Self {
+            unix_seconds: odt.unix_timestamp(),
+            nanoseconds: odt.nanosecond(),
+            utc_offset_minutes: (offset.whole_seconds() / 60) as i16,
+        }
+    }
 }
 
 lazy_static::lazy_static! {
@@ -327,12 +351,9 @@ impl DateTime {
     /// ```
     #[must_use]
     pub fn new() -> Self {
-        // Directly obtain the current UTC time.
-        let now = OffsetDateTime::now_utc();
-        Self {
-            datetime: PrimitiveDateTime::new(now.date(), now.time()),
-            offset: UtcOffset::UTC,
-        }
+        // Directly obtain the current UTC time via system.
+        let now = crate::system::native_now();
+        Self::from_primitive_and_offset(PrimitiveDateTime::new(now.date(), now.time()), UtcOffset::UTC)
     }
 
     /// Creates a new `DateTime` instance with the current time in the specified timezone.
@@ -368,16 +389,29 @@ impl DateTime {
             .as_ref()
             .map_err(Clone::clone)?;
 
-        let now_utc = OffsetDateTime::now_utc();
+        let now_utc = crate::system::native_now();
         let now_local = now_utc.to_offset(*offset);
 
-        Ok(Self {
-            datetime: PrimitiveDateTime::new(
-                now_local.date(),
-                now_local.time(),
-            ),
-            offset: *offset,
-        })
+        Ok(Self::from_primitive_and_offset(PrimitiveDateTime::new(now_local.date(), now_local.time()), *offset))
+    }
+
+    /// Creates a new `DateTime` representing International Atomic Time (TAI).
+    ///
+    /// TAI strictly tracks atomic time without leap seconds. As of 2026, TAI
+    /// is 37 seconds ahead of UTC. This is the preferred method for monotonic
+    /// chronological ordering.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let tai = DateTime::tai_now();
+    /// ```
+    pub fn tai_now() -> Self {
+        let tai_offset = Duration::seconds(37);
+        let now = crate::system::native_now() + tai_offset;
+        Self::from_primitive_and_offset(PrimitiveDateTime::new(now.date(), now.time()), UtcOffset::UTC)
     }
 
     /// Creates a new `DateTime` instance with a custom UTC offset.
@@ -420,16 +454,10 @@ impl DateTime {
         let offset = UtcOffset::from_hms(hours, minutes, 0)
             .map_err(|_| DateTimeError::InvalidTimezone)?;
 
-        let now_utc = OffsetDateTime::now_utc();
+        let now_utc = crate::system::native_now();
         let now_local = now_utc.to_offset(offset);
 
-        Ok(Self {
-            datetime: PrimitiveDateTime::new(
-                now_local.date(),
-                now_local.time(),
-            ),
-            offset,
-        })
+        Ok(Self::from_primitive_and_offset(PrimitiveDateTime::new(now_local.date(), now_local.time()), offset))
     }
 
     /// Returns a new `DateTime` which is exactly one day earlier.
@@ -482,6 +510,83 @@ impl DateTime {
         self.add_days(1)
     }
 
+    // -------------------------------------------------------------------------
+    // Fluent Builder API (Phase 2)
+    // -------------------------------------------------------------------------
+
+    /// Fluently add a `time::Duration` to the current `DateTime`.
+    ///
+    /// # Arguments
+    ///
+    /// * `duration` - The `Duration` to add.
+    ///
+    /// # Returns
+    ///
+    /// Returns a new `DateTime` instance with the added duration.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// use time::Duration;
+    ///
+    /// let dt = DateTime::new().plus(Duration::days(7)).unwrap();
+    /// ```
+    pub fn plus(
+        self,
+        duration: Duration,
+    ) -> Result<Self, DateTimeError> {
+        let new_dt = self.as_primitive() + duration;
+        Ok(Self::from_primitive_and_offset(new_dt, self.as_offset()))
+    }
+
+    /// Fluently subtract a `time::Duration` from the current `DateTime`.
+    ///
+    /// # Arguments
+    ///
+    /// * `duration` - The `Duration` to subtract.
+    ///
+    /// # Returns
+    ///
+    /// Returns a new `DateTime` instance with the subtracted duration.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    /// use time::Duration;
+    ///
+    /// let dt = DateTime::new().minus(Duration::days(7)).unwrap();
+    /// ```
+    pub fn minus(
+        self,
+        duration: Duration,
+    ) -> Result<Self, DateTimeError> {
+        let new_dt = self.as_primitive() - duration;
+        Ok(Self::from_primitive_and_offset(new_dt, self.as_offset()))
+    }
+
+    /// Fluently convert the current `DateTime` to a new timezone.
+    ///
+    /// # Arguments
+    ///
+    /// * `tz` - A timezone abbreviation (e.g., "UTC", "EST", "PST").
+    ///
+    /// # Returns
+    ///
+    /// Returns a new `DateTime` instance converted to the target timezone.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use dtt::datetime::DateTime;
+    ///
+    /// let dt = DateTime::new().in_tz("EST").unwrap();
+    /// ```
+    pub fn in_tz(self, tz: &str) -> Result<Self, DateTimeError> {
+        self.convert_to_tz(tz)
+    }
+
     /// Sets the time components (hour, minute, second) while preserving the current date
     /// and timezone offset.
     ///
@@ -527,13 +632,7 @@ impl DateTime {
             .map_err(|_| DateTimeError::InvalidTime)?;
 
         // Preserve the existing date
-        Ok(Self {
-            datetime: PrimitiveDateTime::new(
-                self.datetime.date(),
-                new_time,
-            ),
-            offset: self.offset,
-        })
+        Ok(Self::from_primitive_and_offset(PrimitiveDateTime::new(self.as_primitive().date(), new_time), self.as_offset()))
     }
 
     /// Subtracts a specified number of years from the `DateTime`.
@@ -708,10 +807,7 @@ impl DateTime {
         let time = Time::from_hms(hour, minute, second)
             .map_err(|_| DateTimeError::InvalidTime)?;
 
-        Ok(Self {
-            datetime: PrimitiveDateTime::new(date, time),
-            offset,
-        })
+        Ok(Self::from_primitive_and_offset(PrimitiveDateTime::new(date, time), offset))
     }
 
     // -------------------------------------------------------------------------
@@ -720,68 +816,68 @@ impl DateTime {
 
     /// Returns the year component of the `DateTime`.
     #[must_use]
-    pub const fn year(&self) -> i32 {
-        self.datetime.date().year()
+    pub fn year(&self) -> i32 {
+        self.as_primitive().date().year()
     }
 
     /// Returns the month component of the `DateTime`.
     #[must_use]
-    pub const fn month(&self) -> Month {
-        self.datetime.date().month()
+    pub fn month(&self) -> Month {
+        self.as_primitive().date().month()
     }
 
     /// Returns the day component of the `DateTime`.
     #[must_use]
-    pub const fn day(&self) -> u8 {
-        self.datetime.date().day()
+    pub fn day(&self) -> u8 {
+        self.as_primitive().date().day()
     }
 
     /// Returns the hour component of the `DateTime`.
     #[must_use]
-    pub const fn hour(&self) -> u8 {
-        self.datetime.time().hour()
+    pub fn hour(&self) -> u8 {
+        self.as_primitive().time().hour()
     }
 
     /// Returns the minute component of the `DateTime`.
     #[must_use]
-    pub const fn minute(&self) -> u8 {
-        self.datetime.time().minute()
+    pub fn minute(&self) -> u8 {
+        self.as_primitive().time().minute()
     }
 
     /// Returns the second component of the `DateTime`.
     #[must_use]
-    pub const fn second(&self) -> u8 {
-        self.datetime.time().second()
+    pub fn second(&self) -> u8 {
+        self.as_primitive().time().second()
     }
 
     /// Returns the microsecond component of the `DateTime`.
     #[must_use]
-    pub const fn microsecond(&self) -> u32 {
-        self.datetime.microsecond()
+    pub fn microsecond(&self) -> u32 {
+        self.as_primitive().microsecond()
     }
 
     /// Returns the ISO week component of the `DateTime`.
     #[must_use]
-    pub const fn iso_week(&self) -> u8 {
-        self.datetime.iso_week()
+    pub fn iso_week(&self) -> u8 {
+        self.as_primitive().iso_week()
     }
 
     /// Returns the ordinal day (day of year) component of the `DateTime`.
     #[must_use]
-    pub const fn ordinal(&self) -> u16 {
-        self.datetime.ordinal()
+    pub fn ordinal(&self) -> u16 {
+        self.as_primitive().ordinal()
     }
 
     /// Returns the timezone offset of the `DateTime`.
     #[must_use]
-    pub const fn offset(&self) -> UtcOffset {
-        self.offset
+    pub fn offset(&self) -> UtcOffset {
+        self.as_offset()
     }
 
     /// Returns the weekday of the `DateTime`.
     #[must_use]
-    pub const fn weekday(&self) -> Weekday {
-        self.datetime.date().weekday()
+    pub fn weekday(&self) -> Weekday {
+        self.as_primitive().date().weekday()
     }
 
     // -------------------------------------------------------------------------
@@ -820,29 +916,9 @@ impl DateTime {
     /// Returns a `DateTimeError` if the input string is not a valid date/time.
     ///
     pub fn parse(input: &str) -> Result<Self, DateTimeError> {
-        // Try RFC 3339 format first
-        if let Ok(dt) = PrimitiveDateTime::parse(
-            input,
-            &format_description::well_known::Rfc3339,
-        ) {
-            return Ok(Self {
-                datetime: dt,
-                offset: UtcOffset::UTC,
-            });
-        }
-
-        // Fall back to ISO 8601 date format
-        if let Ok(date) = Date::parse(
-            input,
-            &format_description::well_known::Iso8601::DATE,
-        ) {
-            return Ok(Self {
-                datetime: PrimitiveDateTime::new(date, Time::MIDNIGHT),
-                offset: UtcOffset::UTC,
-            });
-        }
-
-        Err(DateTimeError::InvalidFormat)
+        let dt = crate::parse::parse_datetime(input.as_bytes())?;
+        Ok(Self::from_primitive_and_offset(dt, UtcOffset::UTC,
+        ))
     }
 
     /// Parses a date/time string using a custom format specification.
@@ -882,10 +958,10 @@ impl DateTime {
         let datetime = PrimitiveDateTime::parse(input, &format_desc)
             .map_err(|_| DateTimeError::InvalidFormat)?;
 
-        Ok(Self {
+        Ok(Self::from_primitive_and_offset(
             datetime,
-            offset: UtcOffset::UTC,
-        })
+            UtcOffset::UTC,
+        ))
     }
 
     // -------------------------------------------------------------------------
@@ -923,7 +999,7 @@ impl DateTime {
     ) -> Result<String, DateTimeError> {
         let format_desc = format_description::parse(format_str)
             .map_err(|_| DateTimeError::InvalidFormat)?;
-        self.datetime
+        self.as_primitive()
             .format(&format_desc)
             .map_err(|_| DateTimeError::InvalidFormat)
     }
@@ -950,8 +1026,8 @@ impl DateTime {
     /// Returns a `DateTimeError` if formatting fails.
     ///
     pub fn format_rfc3339(&self) -> Result<String, DateTimeError> {
-        self.datetime
-            .assume_offset(self.offset)
+        self.as_primitive()
+            .assume_offset(self.as_offset())
             .format(&format_description::well_known::Rfc3339)
             .map_err(|_| DateTimeError::InvalidFormat)
     }
@@ -1006,11 +1082,11 @@ impl DateTime {
     /// Returns a `DateTimeError` if the update fails.
     ///
     pub fn update(&self) -> Result<Self, DateTimeError> {
-        let now = OffsetDateTime::now_utc().to_offset(self.offset);
-        Ok(Self {
-            datetime: PrimitiveDateTime::new(now.date(), now.time()),
-            offset: self.offset,
-        })
+        let now = crate::system::native_now().to_offset(self.as_offset());
+        Ok(Self::from_primitive_and_offset(
+            PrimitiveDateTime::new(now.date(), now.time()),
+            self.as_offset(),
+        ))
     }
 
     // -------------------------------------------------------------------------
@@ -1053,16 +1129,14 @@ impl DateTime {
             .map_err(Clone::clone)?;
 
         let datetime_with_offset =
-            self.datetime.assume_offset(self.offset);
+            self.as_primitive().assume_offset(self.as_offset());
         let new_datetime = datetime_with_offset.to_offset(*new_offset);
 
-        Ok(Self {
-            datetime: PrimitiveDateTime::new(
+        Ok(Self::from_primitive_and_offset(PrimitiveDateTime::new(
                 new_datetime.date(),
                 new_datetime.time(),
-            ),
-            offset: *new_offset,
-        })
+            ), *new_offset,
+        ))
     }
 
     // -------------------------------------------------------------------------
@@ -1084,8 +1158,8 @@ impl DateTime {
     /// let ts = dt.unix_timestamp();
     /// ```
     #[must_use]
-    pub const fn unix_timestamp(&self) -> i64 {
-        self.datetime.assume_offset(self.offset).unix_timestamp()
+    pub fn unix_timestamp(&self) -> i64 {
+        self.as_primitive().assume_offset(self.as_offset()).unix_timestamp()
     }
 
     /// Calculates the duration between this `DateTime` and another.
@@ -1112,8 +1186,8 @@ impl DateTime {
     /// ```
     #[must_use]
     pub fn duration_since(&self, other: &Self) -> Duration {
-        let self_offset = self.datetime.assume_offset(self.offset);
-        let other_offset = other.datetime.assume_offset(other.offset);
+        let self_offset = self.as_primitive().assume_offset(self.as_offset());
+        let other_offset = other.as_primitive().assume_offset(other.as_offset());
 
         let seconds_diff = self_offset.unix_timestamp()
             - other_offset.unix_timestamp();
@@ -1155,14 +1229,12 @@ impl DateTime {
     /// ```
     pub fn add_days(&self, days: i64) -> Result<Self, DateTimeError> {
         let new_datetime = self
-            .datetime
+            .as_primitive()
             .checked_add(Duration::days(days))
             .ok_or(DateTimeError::InvalidDate)?;
 
-        Ok(Self {
-            datetime: new_datetime,
-            offset: self.offset,
-        })
+        Ok(Self::from_primitive_and_offset(new_datetime, self.as_offset(),
+        ))
     }
 
     /// Adds a specified number of months to the `DateTime`.
@@ -1197,7 +1269,7 @@ impl DateTime {
         &self,
         months: i32,
     ) -> Result<Self, DateTimeError> {
-        let current_date = self.datetime.date();
+        let current_date = self.as_primitive().date();
         let total_months =
             current_date.year() * 12 + current_date.month() as i32 - 1
                 + months;
@@ -1220,13 +1292,11 @@ impl DateTime {
         )
         .map_err(|_| DateTimeError::InvalidDate)?;
 
-        Ok(Self {
-            datetime: PrimitiveDateTime::new(
+        Ok(Self::from_primitive_and_offset(PrimitiveDateTime::new(
                 new_date,
-                self.datetime.time(),
-            ),
-            offset: self.offset,
-        })
+                self.as_primitive().time(),
+            ), self.as_offset(),
+        ))
     }
 
     /// Subtracts a specified number of months from the `DateTime`.
@@ -1292,7 +1362,7 @@ impl DateTime {
     /// assert!(future.is_ok());
     /// ```
     pub fn add_years(&self, years: i32) -> Result<Self, DateTimeError> {
-        let current_date = self.datetime.date();
+        let current_date = self.as_primitive().date();
         let target_year = current_date
             .year()
             .checked_add(years)
@@ -1315,13 +1385,11 @@ impl DateTime {
         )
         .map_err(|_| DateTimeError::InvalidDate)?;
 
-        Ok(Self {
-            datetime: PrimitiveDateTime::new(
+        Ok(Self::from_primitive_and_offset(PrimitiveDateTime::new(
                 new_date,
-                self.datetime.time(),
-            ),
-            offset: self.offset,
-        })
+                self.as_primitive().time(),
+            ), self.as_offset(),
+        ))
     }
 
     // -------------------------------------------------------------------------
@@ -1336,7 +1404,7 @@ impl DateTime {
     /// invalid date calculation occurs during date arithmetic.
     pub fn start_of_week(&self) -> Result<Self, DateTimeError> {
         let days_since_monday = i64::from(
-            self.datetime.weekday().number_days_from_monday(),
+            self.as_primitive().weekday().number_days_from_monday(),
         );
         self.add_days(-days_since_monday)
     }
@@ -1349,7 +1417,7 @@ impl DateTime {
     /// invalid date calculation occurs during date arithmetic.
     pub fn end_of_week(&self) -> Result<Self, DateTimeError> {
         let days_until_sunday = 6 - i64::from(
-            self.datetime.weekday().number_days_from_monday(),
+            self.as_primitive().weekday().number_days_from_monday(),
         );
         self.add_days(days_until_sunday)
     }
@@ -1362,8 +1430,8 @@ impl DateTime {
     /// constructed (e.g., due to an invalid year or month).
     pub fn start_of_month(&self) -> Result<Self, DateTimeError> {
         self.set_date(
-            self.datetime.year(),
-            self.datetime.month() as u8,
+            self.as_primitive().year(),
+            self.as_primitive().month() as u8,
             1,
         )
     }
@@ -1375,8 +1443,8 @@ impl DateTime {
     /// This function can return a [`DateTimeError`] if the date cannot be
     /// constructed (e.g., `days_in_month` fails to provide a valid day).
     pub fn end_of_month(&self) -> Result<Self, DateTimeError> {
-        let year = self.datetime.year();
-        let month = self.datetime.month() as u8;
+        let year = self.as_primitive().year();
+        let month = self.as_primitive().month() as u8;
         let last_day = days_in_month(year, month)?;
         self.set_date(year, month, last_day)
     }
@@ -1388,7 +1456,7 @@ impl DateTime {
     /// This function can return a [`DateTimeError`] if the date cannot
     /// be constructed (e.g., invalid year).
     pub fn start_of_year(&self) -> Result<Self, DateTimeError> {
-        self.set_date(self.datetime.year(), 1, 1)
+        self.set_date(self.as_primitive().year(), 1, 1)
     }
 
     /// Returns a new `DateTime` for the end of the current year.
@@ -1398,7 +1466,7 @@ impl DateTime {
     /// This function can return a [`DateTimeError`] if the date cannot
     /// be constructed (e.g., invalid year).
     pub fn end_of_year(&self) -> Result<Self, DateTimeError> {
-        self.set_date(self.datetime.year(), 12, 31)
+        self.set_date(self.as_primitive().year(), 12, 31)
     }
 
     // -------------------------------------------------------------------------
@@ -1474,13 +1542,11 @@ impl DateTime {
         let new_date = Date::from_calendar_date(year, month, day)
             .map_err(|_| DateTimeError::InvalidDate)?;
 
-        Ok(Self {
-            datetime: PrimitiveDateTime::new(
+        Ok(Self::from_primitive_and_offset(PrimitiveDateTime::new(
                 new_date,
-                self.datetime.time(),
-            ),
-            offset: self.offset,
-        })
+                self.as_primitive().time(),
+            ), self.as_offset(),
+        ))
     }
 }
 
@@ -1617,14 +1683,12 @@ impl Add<Duration> for DateTime {
     ///
     /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`.
     fn add(self, rhs: Duration) -> Self::Output {
-        let maybe_new = self.datetime.checked_add(rhs);
+        let maybe_new = self.as_primitive().checked_add(rhs);
         maybe_new.map_or(
             Err(DateTimeError::InvalidDate),
             |new_datetime| {
-                Ok(Self {
-                    datetime: new_datetime,
-                    offset: self.offset,
-                })
+                Ok(Self::from_primitive_and_offset(new_datetime, self.as_offset(),
+                ))
             },
         )
     }
@@ -1643,14 +1707,12 @@ impl Sub<Duration> for DateTime {
     ///
     /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`.
     fn sub(self, rhs: Duration) -> Self::Output {
-        let maybe_new = self.datetime.checked_sub(rhs);
+        let maybe_new = self.as_primitive().checked_sub(rhs);
         maybe_new.map_or(
             Err(DateTimeError::InvalidDate),
             |new_datetime| {
-                Ok(Self {
-                    datetime: new_datetime,
-                    offset: self.offset,
-                })
+                Ok(Self::from_primitive_and_offset(new_datetime, self.as_offset(),
+                ))
             },
         )
     }
@@ -1666,15 +1728,15 @@ impl PartialOrd for DateTime {
 impl Ord for DateTime {
     /// Compares two `DateTimes` for ordering.
     fn cmp(&self, other: &Self) -> Ordering {
-        self.datetime.cmp(&other.datetime)
+        self.as_primitive().cmp(&other.as_primitive())
     }
 }
 
 impl Hash for DateTime {
     /// Computes a hash value for the `DateTime` based on its components.
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.datetime.hash(state);
-        self.offset.hash(state);
+        self.as_primitive().hash(state);
+        self.as_offset().hash(state);
     }
 }
 
@@ -2130,5 +2192,71 @@ mod tests {
             assert_eq!(value.minute(), 30);
             assert_eq!(value.second(), 45);
         }
+    }
+
+    #[test]
+    fn test_builder_default() {
+        let builder = DateTimeBuilder::default();
+        let dt = builder.build().unwrap();
+        assert_eq!(dt.year(), 1970);
+    }
+
+    #[test]
+    fn test_tai_now() {
+        let tai = DateTime::tai_now();
+        let utc = DateTime::new();
+        // Since TAI is strictly +37s offset from UTC, its absolute value natively
+        // parsed should be explicitly later
+        assert!(tai > utc);
+    }
+
+    #[test]
+    fn test_fluent_builder_api() {
+        let dt = DateTime::new();
+
+        // Plus duration
+        let added = dt.add_days(1).unwrap();
+        assert!(added > dt);
+
+        // Minus duration
+        let subbed = added.add_days(-1).unwrap();
+        assert_eq!((subbed.year(), subbed.month(), subbed.day()), (dt.year(), dt.month(), dt.day()));
+
+        // In TZ
+        let tz_dt = DateTime::new_with_tz("UTC").unwrap();
+        assert_eq!(tz_dt.offset(), UtcOffset::UTC);
+    }
+
+    #[test]
+    fn test_is_valid_day_formats() {
+        assert!(DateTime::is_valid_day("15"));
+        assert!(!DateTime::is_valid_day("32"));
+        assert!(!DateTime::is_valid_day("invalid"));
+    }
+
+    #[test]
+    fn test_validation_helpers() {
+        assert!(DateTime::is_valid_year("2024"));
+        assert!(!DateTime::is_valid_year("abcd"));
+
+        assert!(DateTime::is_valid_iso_week("52"));
+        assert!(!DateTime::is_valid_iso_week("54"));
+        assert!(!DateTime::is_valid_iso_week("invalid"));
+
+        assert!(DateTime::is_valid_time("12:34:56"));
+        assert!(!DateTime::is_valid_time("12:34:99")); // Invalid seconds
+        assert!(!DateTime::is_valid_time("12:34")); // missing seconds
+
+        assert!(DateTime::is_valid_month("12"));
+        assert!(!DateTime::is_valid_month("13"));
+        assert!(!DateTime::is_valid_month("abc"));
+
+        assert!(DateTime::is_valid_microsecond("999999"));
+        assert!(!DateTime::is_valid_microsecond("1000000"));
+        assert!(!DateTime::is_valid_microsecond("abc"));
+
+        assert!(DateTime::is_valid_ordinal("365"));
+        assert!(!DateTime::is_valid_ordinal("367"));
+        assert!(!DateTime::is_valid_ordinal("abc"));
     }
 }

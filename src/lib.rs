@@ -1,5 +1,4 @@
-// Copyright © 2025 DateTime (DTT) library. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0 OR MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
 //! DateTime (DTT) is a comprehensive library for date and time manipulation.
 //!
@@ -30,6 +29,7 @@
 //! println!("Current time: {}", now);
 //! ```
 
+#![feature(portable_simd)]
 #![doc = include_str!("../README.md")]
 #![doc(
     html_favicon_url = "https://kura.pro/dtt/images/favicon.ico",
@@ -42,6 +42,7 @@
     clippy::pedantic,
     clippy::cargo,
     clippy::nursery,
+    clippy::missing_errors_doc,
     rustdoc::broken_intra_doc_links,
     missing_docs,
     unsafe_code
@@ -93,6 +94,25 @@ pub mod error;
 /// Contains utility macros to simplify common datetime operations and reduce
 /// boilerplate code.
 pub mod macros;
+
+/// SIMD-Accelerated parsing logic.
+pub mod parse;
+
+/// Platform-Native Time Hooks for zero-abstraction timestamps.
+pub mod system;
+
+/// Zero-Copy Timezone Hot-Reloading using memory-mapped reading.
+pub mod timezone;
+
+/// Ultra-fast humanized relative time parsing (e.g. "Just now").
+pub mod relative;
+
+/// Native Database Driver abstractions.
+#[cfg(feature = "db-sqlx")]
+pub mod db;
+
+/// Calendar-aware arithmetic and logic.
+pub mod calendar;
 
 /// Commonly used types and traits.
 ///
