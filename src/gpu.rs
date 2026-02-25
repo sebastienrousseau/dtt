@@ -9,6 +9,7 @@
 #![cfg(feature = "gpu")]
 
 use crate::DateTime;
+use std::mem::size_of;
 use wgpu::util::DeviceExt;
 
 /// Interface representation mirroring the WGSL output `TimeRecord`
@@ -26,6 +27,7 @@ pub struct TimeRecord {
 }
 
 /// The context environment for offloading datetime processing to the GPU.
+#[derive(Debug)]
 pub struct DttCompute {
     device: wgpu::Device,
     queue: wgpu::Queue,
@@ -77,8 +79,7 @@ impl DttCompute {
             return vec![];
         }
 
-        let input_size = std::mem::size_of_val(raw_buffer) as wgpu::BufferAddress;
-        let output_size = (count as usize * std::mem::size_of::<TimeRecord>()) as wgpu::BufferAddress;
+        let output_size = (count as usize * size_of::<TimeRecord>()) as wgpu::BufferAddress;
 
         // Create GPU buffers
         let input_buffer = self.device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -130,16 +131,16 @@ impl DttCompute {
         });
 
         encoder.copy_buffer_to_buffer(&output_buffer, 0, &staging_buffer, 0, output_size);
-        self.queue.submit(Some(encoder.finish()));
+        let _ = self.queue.submit(Some(encoder.finish()));
 
         // Await GPU sync
         let buffer_slice = staging_buffer.slice(..);
-        let (sender, receiver) = flume::bounded(1);
+        let (sender, receiver) = std::sync::mpsc::channel();
         buffer_slice.map_async(wgpu::MapMode::Read, move |v| sender.send(v).unwrap());
         
-        // Wait for device to finish (pollster handles async wgpu boundaries)
-        self.device.poll(wgpu::Maintain::Wait);
-        receiver.recv_async().await.unwrap().unwrap();
+        // Wait for device to finish
+        let _ = self.device.poll(wgpu::Maintain::Wait);
+        receiver.recv().unwrap().unwrap();
 
         let data = buffer_slice.get_mapped_range();
         let records: &[TimeRecord] = bytemuck::cast_slice(&data);

@@ -98,6 +98,10 @@ pub mod parse;
 /// Platform-Native Time Hooks for zero-abstraction timestamps.
 pub mod system;
 
+/// Native GPU Compute Offloading module
+#[cfg(feature = "gpu")]
+pub mod gpu;
+
 /// Zero-Copy Timezone Hot-Reloading using memory-mapped reading.
 pub mod timezone;
 
