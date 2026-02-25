@@ -27,12 +27,24 @@
 #[cfg(test)]
 mod tests {
     use dtt::run;
+    use std::sync::Mutex;
+    use std::sync::OnceLock;
+
+    static TEST_ENV_MUTEX: OnceLock<Mutex<()>> = OnceLock::new();
+
+    fn get_test_env_mutex() -> std::sync::MutexGuard<'static, ()> {
+        TEST_ENV_MUTEX
+            .get_or_init(|| Mutex::new(()))
+            .lock()
+            .unwrap()
+    }
 
     /// Tests the main `run` function of the library.
     ///
     /// This test ensures that the `run` function executes correctly when not in test mode.
     #[test]
     fn test_run_success() {
+        let _lock = get_test_env_mutex();
         std::env::set_var("DTT_TEST_MODE", "0");
         let result = run();
         assert!(result.is_ok());
@@ -43,6 +55,7 @@ mod tests {
     /// This test ensures that the `run` function returns an error when in test mode.
     #[test]
     fn test_run_test_mode_error() {
+        let _lock = get_test_env_mutex();
         std::env::set_var("DTT_TEST_MODE", "1");
         let result = run();
         assert!(
@@ -93,6 +106,7 @@ mod tests {
     /// This test ensures that the environment variable `DTT_TEST_MODE` is correctly read and used by the `run` function.
     #[test]
     fn test_env_var_handling() {
+        let _lock = get_test_env_mutex();
         std::env::set_var("DTT_TEST_MODE", "0");
         let result = run();
         assert!(result.is_ok());
