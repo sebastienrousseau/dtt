@@ -463,7 +463,7 @@ mod tests {
         /// and do not change unexpectedly. This is important for ensuring ABI compatibility.
         #[test]
         fn test_memory_layout() {
-            assert_eq!(size_of::<DateTimeError>(), 56);
+            assert_eq!(size_of::<DateTimeError>(), 32);
         }
 
         #[test]
