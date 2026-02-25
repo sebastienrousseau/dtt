@@ -20,11 +20,10 @@ pub fn native_now() -> OffsetDateTime {
         unsafe {
             let _ = libc::clock_gettime(libc::CLOCK_REALTIME, &mut ts);
         }
-        let now_utc = OffsetDateTime::from_unix_timestamp_nanos(
+        OffsetDateTime::from_unix_timestamp_nanos(
             (ts.tv_sec as i128) * 1_000_000_000 + (ts.tv_nsec as i128),
         )
-        .unwrap_or_else(|_| OffsetDateTime::now_utc());
-        now_utc
+        .unwrap_or_else(|_| OffsetDateTime::now_utc())
     }
     #[cfg(target_arch = "wasm32")]
     {

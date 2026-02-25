@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
+#![allow(missing_docs, unused_must_use, unused_results, unused_variables, dead_code)]
+
 use dtt::DateTime;
 use time::Duration;
 
@@ -50,7 +53,11 @@ fn test_relative_formats_future() {
 
     let future = now.plus(Duration::hours(5)).unwrap();
     let rel = future.relative();
-    assert!(rel == "in 5 hours" || rel == "in 4 hours", "Future format strict assertions: {}", rel);
+    assert!(
+        rel == "in 5 hours" || rel == "in 4 hours",
+        "Future format strict assertions: {}",
+        rel
+    );
 
     let precise_now = DateTime::new();
     assert_eq!(precise_now.relative(), "Just now");

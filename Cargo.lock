@@ -321,6 +321,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "commons"
+version = "0.0.1"
+source = "git+https://github.com/sebastienrousseau/commons?tag=v0.0.1#e1e455afa3917b86ca17bb6eea6eb5831db46b78"
+dependencies = [
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "concurrent-queue"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -642,6 +650,7 @@ dependencies = [
  "assert_cmd",
  "bytemuck",
  "bytes",
+ "commons",
  "criterion",
  "diesel",
  "js-sys",

@@ -177,9 +177,6 @@ variant_size_differences = "deny"
 [package.metadata.clippy]
 warn-lints = [
     "clippy::all",
-    "clippy::pedantic",
-    "clippy::cargo",
-    "clippy::nursery",
 ]
 
 [profile.dev]

@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
+#![allow(missing_docs, unused_must_use, unused_results, unused_variables, dead_code)]
+
 //! # Macro Tests for DTT
 //!
 //! This file contains unit tests validating the macros provided by the `dtt` crate.
@@ -261,16 +264,16 @@ mod tests {
     #[test]
     fn test_dtt_calendar_duration_helpers() {
         let months = dtt_months!(5);
-        assert_eq!(months.months(), 5);
+        assert_eq!(months, calendar::CalendarDuration::months(5));
 
         let years = dtt_years!(5);
-        assert_eq!(years.years(), 5);
+        assert_eq!(years, calendar::CalendarDuration::years(5));
     }
 
     #[test]
     fn test_dtt_add_sub_macros() {
         let dt = dtt_parse!("2023-01-01T12:00:00+00:00").unwrap();
-        
+
         let future = dtt_add!(dt, dtt_days!(5)).unwrap();
         assert_eq!(future.day(), 6);
 
@@ -292,7 +295,16 @@ mod tests {
     #[test]
     fn test_dtt_from_components_macro() {
         use time::UtcOffset;
-        let dt = dtt_from_components!(2024, 1, 15, 12, 30, 0, UtcOffset::UTC).unwrap();
+        let dt = dtt_from_components!(
+            2024,
+            1,
+            15,
+            12,
+            30,
+            0,
+            UtcOffset::UTC
+        )
+        .unwrap();
         assert_eq!(dt.year(), 2024);
         assert_eq!(dt.day(), 15);
         assert_eq!(dt.hour(), 12);

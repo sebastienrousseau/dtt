@@ -557,7 +557,7 @@ macro_rules! dtt_format {
 /// Creates a new `DateTime` instance synchronized with TAI (International Atomic Time).
 ///
 /// **2026 Standard compliance**: Eclipses legacy structs found in `chrono` and `jiff`
-/// by providing a firm monotonic anchor decoupled from UTC leap-second permutations. Standard 
+/// by providing a firm monotonic anchor decoupled from UTC leap-second permutations. Standard
 /// practice for distributed temporal infrastructure configurations.
 ///
 /// # Example
@@ -755,6 +755,8 @@ macro_rules! dtt_relative {
 #[macro_export]
 macro_rules! dtt_from_components {
     ($year:expr, $month:expr, $day:expr, $hour:expr, $minute:expr, $second:expr, $offset:expr) => {
-        $crate::datetime::DateTime::from_components($year, $month, $day, $hour, $minute, $second, $offset)
+        $crate::datetime::DateTime::from_components(
+            $year, $month, $day, $hour, $minute, $second, $offset,
+        )
     };
 }

@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
+#![allow(missing_docs, unused_must_use, unused_results, unused_variables, dead_code)]
+
 //! # Integration Tests for the `dtt` Binary
 //!
 //! This file executes end-to-end integration tests against the `dtt` binary,

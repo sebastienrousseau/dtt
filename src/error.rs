@@ -233,7 +233,6 @@ mod tests {
             serde_json::to_string(&DateTimeError::InvalidTime).unwrap(),
             "\"InvalidTime\""
         );
-        use time::error::Parse;
         assert_eq!(
             serde_json::to_string(&DateTimeError::ParseError(
                 Parse::TryFromParsed(

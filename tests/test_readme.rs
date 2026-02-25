@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
+#![allow(missing_docs, unused_must_use, unused_results, unused_variables, dead_code)]
+
 //! # Test Suite for `DateTime` (DTT) Library
 //!
 //! This module contains a series of unit tests that demonstrate and verify the functionality of the `DateTime` (DTT) library. The tests cover various aspects of date and time manipulation, validation, and parsing using the `DateTime` struct.

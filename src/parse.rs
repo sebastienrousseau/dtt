@@ -10,12 +10,18 @@ use time::{Date, Month, PrimitiveDateTime, Time};
 /// Returns a `time::PrimitiveDateTime` or `DateTimeError`.
 ///
 /// This is a zero-allocation parser that uses 256-bit vector bounds checking.
-#[cfg_attr(feature = "tracing", tracing::instrument(level = "trace", skip_all))]
+///
+/// # Errors
+/// Returns `DateTimeError::InvalidFormat` if the input cannot be safely parsed.
+#[cfg_attr(
+    feature = "tracing",
+    tracing::instrument(level = "trace", skip_all)
+)]
 pub fn parse_datetime(
     bytes: &[u8],
 ) -> Result<PrimitiveDateTime, DateTimeError> {
     let len = bytes.len();
-    if len < 10 || len > 32 {
+    if !(10..=32).contains(&len) {
         return fallback_parse(bytes);
     }
 

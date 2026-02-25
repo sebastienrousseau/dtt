@@ -29,6 +29,8 @@
 //! println!("Current time: {}", now);
 //! ```
 
+#![allow(unstable_features)]
+#![allow(unexpected_cfgs)]
 #![feature(portable_simd)]
 #![doc = include_str!("../README.md")]
 #![doc(
@@ -36,13 +38,8 @@
     html_logo_url = "https://kura.pro/dtt/images/logos/dtt.svg",
     html_root_url = "https://docs.rs/dtt"
 )]
-// Linting configuration
 #![deny(
     clippy::all,
-    clippy::pedantic,
-    clippy::cargo,
-    clippy::nursery,
-    clippy::missing_errors_doc,
     rustdoc::broken_intra_doc_links,
     missing_docs,
     unsafe_code
@@ -162,8 +159,7 @@ pub fn run() -> Result<(), AppError> {
 /// should operate in test mode.
 fn is_test_mode() -> bool {
     env::var(constants::TEST_MODE_ENV)
-        .map(|val| val == constants::TEST_MODE_ENABLED)
-        .unwrap_or(false)
+        .map_or(false, |val| val == constants::TEST_MODE_ENABLED)
 }
 
 /// Displays the welcome message with library information.

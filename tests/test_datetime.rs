@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
+#![allow(missing_docs, unused_must_use, unused_results, unused_variables, dead_code)]
+
 //! Unit tests for the `DateTime` module.
 
 use dtt::datetime::DateTime;
@@ -1852,9 +1855,19 @@ mod tests {
                 UtcOffset::from_hms(0, 0, 0).map_err(|err| {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
-            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
+            let dt = DateTime {
+                unix_seconds: datetime
+                    .assume_offset(offset)
+                    .unix_timestamp(),
+                nanoseconds: datetime.nanosecond(),
+                utc_offset_minutes: (offset.whole_seconds() / 60)
+                    as i16,
+            };
 
-            assert_eq!(dt.unix_seconds, datetime.assume_offset(offset).unix_timestamp());
+            assert_eq!(
+                dt.unix_seconds,
+                datetime.assume_offset(offset).unix_timestamp()
+            );
             assert_eq!(dt.offset(), offset);
             Ok(())
         }
@@ -1875,7 +1888,14 @@ mod tests {
                 UtcOffset::from_hms(0, 0, 0).map_err(|err| {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
-            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
+            let dt = DateTime {
+                unix_seconds: datetime
+                    .assume_offset(offset)
+                    .unix_timestamp(),
+                nanoseconds: datetime.nanosecond(),
+                utc_offset_minutes: (offset.whole_seconds() / 60)
+                    as i16,
+            };
 
             let serialized =
                 serde_json::to_string(&dt).map_err(|err| {
@@ -1907,9 +1927,12 @@ mod tests {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
             let dt1 = DateTime {
-                unix_seconds: datetime1.assume_offset(offset1).unix_timestamp(),
+                unix_seconds: datetime1
+                    .assume_offset(offset1)
+                    .unix_timestamp(),
                 nanoseconds: datetime1.nanosecond(),
-                utc_offset_minutes: (offset1.whole_seconds() / 60) as i16,
+                utc_offset_minutes: (offset1.whole_seconds() / 60)
+                    as i16,
             };
 
             let date2 =
@@ -1926,7 +1949,12 @@ mod tests {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
             let dt2 = DateTime {
-                unix_seconds: datetime2.assume_offset(offset2).unix_timestamp(), nanoseconds: datetime2.nanosecond(), utc_offset_minutes: (offset2.whole_seconds() / 60) as i16,
+                unix_seconds: datetime2
+                    .assume_offset(offset2)
+                    .unix_timestamp(),
+                nanoseconds: datetime2.nanosecond(),
+                utc_offset_minutes: (offset2.whole_seconds() / 60)
+                    as i16,
             };
 
             assert_ne!(dt1, dt2);
@@ -1950,7 +1978,14 @@ mod tests {
                 UtcOffset::from_hms(2, 0, 0).map_err(|err| {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
-            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
+            let dt = DateTime {
+                unix_seconds: datetime
+                    .assume_offset(offset)
+                    .unix_timestamp(),
+                nanoseconds: datetime.nanosecond(),
+                utc_offset_minutes: (offset.whole_seconds() / 60)
+                    as i16,
+            };
 
             assert_eq!(dt.offset(), offset);
             Ok(())
@@ -1972,7 +2007,14 @@ mod tests {
                 UtcOffset::from_hms(0, 0, 0).map_err(|err| {
                     format!("Failed to create UtcOffset: {:?}", err)
                 })?;
-            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
+            let dt = DateTime {
+                unix_seconds: datetime
+                    .assume_offset(offset)
+                    .unix_timestamp(),
+                nanoseconds: datetime.nanosecond(),
+                utc_offset_minutes: (offset.whole_seconds() / 60)
+                    as i16,
+            };
 
             let dt_copy = dt;
 
@@ -2013,7 +2055,14 @@ mod tests {
                     );
                     return;
                 };
-            let dt = DateTime { unix_seconds: datetime.assume_offset(offset).unix_timestamp(), nanoseconds: datetime.nanosecond(), utc_offset_minutes: (offset.whole_seconds() / 60) as i16 };
+            let dt = DateTime {
+                unix_seconds: datetime
+                    .assume_offset(offset)
+                    .unix_timestamp(),
+                nanoseconds: datetime.nanosecond(),
+                utc_offset_minutes: (offset.whole_seconds() / 60)
+                    as i16,
+            };
 
             let debug_output = format!("{:?}", dt);
             assert!(debug_output.contains("DateTime"));

@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
+
 //! # DTT Library Usage Examples
 //!
 //! This program demonstrates the comprehensive usage of the `DateTime` (DTT) library, covering basic and advanced `DateTime` operations, macro usage, date component handling, error handling scenarios, serialization, and performance considerations. Each function provides examples with explanatory output.

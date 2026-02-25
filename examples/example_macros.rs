@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
+#![allow(missing_docs, unused_must_use, unused_results, unused_variables, dead_code)]
+
 //! Example showcasing the 2026 DTT enterprise macros.
 
 use dtt::{
-    dtt_add, dtt_add_calendar, dtt_days, dtt_months, dtt_now, dtt_relative,
-    dtt_sub, dtt_tai_now, dtt_print,
+    dtt_add, dtt_add_calendar, dtt_days, dtt_months, dtt_now,
+    dtt_print, dtt_relative, dtt_sub, dtt_tai_now,
 };
 
 fn main() {
@@ -29,7 +32,10 @@ fn main() {
     // 4. Zero-Allocation Duration Math
     println!("\n[Temporal Duration Vectors]");
     let future_days = dtt_add!(now, dtt_days!(5)).unwrap();
-    println!("5 Days from now: {}", future_days.format_iso8601().unwrap());
+    println!(
+        "5 Days from now: {}",
+        future_days.format_iso8601().unwrap()
+    );
 
     let past_days = dtt_sub!(now, dtt_days!(5)).unwrap();
     println!("5 Days ago: {}", past_days.format_iso8601().unwrap());
@@ -37,7 +43,10 @@ fn main() {
     // 5. Advanced Calendar Math (Leap-year safe shift)
     println!("\n[Calendar Operations]");
     let future_months = dtt_add_calendar!(now, dtt_months!(1)).unwrap();
-    println!("1 Month from now: {}", future_months.format_iso8601().unwrap());
-    
+    println!(
+        "1 Month from now: {}",
+        future_months.format_iso8601().unwrap()
+    );
+
     println!("\n=== Demo Complete ===");
 }

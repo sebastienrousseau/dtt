@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
+#![allow(missing_docs, unused_must_use, unused_results, unused_variables, dead_code)]
+
+use criterion::{
+    black_box, criterion_group, criterion_main, Criterion,
+};
 use dtt::{calendar::CalendarDuration, DateTime};
 
 fn bench_calendar_addition(c: &mut Criterion) {

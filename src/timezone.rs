@@ -16,6 +16,10 @@ use std::path::Path;
 /// Fetches the current UTC offset for a given timezone identifier.
 #[allow(unused_variables)]
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "trace"))]
+///
+/// # Errors
+///
+/// Returns `DateTimeError::InvalidTimezone` if the tzdata cannot be mapped or the format is incorrect.
 pub fn get_tz_offset(
     tz_name: &str,
 ) -> Result<UtcOffset, DateTimeError> {
@@ -83,8 +87,8 @@ pub fn get_tz_offset(
         let minutes = ((utoff % 3600) / 60) as i8;
         let seconds = (utoff % 60) as i8;
 
-        return UtcOffset::from_hms(hours, minutes, seconds)
-            .map_err(|_| DateTimeError::InvalidTimezone);
+        UtcOffset::from_hms(hours, minutes, seconds)
+            .map_err(|_| DateTimeError::InvalidTimezone)
     }
 
     #[cfg(not(unix))]

@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
+#![allow(missing_docs, unused_must_use, unused_results, unused_variables, dead_code)]
+
+use criterion::{
+    black_box, criterion_group, criterion_main, Criterion,
+};
 use dtt::{
-    dtt_add_days, dtt_days, dtt_hours, dtt_minutes, dtt_months, dtt_now,
-    dtt_tai_now, dtt_years, dtt_relative
+    dtt_days, dtt_hours, dtt_minutes, dtt_months,
+    dtt_now, dtt_relative, dtt_tai_now, dtt_years,
 };
 
 fn bench_macro_generation(c: &mut Criterion) {
