@@ -3,7 +3,9 @@
 use crate::error::DateTimeError;
 #[cfg(nightly)]
 use std::simd::prelude::*;
-use time::{Date, Month, PrimitiveDateTime, Time};
+#[cfg(nightly)]
+use time::Month;
+use time::{Date, PrimitiveDateTime, Time};
 
 /// Parses an ISO-8601/RFC-3339 datetime byte slice using SIMD vector operations.
 ///
