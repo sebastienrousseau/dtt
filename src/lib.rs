@@ -174,18 +174,28 @@ fn display_welcome_message() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Mutex;
+    use std::sync::OnceLock;
+
+    static ENV_MUTEX: OnceLock<Mutex<()>> = OnceLock::new();
+
+    fn get_env_mutex() -> std::sync::MutexGuard<'static, ()> {
+        ENV_MUTEX.get_or_init(|| Mutex::new(())).lock().unwrap()
+    }
 
     mod initialization {
         use super::*;
 
         #[test]
         fn test_normal_run() {
+            let _lock = get_env_mutex();
             env::remove_var(constants::TEST_MODE_ENV);
             assert!(run().is_ok());
         }
 
         #[test]
         fn test_simulated_error() {
+            let _lock = get_env_mutex();
             env::set_var(
                 constants::TEST_MODE_ENV,
                 constants::TEST_MODE_ENABLED,
@@ -208,6 +218,7 @@ mod tests {
 
         #[test]
         fn test_is_test_mode() {
+            let _lock = get_env_mutex();
             env::remove_var(constants::TEST_MODE_ENV);
             let first_check = is_test_mode();
             assert!(
@@ -224,6 +235,7 @@ mod tests {
                 second_check,
                 "Should be in test mode after enabling it"
             );
+            env::remove_var(constants::TEST_MODE_ENV);
         }
     }
 }
