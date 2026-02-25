@@ -10,6 +10,7 @@ use time::{Date, Month, PrimitiveDateTime, Time};
 /// Returns a `time::PrimitiveDateTime` or `DateTimeError`.
 ///
 /// This is a zero-allocation parser that uses 256-bit vector bounds checking.
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "trace", skip_all))]
 pub fn parse_datetime(
     bytes: &[u8],
 ) -> Result<PrimitiveDateTime, DateTimeError> {
@@ -126,6 +127,13 @@ fn fallback_parse(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_internal_fallback_parse_date() {
+        // Trigger line 122 by feeding a raw date directly to fallback
+        let res = fallback_parse(b"2026-02-24");
+        assert!(res.is_ok());
+    }
 
     #[test]
     fn test_simd_parse_branches() {

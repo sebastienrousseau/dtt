@@ -230,4 +230,71 @@ mod tests {
         assert_eq!(dt.month(), Month::January);
         assert_eq!(dt.day(), 1);
     }
+
+    #[test]
+    fn test_dtt_is_valid_macro_invalid() {
+        dtt_is_valid_function!(day, u8);
+        assert!(!is_valid_day("completely_invalid_time"));
+    }
+
+    #[test]
+    fn test_dtt_tai_now() {
+        let tai = dtt_tai_now!();
+        assert!(tai.offset().whole_seconds() == 0); // TAI maps to UTC offset block physically
+    }
+
+    #[test]
+    fn test_dtt_duration_helpers() {
+        let days = dtt_days!(5);
+        assert_eq!(days.whole_days(), 5);
+
+        let hours = dtt_hours!(5);
+        assert_eq!(hours.whole_hours(), 5);
+
+        let minutes = dtt_minutes!(5);
+        assert_eq!(minutes.whole_minutes(), 5);
+
+        let seconds = dtt_seconds!(5);
+        assert_eq!(seconds.whole_seconds(), 5);
+    }
+
+    #[test]
+    fn test_dtt_calendar_duration_helpers() {
+        let months = dtt_months!(5);
+        assert_eq!(months.months(), 5);
+
+        let years = dtt_years!(5);
+        assert_eq!(years.years(), 5);
+    }
+
+    #[test]
+    fn test_dtt_add_sub_macros() {
+        let dt = dtt_parse!("2023-01-01T12:00:00+00:00").unwrap();
+        
+        let future = dtt_add!(dt, dtt_days!(5)).unwrap();
+        assert_eq!(future.day(), 6);
+
+        let past = dtt_sub!(dt, dtt_days!(5)).unwrap();
+        assert_eq!(past.month(), Month::December);
+        assert_eq!(past.year(), 2022);
+
+        let future_cal = dtt_add_calendar!(dt, dtt_months!(1)).unwrap();
+        assert_eq!(future_cal.month(), Month::February);
+    }
+
+    #[test]
+    fn test_dtt_relative_macro() {
+        let dt = dtt_now!();
+        let rel = dtt_relative!(dt);
+        assert_eq!(rel, "Just now");
+    }
+
+    #[test]
+    fn test_dtt_from_components_macro() {
+        use time::UtcOffset;
+        let dt = dtt_from_components!(2024, 1, 15, 12, 30, 0, UtcOffset::UTC).unwrap();
+        assert_eq!(dt.year(), 2024);
+        assert_eq!(dt.day(), 15);
+        assert_eq!(dt.hour(), 12);
+    }
 }

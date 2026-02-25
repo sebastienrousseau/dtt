@@ -460,6 +460,27 @@ mod tests {
             Ok(())
         }
 
+    #[test]
+    fn test_error_serialization_exhaustive() {
+        let parse_err = time::PrimitiveDateTime::parse("bad", &time::format_description::well_known::Rfc3339).unwrap_err().into();
+        let comp_err: time::error::ComponentRange = time::Time::from_hms(25, 0, 0).unwrap_err().into();
+
+        // Test serialization for ALL variants to ensure 100% coverage
+        let errs = vec![
+            (DateTimeError::InvalidFormat, "\"InvalidFormat\""),
+            (DateTimeError::InvalidTimezone, "\"InvalidTimezone\""),
+            (DateTimeError::InvalidDate, "\"InvalidDate\""),
+            (DateTimeError::InvalidTime, "\"InvalidTime\""),
+            (DateTimeError::ParseError(parse_err), "\"ParseError\""),
+            (DateTimeError::ComponentRange(comp_err), "\"ComponentRange\""),
+        ];
+
+        for (err, expected) in errs {
+            let serialized = serde_json::to_string(&err).unwrap();
+            assert_eq!(serialized, expected);
+        }
+    }
+
         #[test]
         fn test_error_deserialization(
         ) -> Result<(), Box<dyn std::error::Error>> {

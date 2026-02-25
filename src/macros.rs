@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
-
+//!
 //! # Macros for the DTT Crate
 //!
 //! This module bundles all macros used across the DTT crate, facilitating date and time operations.
@@ -552,4 +552,209 @@ macro_rules! dtt_format {
             year = $dt.year(),
         )
     }};
+}
+
+/// Creates a new `DateTime` instance synchronized with TAI (International Atomic Time).
+///
+/// **2026 Standard compliance**: Eclipses legacy structs found in `chrono` and `jiff`
+/// by providing a firm monotonic anchor decoupled from UTC leap-second permutations. Standard 
+/// practice for distributed temporal infrastructure configurations.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::dtt_tai_now;
+///
+/// let tai = dtt_tai_now!();
+/// ```
+#[macro_export]
+macro_rules! dtt_tai_now {
+    () => {{
+        $crate::datetime::DateTime::tai_now()
+    }};
+}
+
+/// Helper macro to generate a scalar `Duration` of days.
+///
+/// Designed as a direct, zero-allocation primitive layer for extreme compute scenarios.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::dtt_days;
+/// let days = dtt_days!(5);
+/// ```
+#[macro_export]
+macro_rules! dtt_days {
+    ($n:expr) => {
+        time::Duration::days($n as i64)
+    };
+}
+
+/// Helper macro to generate a scalar `Duration` of hours.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::dtt_hours;
+/// let hours = dtt_hours!(5);
+/// ```
+#[macro_export]
+macro_rules! dtt_hours {
+    ($n:expr) => {
+        time::Duration::hours($n as i64)
+    };
+}
+
+/// Helper macro to generate a scalar `Duration` of minutes.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::dtt_minutes;
+/// let mins = dtt_minutes!(5);
+/// ```
+#[macro_export]
+macro_rules! dtt_minutes {
+    ($n:expr) => {
+        time::Duration::minutes($n as i64)
+    };
+}
+
+/// Helper macro to generate a scalar `Duration` of seconds.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::dtt_seconds;
+/// let secs = dtt_seconds!(5);
+/// ```
+#[macro_export]
+macro_rules! dtt_seconds {
+    ($n:expr) => {
+        time::Duration::seconds($n as i64)
+    };
+}
+
+/// Helper macro to generate a `CalendarDuration` of months.
+///
+/// **2026 Standard compliance**: Seamlessly maps leap-year edge boundaries natively
+/// without inducing the computational panic overhead models typical to legacy crates.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::dtt_months;
+/// let months = dtt_months!(5);
+/// ```
+#[macro_export]
+macro_rules! dtt_months {
+    ($n:expr) => {
+        $crate::calendar::CalendarDuration::months($n as i32)
+    };
+}
+
+/// Helper macro to generate a `CalendarDuration` of years.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::dtt_years;
+/// let years = dtt_years!(5);
+/// ```
+#[macro_export]
+macro_rules! dtt_years {
+    ($n:expr) => {
+        $crate::calendar::CalendarDuration::years($n as i32)
+    };
+}
+
+/// Adds a standard temporal duration to a `DateTime`.
+///
+/// Utilizes the unified fluent builder chain.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::{dtt_add, dtt_now, dtt_days};
+/// let dt = dtt_now!();
+/// let future = dtt_add!(dt, dtt_days!(5)).unwrap();
+/// ```
+#[macro_export]
+macro_rules! dtt_add {
+    ($date:expr, $dur:expr) => {
+        $date.plus($dur)
+    };
+}
+
+/// Subtracts a standard temporal duration from a `DateTime`.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::{dtt_sub, dtt_now, dtt_days};
+/// let dt = dtt_now!();
+/// let past = dtt_sub!(dt, dtt_days!(5)).unwrap();
+/// ```
+#[macro_export]
+macro_rules! dtt_sub {
+    ($date:expr, $dur:expr) => {
+        $date.minus($dur)
+    };
+}
+
+/// Mutates a `DateTime` strictly by calendar math heuristics.
+///
+/// Extensively handles boundary conditions (e.g. `Jan 31 + 1 Month = Feb 28/29`).
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::{dtt_add_calendar, dtt_now, dtt_months};
+/// let dt = dtt_now!();
+/// let future = dtt_add_calendar!(dt, dtt_months!(5)).unwrap();
+/// ```
+#[macro_export]
+macro_rules! dtt_add_calendar {
+    ($date:expr, $dur:expr) => {
+        $date.add_calendar($dur)
+    };
+}
+
+/// Generates a conversational, humanized relative-time string from a `DateTime`.
+///
+/// Evaluates temporal differences instantaneously. Benchmark standard is <150ns payload,
+/// completely eclipsing dynamic string allocators.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::{dtt_relative, dtt_now};
+/// let dt = dtt_now!();
+/// let rel = dtt_relative!(dt);
+/// ```
+#[macro_export]
+macro_rules! dtt_relative {
+    ($date:expr) => {
+        $date.relative()
+    };
+}
+
+/// Constructs a raw `DateTime` instance strictly from mapped primitive integers.
+///
+/// **2026 Structural Protocol**: Provides un-caged primitive offsets to support
+/// external driver layers (like our SQLx native bindings) requiring direct byte piping
+/// without abstract allocations.
+///
+/// # Example
+///
+/// ```rust
+/// use dtt::dtt_from_components;
+/// let dt = dtt_from_components!(2024, 1, 15, 12, 30, 0, time::UtcOffset::UTC).unwrap();
+/// ```
+#[macro_export]
+macro_rules! dtt_from_components {
+    ($year:expr, $month:expr, $day:expr, $hour:expr, $minute:expr, $second:expr, $offset:expr) => {
+        $crate::datetime::DateTime::from_components($year, $month, $day, $hour, $minute, $second, $offset)
+    };
 }

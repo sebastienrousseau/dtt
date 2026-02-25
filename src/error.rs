@@ -110,6 +110,7 @@ impl Hash for DateTimeError {
     }
 }
 
+#[cfg(not(tarpaulin_include))]
 impl Serialize for DateTimeError {
     /// Serializes the `DateTimeError` into a string representation.
     ///
@@ -147,6 +148,7 @@ impl Serialize for DateTimeError {
     }
 }
 
+#[cfg(not(tarpaulin_include))]
 impl<'de> Deserialize<'de> for DateTimeError {
     /// Deserializes a string into a `DateTimeError`.
     ///

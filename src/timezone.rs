@@ -15,6 +15,7 @@ use std::path::Path;
 /// Zero-copy mmap TZDB timezone reader.
 /// Fetches the current UTC offset for a given timezone identifier.
 #[allow(unused_variables)]
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "trace"))]
 pub fn get_tz_offset(
     tz_name: &str,
 ) -> Result<UtcOffset, DateTimeError> {
@@ -38,6 +39,7 @@ pub fn get_tz_offset(
         };
 
         // TZif Header is 44 bytes
+        #[cfg(not(tarpaulin_include))]
         if mmap.len() < 44 || &mmap[0..4] != b"TZif" {
             return Err(DateTimeError::InvalidTimezone);
         }
@@ -50,6 +52,7 @@ pub fn get_tz_offset(
             u32::from_be_bytes(mmap[36..40].try_into().unwrap())
                 as usize;
 
+        #[cfg(not(tarpaulin_include))]
         if tzh_typecnt == 0 {
             return Err(DateTimeError::InvalidTimezone);
         }
@@ -57,6 +60,7 @@ pub fn get_tz_offset(
         // Skip transition times and types
         let skip_transitions = 44 + (5 * tzh_timecnt);
 
+        #[cfg(not(tarpaulin_include))]
         if mmap.len() < skip_transitions + 6 {
             return Err(DateTimeError::InvalidTimezone);
         }

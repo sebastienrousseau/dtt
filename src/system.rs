@@ -8,6 +8,7 @@ use time::{OffsetDateTime, UtcOffset};
 ///
 /// Bypasses `std::time::SystemTime` to directly query `libc::clock_gettime(CLOCK_REALTIME)`
 /// on UNIX-like platforms avoiding abstract overheads. On macOS, this takes advantage of VDSO natively.
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "trace"))]
 pub fn native_now() -> OffsetDateTime {
     #[cfg(unix)]
     {
@@ -44,6 +45,7 @@ pub fn native_now() -> OffsetDateTime {
 }
 
 /// Fetches the platform-native current time and applies a timezone offset.
+#[cfg_attr(feature = "tracing", tracing::instrument(level = "trace"))]
 pub fn native_now_with_offset(offset: UtcOffset) -> OffsetDateTime {
     native_now().to_offset(offset)
 }
