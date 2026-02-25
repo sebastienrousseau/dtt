@@ -1,7 +1,19 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-#![allow(clippy::all, clippy::pedantic, clippy::nursery, clippy::unwrap_used, clippy::expect_used)]
-#![allow(missing_docs, unused_must_use, unused_results, unused_variables, dead_code)]
+#![allow(
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::unwrap_used,
+    clippy::expect_used
+)]
+#![allow(
+    missing_docs,
+    unused_must_use,
+    unused_results,
+    unused_variables,
+    dead_code
+)]
 
 //! # Example: SIMD Accelerated Parse Validation
 //!

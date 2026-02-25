@@ -78,8 +78,13 @@ impl DateTime {
         // Add residual calendar days natively using standard bounds
         let intermediate = DateTime::from_components(
             year,
-            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-            { month as u8 },
+            #[allow(
+                clippy::cast_possible_truncation,
+                clippy::cast_sign_loss
+            )]
+            {
+                month as u8
+            },
             next_day,
             self.hour(),
             self.minute(),
