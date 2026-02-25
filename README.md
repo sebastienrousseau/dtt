@@ -29,12 +29,14 @@ A Rust library for parsing, validating, manipulating, and formatting dates and t
 | 1.0.x | Stable (planned) | Stable API, semver guarantees |
 
 ## Features
-- **Performance Architecture** — High-speed, SIMD-accelerated date-time parsing and zero-allocation timezone loading.
-- **Hardware Integrations** — Sub-nanosecond time hooks via platform VDSOs and native WebGPU compute shading for extreme parallel processing.
-- **Fluent Builder APIs** — Ergonomic, chainable macros and builder components to create precise dates instantly.
-- **Database Interoperability** — Out-of-the-box native trait support for `diesel`, `tokio-postgres`, and `sqlx`.
-- **Ecosystem Ready** — Support for 100% test coverage, comprehensive observability (`tracing`), and high-diagnostic contexts (`miette`).
-- **WebAssembly** — Ready to deploy natively in browser runtimes (`wasm32-unknown-unknown`).
+- **High-Speed Parsing** — SIMD-accelerated date-time string parsing out of the box
+- **Zero-Allocation Timezones** — Memory-mapped timezone hot-reloading using `tzdata`
+- **Sub-Nanosecond Hooks** — Hardware-native OS time hooks via VDSO streams
+- **WebGPU Offloading** — Execute parsing on billion-row matrices using Apple Metal/CUDA shaders
+- **Fluent Builder APIs** — Chainable macros and builder components to create precise offsets
+- **Database Interoperability** — Native trait implementations for `diesel`, `tokio-postgres` and `sqlx`
+- **Ecosystem Ready** — 100% test coverage, structured `tracing`, and `miette` diagnostics
+- **WebAssembly** — Out-of-the-box browser support for `wasm32-unknown-unknown`
 
 ## Installation
 Add to `Cargo.toml`:
