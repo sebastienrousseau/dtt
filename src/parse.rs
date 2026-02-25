@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use crate::error::DateTimeError;
+#[cfg(nightly)]
 use std::simd::prelude::*;
 use time::{Date, Month, PrimitiveDateTime, Time};
 
@@ -20,91 +21,94 @@ use time::{Date, Month, PrimitiveDateTime, Time};
 pub fn parse_datetime(
     bytes: &[u8],
 ) -> Result<PrimitiveDateTime, DateTimeError> {
-    let len = bytes.len();
-    if !(10..=32).contains(&len) {
-        return fallback_parse(bytes);
-    }
-
-    let mut chunk = [b'0'; 32];
-    chunk[..len].copy_from_slice(bytes);
-    let v = u8x32::from_array(chunk);
-
-    let zero = u8x32::splat(b'0');
-    let nine = u8x32::splat(b'9');
-
-    // Bounds check digits using SIMD mask
-    let digits_mask = v.simd_ge(zero) & v.simd_le(nine);
-    let mask_arr = digits_mask.to_array();
-
-    if bytes[4] != b'-' || bytes[7] != b'-' {
-        return fallback_parse(bytes);
-    }
-
-    let valid_date_digits = mask_arr[0]
-        && mask_arr[1]
-        && mask_arr[2]
-        && mask_arr[3]
-        && mask_arr[5]
-        && mask_arr[6]
-        && mask_arr[8]
-        && mask_arr[9];
-
-    if !valid_date_digits {
-        return fallback_parse(bytes);
-    }
-
-    let year = ((bytes[0] - b'0') as i32) * 1000
-        + ((bytes[1] - b'0') as i32) * 100
-        + ((bytes[2] - b'0') as i32) * 10
-        + ((bytes[3] - b'0') as i32);
-    let month = (bytes[5] - b'0') * 10 + (bytes[6] - b'0');
-    let day = (bytes[8] - b'0') * 10 + (bytes[9] - b'0');
-
-    let month_enum = Month::try_from(month)
-        .map_err(|_| DateTimeError::InvalidFormat)?;
-    let date = Date::from_calendar_date(year, month_enum, day)
-        .map_err(|_| DateTimeError::InvalidDate)?;
-
-    if len == 10 {
-        return Ok(PrimitiveDateTime::new(date, Time::MIDNIGHT));
-    }
-
-    if len >= 19 {
-        if (bytes[10] != b'T' && bytes[10] != b' ')
-            || bytes[13] != b':'
-            || bytes[16] != b':'
-        {
+    #[cfg(nightly)]
+    {
+        let len = bytes.len();
+        if !(10..=32).contains(&len) {
             return fallback_parse(bytes);
         }
 
-        let valid_time_digits = mask_arr[11]
-            && mask_arr[12]
-            && mask_arr[14]
-            && mask_arr[15]
-            && mask_arr[17]
-            && mask_arr[18];
+        let mut chunk = [b'0'; 32];
+        chunk[..len].copy_from_slice(bytes);
+        let v = u8x32::from_array(chunk);
 
-        if !valid_time_digits {
+        let zero = u8x32::splat(b'0');
+        let nine = u8x32::splat(b'9');
+
+        // Bounds check digits using SIMD mask
+        let digits_mask = v.simd_ge(zero) & v.simd_le(nine);
+        let mask_arr = digits_mask.to_array();
+
+        if bytes[4] != b'-' || bytes[7] != b'-' {
             return fallback_parse(bytes);
         }
 
-        let hour = (bytes[11] - b'0') * 10 + (bytes[12] - b'0');
-        let minute = (bytes[14] - b'0') * 10 + (bytes[15] - b'0');
-        let second = (bytes[17] - b'0') * 10 + (bytes[18] - b'0');
+        let valid_date_digits = mask_arr[0]
+            && mask_arr[1]
+            && mask_arr[2]
+            && mask_arr[3]
+            && mask_arr[5]
+            && mask_arr[6]
+            && mask_arr[8]
+            && mask_arr[9];
 
-        if len > 19 {
-            if bytes[19] == b'Z' && len == 20 {
-                // Just 'Z', we can safely ignore since PrimitiveDateTime doesn't store TZ.
-            } else {
-                // Fractional seconds, arbitrary TZ offsets, or invalid characters: fallback
+        if !valid_date_digits {
+            return fallback_parse(bytes);
+        }
+
+        let year = ((bytes[0] - b'0') as i32) * 1000
+            + ((bytes[1] - b'0') as i32) * 100
+            + ((bytes[2] - b'0') as i32) * 10
+            + ((bytes[3] - b'0') as i32);
+        let month = (bytes[5] - b'0') * 10 + (bytes[6] - b'0');
+        let day = (bytes[8] - b'0') * 10 + (bytes[9] - b'0');
+
+        let month_enum = Month::try_from(month)
+            .map_err(|_| DateTimeError::InvalidFormat)?;
+        let date = Date::from_calendar_date(year, month_enum, day)
+            .map_err(|_| DateTimeError::InvalidDate)?;
+
+        if len == 10 {
+            return Ok(PrimitiveDateTime::new(date, Time::MIDNIGHT));
+        }
+
+        if len >= 19 {
+            if (bytes[10] != b'T' && bytes[10] != b' ')
+                || bytes[13] != b':'
+                || bytes[16] != b':'
+            {
                 return fallback_parse(bytes);
             }
+
+            let valid_time_digits = mask_arr[11]
+                && mask_arr[12]
+                && mask_arr[14]
+                && mask_arr[15]
+                && mask_arr[17]
+                && mask_arr[18];
+
+            if !valid_time_digits {
+                return fallback_parse(bytes);
+            }
+
+            let hour = (bytes[11] - b'0') * 10 + (bytes[12] - b'0');
+            let minute = (bytes[14] - b'0') * 10 + (bytes[15] - b'0');
+            let second = (bytes[17] - b'0') * 10 + (bytes[18] - b'0');
+
+            if len > 19 {
+                if bytes[19] == b'Z' && len == 20 {
+                    // Just 'Z', we can safely ignore since PrimitiveDateTime doesn't store TZ.
+                } else {
+                    // Fractional seconds, arbitrary TZ offsets, or invalid characters: fallback
+                    return fallback_parse(bytes);
+                }
+            }
+
+            let time = Time::from_hms(hour, minute, second)
+                .map_err(|_| DateTimeError::InvalidTime)?;
+
+            return Ok(PrimitiveDateTime::new(date, time));
         }
-
-        let time = Time::from_hms(hour, minute, second)
-            .map_err(|_| DateTimeError::InvalidTime)?;
-
-        return Ok(PrimitiveDateTime::new(date, time));
     }
 
     fallback_parse(bytes)

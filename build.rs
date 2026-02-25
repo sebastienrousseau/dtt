@@ -53,4 +53,10 @@ fn main() {
         eprintln!("'fd' requires Rustc version >= {}", min_version);
         process::exit(1);
     }
+
+    if let Some(channel) = version_check::Channel::read() {
+        if channel.is_nightly() {
+            println!("cargo:rustc-cfg=nightly");
+        }
+    }
 }

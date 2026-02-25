@@ -31,7 +31,7 @@
 
 #![allow(unstable_features)]
 #![allow(unexpected_cfgs)]
-#![feature(portable_simd)]
+#![cfg_attr(nightly, feature(portable_simd))]
 #![doc = include_str!("../README.md")]
 #![doc(
     html_favicon_url = "https://kura.pro/dtt/images/favicon.ico",
