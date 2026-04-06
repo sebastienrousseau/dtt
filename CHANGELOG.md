@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **Bump `time` to 0.3.47** to pull in the upstream fix for
+  [RUSTSEC: time vulnerable to stack exhaustion DoS][rustsec-time]
+  (medium severity, affects `>= 0.3.6, < 0.3.47`).
+
+### Changed
+
+- Bump `serde` 1.0.217 → 1.0.219 (absorbs dependabot PR #110).
+- Bump `serde_json` 1.0.135 → 1.0.140 (absorbs dependabot PR #107).
+- Bump `thiserror` 2.0.11 → 2.0.12 (absorbs dependabot PR #106).
+- Bump `assert_cmd` (dev) 2.0.16 → 2.0.17 (absorbs dependabot PR #113).
+
+[rustsec-time]: https://github.com/sebastienrousseau/dtt/security/dependabot/3
+
+
 ## [0.0.10] — 2026-04-06
 
 ### Added
