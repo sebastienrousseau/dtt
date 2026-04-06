@@ -3,7 +3,7 @@
 # Works identically on macOS, Linux, and WSL with any POSIX-compliant `make`.
 # Run `make help` for the command list.
 
-.PHONY: help all build test lint fmt fmt-check doc bench example verify coverage clean install-hooks check-deps
+.PHONY: help all build test lint fmt fmt-check doc bench example verify coverage audit sbom clean install-hooks check-deps
 
 help:
 	@echo "DTT — common tasks (works on macOS, Linux, WSL)"
@@ -18,6 +18,8 @@ help:
 	@echo "  make example       cargo run --example dtt"
 	@echo "  make verify        fmt-check + lint + test (PR-ready gate)"
 	@echo "  make coverage      Run cargo llvm-cov and print summary"
+	@echo "  make audit         Run cargo-audit against RustSec database"
+	@echo "  make sbom          Generate CycloneDX SBOM at dtt-sbom.cdx.json"
 	@echo "  make check-deps    Run tools/check_dependencies.sh"
 	@echo "  make install-hooks Install signed-commit pre-commit hook"
 	@echo "  make clean         cargo clean"
@@ -58,6 +60,21 @@ coverage:
 	    cargo install cargo-llvm-cov; \
 	}
 	cargo llvm-cov --summary-only
+
+audit:
+	@command -v cargo-audit >/dev/null 2>&1 || { \
+	    echo "Installing cargo-audit…"; \
+	    cargo install cargo-audit; \
+	}
+	cargo-audit audit --deny warnings
+
+sbom:
+	@command -v cargo-cyclonedx >/dev/null 2>&1 || { \
+	    echo "Installing cargo-cyclonedx…"; \
+	    cargo install cargo-cyclonedx; \
+	}
+	cargo cyclonedx --format json --override-filename dtt-sbom
+	@echo "✅ SBOM written to dtt-sbom.cdx.json"
 
 check-deps:
 	./tools/check_dependencies.sh

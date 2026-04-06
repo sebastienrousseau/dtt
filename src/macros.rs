@@ -157,7 +157,6 @@ macro_rules! dtt_assert {
 ///
 /// ```rust
 /// use dtt::dtt_is_valid_function;
-/// use paste::paste;
 ///
 /// dtt_is_valid_function!(day, u8);
 /// assert!(is_valid_day("15"));
@@ -166,7 +165,7 @@ macro_rules! dtt_assert {
 #[macro_export]
 macro_rules! dtt_is_valid_function {
     ($name:ident, $type:ty) => {
-        paste! {
+        ::pastey::paste! {
             pub fn [<is_valid_ $name>](input: &str) -> bool {
                 if let Ok(parsed_val) = input.parse::<$type>() {
                     $crate::datetime::DateTime::[<is_valid_ $name>](&parsed_val.to_string())
@@ -288,7 +287,6 @@ macro_rules! dtt_print_vec {
 ///
 /// ```rust
 /// use dtt::dtt_is_valid_function;
-/// use paste::paste;
 ///
 /// dtt_is_valid_function!(day, u8);
 /// assert!(is_valid_day("15"));

@@ -11,7 +11,6 @@
 #[cfg(test)]
 mod tests {
     use dtt::*;
-    use paste::paste;
     use std::collections::HashMap;
     use time::Month;
 
