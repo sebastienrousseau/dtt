@@ -134,6 +134,26 @@ mod tests {
                 Err(DateTimeError::InvalidTimezone)
             ));
         }
+
+        /// Regression test: mixed-sign hours/minutes must be rejected
+        /// rather than silently coerced. The upstream `time` crate
+        /// produces e.g. `+05:30` for `(5, -30)`, which is rarely the
+        /// caller's intent.
+        #[test]
+        fn test_new_with_custom_offset_mixed_signs_rejected() {
+            assert!(DateTime::new_with_custom_offset(5, -30).is_err());
+            assert!(DateTime::new_with_custom_offset(-5, 30).is_err());
+            assert!(DateTime::new_with_custom_offset(-1, 30).is_err());
+            assert!(DateTime::new_with_custom_offset(1, -30).is_err());
+
+            // Same-sign and zero-component cases must still succeed.
+            assert!(DateTime::new_with_custom_offset(5, 30).is_ok());
+            assert!(DateTime::new_with_custom_offset(-5, -30).is_ok());
+            assert!(DateTime::new_with_custom_offset(0, 30).is_ok());
+            assert!(DateTime::new_with_custom_offset(0, -30).is_ok());
+            assert!(DateTime::new_with_custom_offset(5, 0).is_ok());
+            assert!(DateTime::new_with_custom_offset(-5, 0).is_ok());
+        }
     }
 
     /// Tests related to parsing and formatting `DateTime` objects.
@@ -878,7 +898,6 @@ mod tests {
             );
         }
     }
-
 
     mod update_and_conversion {
         use super::*;

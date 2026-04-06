@@ -156,10 +156,14 @@ mod tests {
         dtt_is_valid_function!(day, u8);
         assert!(is_valid_day("15"));
         assert!(!is_valid_day("32"));
+        // Non-numeric input — exercises the macro's parse-fail branch.
+        assert!(!is_valid_day("abc"));
+        assert!(!is_valid_day(""));
 
         dtt_is_valid_function!(month, u8);
         assert!(is_valid_month("12"));
         assert!(!is_valid_month("13"));
+        assert!(!is_valid_month("not-a-number"));
     }
 
     #[test]

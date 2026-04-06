@@ -117,7 +117,8 @@ impl Serialize for DateTime {
     where
         S: Serializer,
     {
-        let s = self.format_rfc3339().map_err(serde::ser::Error::custom)?;
+        let s =
+            self.format_rfc3339().map_err(serde::ser::Error::custom)?;
         serializer.serialize_str(&s)
     }
 }
@@ -168,39 +169,101 @@ static TIMEZONE_OFFSETS: LazyLock<
     let _ = m.insert("GMT", Ok(UtcOffset::UTC));
 
     // North American time zones (USA)
-    let _ = m.insert("EST_USA", UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("EDT", UtcOffset::from_hms(-4, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("CST_USA", UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("CDT", UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("MST", UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("MDT", UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("PST", UtcOffset::from_hms(-8, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("PDT", UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert(
+        "EST_USA",
+        UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "EDT",
+        UtcOffset::from_hms(-4, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "CST_USA",
+        UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "CDT",
+        UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "MST",
+        UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "MDT",
+        UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "PST",
+        UtcOffset::from_hms(-8, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "PDT",
+        UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from),
+    );
 
     // European time zones
-    let _ = m.insert("CET", UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("CEST", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("EET", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("EEST", UtcOffset::from_hms(3, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("IST_IRELAND", UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert(
+        "CET",
+        UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "CEST",
+        UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "EET",
+        UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "EEST",
+        UtcOffset::from_hms(3, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "IST_IRELAND",
+        UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from),
+    );
 
     // Middle East time zones
-    let _ = m.insert("IST_ISRAEL", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert(
+        "IST_ISRAEL",
+        UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from),
+    );
 
     // Asian time zones
-    let _ = m.insert("JST", UtcOffset::from_hms(9, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("IST_INDIA", UtcOffset::from_hms(5, 30, 0).map_err(DateTimeError::from));
-    let _ = m.insert("CST_CHINA", UtcOffset::from_hms(8, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("HKT", UtcOffset::from_hms(8, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert(
+        "JST",
+        UtcOffset::from_hms(9, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "IST_INDIA",
+        UtcOffset::from_hms(5, 30, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "CST_CHINA",
+        UtcOffset::from_hms(8, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "HKT",
+        UtcOffset::from_hms(8, 0, 0).map_err(DateTimeError::from),
+    );
 
     // Australian time zones
-    let _ = m.insert("EST_AUS", UtcOffset::from_hms(10, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("AEDT", UtcOffset::from_hms(11, 0, 0).map_err(DateTimeError::from));
-    let _ = m.insert("AEST", UtcOffset::from_hms(10, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert(
+        "EST_AUS",
+        UtcOffset::from_hms(10, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "AEDT",
+        UtcOffset::from_hms(11, 0, 0).map_err(DateTimeError::from),
+    );
+    let _ = m.insert(
+        "AEST",
+        UtcOffset::from_hms(10, 0, 0).map_err(DateTimeError::from),
+    );
     let _ = m.insert(
         "ACWST",
-        UtcOffset::from_hms(8, 45, 0)
-            .map_err(DateTimeError::from)
+        UtcOffset::from_hms(8, 45, 0).map_err(DateTimeError::from),
     );
 
     m
@@ -428,12 +491,14 @@ impl DateTime {
     /// # Arguments
     ///
     /// * `hours` - Hour offset from UTC (-23 to +23)
-    /// * `minutes` - Minute offset from UTC (-59 to +59)
+    /// * `minutes` - Minute offset from UTC (-59 to +59). Must have the
+    ///   same sign as `hours` unless one of the two is zero.
     ///
     /// # Returns
     ///
-    /// Returns a `Result` containing either the new `DateTime` or a `DateTimeError`
-    /// if the offset is invalid.
+    /// Returns a `Result` containing either the new `DateTime` or a
+    /// `DateTimeError::InvalidTimezone` if any component is out of range
+    /// or if `hours` and `minutes` have opposing signs.
     ///
     /// # Examples
     ///
@@ -457,6 +522,17 @@ impl DateTime {
     ) -> Result<Self, DateTimeError> {
         // Direct numeric checks (no casts needed)
         if hours.abs() > 23 || minutes.abs() > 59 {
+            return Err(DateTimeError::InvalidTimezone);
+        }
+
+        // Reject ambiguous mixed-sign inputs. The `time` crate would
+        // silently coerce e.g. `(5, -30)` to `+05:30`, which is almost
+        // never what the caller wants. Same-sign inputs and inputs where
+        // one component is zero are still accepted.
+        if hours != 0
+            && minutes != 0
+            && hours.signum() != minutes.signum()
+        {
             return Err(DateTimeError::InvalidTimezone);
         }
 
@@ -813,6 +889,16 @@ impl DateTime {
         self.datetime.iso_week()
     }
 
+    /// Returns the ISO 8601 week-numbering year.
+    ///
+    /// **Note:** This may differ from [`Self::year`] near year boundaries.
+    /// For example, `2022-01-01` has calendar year `2022` but ISO year
+    /// `2021` (because it falls in ISO week 52 of 2021).
+    #[must_use]
+    pub const fn iso_year(&self) -> i32 {
+        self.datetime.date().to_iso_week_date().0
+    }
+
     /// Returns the ordinal day (day of year) component of the `DateTime`.
     #[must_use]
     pub const fn ordinal(&self) -> u16 {
@@ -873,7 +959,10 @@ impl DateTime {
             &format_description::well_known::Rfc3339,
         ) {
             return Ok(Self {
-                datetime: PrimitiveDateTime::new(odt.date(), odt.time()),
+                datetime: PrimitiveDateTime::new(
+                    odt.date(),
+                    odt.time(),
+                ),
                 offset: odt.offset(),
             });
         }
@@ -1229,7 +1318,9 @@ impl DateTime {
         let total_months = current_date
             .year()
             .checked_mul(12)
-            .and_then(|v| v.checked_add(i32::from(current_date.month() as u8)))
+            .and_then(|v| {
+                v.checked_add(i32::from(current_date.month() as u8))
+            })
             .and_then(|v| v.checked_sub(1))
             .and_then(|v| v.checked_add(months))
             .ok_or(DateTimeError::InvalidDate)?;
@@ -1563,10 +1654,16 @@ impl DateTime {
             .unwrap_or(false)
     }
 
-    /// Validates whether a string represents a valid year.
+    /// Validates whether a string represents a valid year within the
+    /// supported `time::Date` range of `-9999..=9999`.
+    ///
+    /// This bound matches what `DateTime::from_components` can actually
+    /// construct, so the validator and the builder agree.
     #[must_use]
     pub fn is_valid_year(year: &str) -> bool {
-        year.parse::<i32>().is_ok()
+        year.parse::<i32>()
+            .map(|y| (-9999..=9999).contains(&y))
+            .unwrap_or(false)
     }
 
     /// Validates whether a string represents a valid microsecond.
@@ -1799,6 +1896,7 @@ pub const fn is_leap_year(year: i32) -> bool {
 // -----------------------------------------------------------------------------
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
     use super::*;
     use std::str::FromStr;
@@ -1811,11 +1909,8 @@ mod tests {
 
     #[test]
     fn test_new_with_tz() {
-        let est = DateTime::new_with_tz("EST_USA");
-        assert!(est.is_ok());
-        if let Ok(est_dt) = est {
-            assert_eq!(est_dt.offset().whole_hours(), -5);
-        }
+        let est_dt = DateTime::new_with_tz("EST_USA").unwrap();
+        assert_eq!(est_dt.offset().whole_hours(), -5);
 
         let invalid = DateTime::new_with_tz("INVALID");
         assert!(matches!(invalid, Err(DateTimeError::InvalidTimezone)));
@@ -1823,12 +1918,9 @@ mod tests {
 
     #[test]
     fn test_new_with_custom_offset() {
-        let offset = DateTime::new_with_custom_offset(5, 30);
-        assert!(offset.is_ok());
-        if let Ok(dt) = offset {
-            assert_eq!(dt.offset().whole_hours(), 5);
-            assert_eq!(dt.offset().minutes_past_hour(), 30);
-        }
+        let dt = DateTime::new_with_custom_offset(5, 30).unwrap();
+        assert_eq!(dt.offset().whole_hours(), 5);
+        assert_eq!(dt.offset().minutes_past_hour(), 30);
 
         // Test invalid offsets
         let too_large_hours = DateTime::new_with_custom_offset(24, 0);
@@ -1839,7 +1931,7 @@ mod tests {
 
     #[test]
     fn test_from_components() {
-        let dt = DateTime::from_components(
+        let dt_val = DateTime::from_components(
             2024,
             1,
             1,
@@ -1847,16 +1939,14 @@ mod tests {
             0,
             0,
             UtcOffset::UTC,
-        );
-        assert!(dt.is_ok());
-        if let Ok(dt_val) = dt {
-            assert_eq!(dt_val.year(), 2024);
-            assert_eq!(dt_val.month(), Month::January);
-            assert_eq!(dt_val.day(), 1);
-            assert_eq!(dt_val.hour(), 12);
-            assert_eq!(dt_val.minute(), 0);
-            assert_eq!(dt_val.second(), 0);
-        }
+        )
+        .unwrap();
+        assert_eq!(dt_val.year(), 2024);
+        assert_eq!(dt_val.month(), Month::January);
+        assert_eq!(dt_val.day(), 1);
+        assert_eq!(dt_val.hour(), 12);
+        assert_eq!(dt_val.minute(), 0);
+        assert_eq!(dt_val.second(), 0);
 
         // Test invalid dates
         let invalid_month = DateTime::from_components(
@@ -1889,12 +1979,9 @@ mod tests {
         assert!(dt.is_ok());
 
         // Test ISO 8601 date
-        let dt = DateTime::parse("2024-01-01");
-        assert!(dt.is_ok());
-        if let Ok(dt_val) = dt {
-            assert_eq!(dt_val.hour(), 0);
-            assert_eq!(dt_val.minute(), 0);
-        }
+        let dt_val = DateTime::parse("2024-01-01").unwrap();
+        assert_eq!(dt_val.hour(), 0);
+        assert_eq!(dt_val.minute(), 0);
 
         // Test invalid formats
         let invalid1 = DateTime::parse("invalid");
@@ -1916,11 +2003,8 @@ mod tests {
     #[test]
     fn test_timezone_conversion() {
         let utc = DateTime::new();
-        let est = utc.convert_to_tz("EST_USA");
-        assert!(est.is_ok());
-        if let Ok(est_val) = est {
-            assert_eq!(est_val.offset().whole_hours(), -5);
-        }
+        let est_val = utc.convert_to_tz("EST_USA").unwrap();
+        assert_eq!(est_val.offset().whole_hours(), -5);
 
         let invalid = utc.convert_to_tz("INVALID");
         assert!(invalid.is_err());
@@ -1943,7 +2027,7 @@ mod tests {
         assert!(next_month.is_ok());
 
         // Test month edge cases
-        let jan31 = DateTime::from_components(
+        let jan31_dt = DateTime::from_components(
             2024,
             1,
             31,
@@ -1951,16 +2035,11 @@ mod tests {
             0,
             0,
             UtcOffset::UTC,
-        );
-        assert!(jan31.is_ok());
-        if let Ok(jan31_dt) = jan31 {
-            let feb = jan31_dt.add_months(1);
-            assert!(feb.is_ok());
-            if let Ok(feb_dt) = feb {
-                // 2024 is a leap year => Feb has 29 days
-                assert_eq!(feb_dt.day(), 29);
-            }
-        }
+        )
+        .unwrap();
+        let feb_dt = jan31_dt.add_months(1).unwrap();
+        // 2024 is a leap year => Feb has 29 days
+        assert_eq!(feb_dt.day(), 29);
     }
 
     #[test]
@@ -1996,11 +2075,54 @@ mod tests {
         assert!(!DateTime::is_valid_time("24:00:00"));
         assert!(!DateTime::is_valid_time("23:60:00"));
         assert!(!DateTime::is_valid_time("23:59:60"));
+
+        // Year validation must agree with what `from_components` accepts:
+        // the `time::Date` range is -9999..=9999.
+        assert!(DateTime::is_valid_year("0"));
+        assert!(DateTime::is_valid_year("2024"));
+        assert!(DateTime::is_valid_year("9999"));
+        assert!(DateTime::is_valid_year("-9999"));
+        assert!(!DateTime::is_valid_year("10000"));
+        assert!(!DateTime::is_valid_year("-10000"));
+        assert!(!DateTime::is_valid_year("99999999"));
+        assert!(!DateTime::is_valid_year("abc"));
+    }
+
+    #[test]
+    fn test_iso_year_at_boundary() {
+        // 2022-01-01 is a Saturday and falls in ISO week 52 of 2021,
+        // so its ISO year (2021) differs from its calendar year (2022).
+        let dt = DateTime::from_components(
+            2022,
+            1,
+            1,
+            0,
+            0,
+            0,
+            UtcOffset::UTC,
+        )
+        .unwrap();
+        assert_eq!(dt.year(), 2022);
+        assert_eq!(dt.iso_week(), 52);
+        assert_eq!(dt.iso_year(), 2021);
+
+        // Mid-year: ISO year matches calendar year.
+        let mid = DateTime::from_components(
+            2024,
+            6,
+            15,
+            0,
+            0,
+            0,
+            UtcOffset::UTC,
+        )
+        .unwrap();
+        assert_eq!(mid.year(), mid.iso_year());
     }
 
     #[test]
     fn test_range_operations() {
-        let dt = DateTime::from_components(
+        let dt_val = DateTime::from_components(
             2024,
             1,
             15,
@@ -2008,50 +2130,30 @@ mod tests {
             0,
             0,
             UtcOffset::UTC,
-        );
-        assert!(dt.is_ok());
-        if let Ok(dt_val) = dt {
-            // Test week ranges
-            let week_start = dt_val.start_of_week();
-            assert!(week_start.is_ok());
-            if let Ok(ws) = week_start {
-                assert_eq!(ws.weekday(), Weekday::Monday);
-            }
+        )
+        .unwrap();
+        // Test week ranges
+        let ws = dt_val.start_of_week().unwrap();
+        assert_eq!(ws.weekday(), Weekday::Monday);
 
-            let week_end = dt_val.end_of_week();
-            assert!(week_end.is_ok());
-            if let Ok(we) = week_end {
-                assert_eq!(we.weekday(), Weekday::Sunday);
-            }
+        let we = dt_val.end_of_week().unwrap();
+        assert_eq!(we.weekday(), Weekday::Sunday);
 
-            // Test month ranges
-            let month_start = dt_val.start_of_month();
-            assert!(month_start.is_ok());
-            if let Ok(ms) = month_start {
-                assert_eq!(ms.day(), 1);
-            }
+        // Test month ranges
+        let ms = dt_val.start_of_month().unwrap();
+        assert_eq!(ms.day(), 1);
 
-            let month_end = dt_val.end_of_month();
-            assert!(month_end.is_ok());
-            if let Ok(me) = month_end {
-                assert_eq!(me.day(), 31);
-            }
+        let me = dt_val.end_of_month().unwrap();
+        assert_eq!(me.day(), 31);
 
-            // Test year ranges
-            let year_start = dt_val.start_of_year();
-            assert!(year_start.is_ok());
-            if let Ok(ys) = year_start {
-                assert_eq!(ys.month(), Month::January);
-                assert_eq!(ys.day(), 1);
-            }
+        // Test year ranges
+        let ys = dt_val.start_of_year().unwrap();
+        assert_eq!(ys.month(), Month::January);
+        assert_eq!(ys.day(), 1);
 
-            let year_end = dt_val.end_of_year();
-            assert!(year_end.is_ok());
-            if let Ok(ye) = year_end {
-                assert_eq!(ye.month(), Month::December);
-                assert_eq!(ye.day(), 31);
-            }
-        }
+        let ye = dt_val.end_of_year().unwrap();
+        assert_eq!(ye.month(), Month::December);
+        assert_eq!(ye.day(), 31);
     }
 
     #[test]
@@ -2075,13 +2177,11 @@ mod tests {
             UtcOffset::UTC,
         );
 
-        assert!(dt1.is_ok());
-        assert!(dt2.is_ok());
-        if let (Ok(a), Ok(b)) = (dt1, dt2) {
-            assert!(a < b);
-            assert!(b > a);
-            assert_ne!(a, b);
-        }
+        let a = dt1.unwrap();
+        let b = dt2.unwrap();
+        assert!(a < b);
+        assert!(b > a);
+        assert_ne!(a, b);
     }
 
     #[test]
@@ -2105,10 +2205,10 @@ mod tests {
             UtcOffset::UTC,
         );
 
-        if let (Ok(a), Ok(b)) = (dt1, dt2) {
-            let duration = b.duration_since(&a);
-            assert_eq!(duration.whole_days(), 1);
-        }
+        let a = dt1.unwrap();
+        let b = dt2.unwrap();
+        let duration = b.duration_since(&a);
+        assert_eq!(duration.whole_days(), 1);
     }
 
     #[test]
@@ -2121,7 +2221,7 @@ mod tests {
 
     #[test]
     fn test_display() {
-        let dt = DateTime::from_components(
+        let dt_val = DateTime::from_components(
             2024,
             1,
             1,
@@ -2129,11 +2229,9 @@ mod tests {
             0,
             0,
             UtcOffset::UTC,
-        );
-        assert!(dt.is_ok());
-        if let Ok(dt_val) = dt {
-            assert_eq!(dt_val.to_string(), "2024-01-01T00:00:00Z");
-        }
+        )
+        .unwrap();
+        assert_eq!(dt_val.to_string(), "2024-01-01T00:00:00Z");
     }
 
     #[test]
@@ -2157,16 +2255,14 @@ mod tests {
             0,
             UtcOffset::UTC,
         );
-        assert!(dt1.is_ok());
-        assert!(dt2.is_ok());
-        if let (Ok(a), Ok(b)) = (dt1, dt2) {
-            let mut set = HashSet::new();
-            assert!(
-                set.insert(a),
-                "The set should not have contained `a` before"
-            );
-            assert!(set.contains(&b));
-        }
+        let a = dt1.unwrap();
+        let b = dt2.unwrap();
+        let mut set = HashSet::new();
+        assert!(
+            set.insert(a),
+            "The set should not have contained `a` before"
+        );
+        assert!(set.contains(&b));
     }
 
     #[test]
@@ -2180,15 +2276,237 @@ mod tests {
             .second(45)
             .offset(UtcOffset::UTC);
 
-        let dt = builder.build();
-        assert!(dt.is_ok());
-        if let Ok(value) = dt {
-            assert_eq!(value.year(), 2024);
-            assert_eq!(value.month(), Month::January);
-            assert_eq!(value.day(), 1);
-            assert_eq!(value.hour(), 12);
-            assert_eq!(value.minute(), 30);
-            assert_eq!(value.second(), 45);
-        }
+        let value = builder.build().unwrap();
+        assert_eq!(value.year(), 2024);
+        assert_eq!(value.month(), Month::January);
+        assert_eq!(value.day(), 1);
+        assert_eq!(value.hour(), 12);
+        assert_eq!(value.minute(), 30);
+        assert_eq!(value.second(), 45);
+    }
+
+    // -------------------------------------------------------------------------
+    // Error-path coverage. These tests pin every fallible production branch
+    // so that the coverage report stays at (or near) 100% and a future
+    // refactor cannot silently turn an error into a panic.
+    // -------------------------------------------------------------------------
+
+    #[test]
+    fn test_set_time_invalid_returns_err() {
+        let dt = DateTime::new();
+        // Hour out of range — exercises the `Time::from_hms` Err arm.
+        assert!(matches!(
+            dt.set_time(24, 0, 0),
+            Err(DateTimeError::InvalidTime)
+        ));
+        assert!(matches!(
+            dt.set_time(0, 60, 0),
+            Err(DateTimeError::InvalidTime)
+        ));
+        assert!(matches!(
+            dt.set_time(0, 0, 60),
+            Err(DateTimeError::InvalidTime)
+        ));
+    }
+
+    #[test]
+    fn test_set_date_invalid_month_returns_err() {
+        let dt = DateTime::new();
+        // Month 13 — exercises the `Month::try_from` Err arm in `set_date`.
+        assert!(matches!(
+            dt.set_date(2024, 13, 1),
+            Err(DateTimeError::InvalidDate)
+        ));
+        // Day 30 in February — exercises the `Date::from_calendar_date` Err arm.
+        assert!(matches!(
+            dt.set_date(2024, 2, 30),
+            Err(DateTimeError::InvalidDate)
+        ));
+    }
+
+    #[test]
+    fn test_parse_custom_format_invalid_input_returns_err() {
+        // Format is valid, input does not match it.
+        let result = DateTime::parse_custom_format(
+            "not-a-date",
+            "[year]-[month]-[day]",
+        );
+        assert!(matches!(result, Err(DateTimeError::InvalidFormat)));
+    }
+
+    #[test]
+    fn test_add_months_overflow_returns_err() {
+        let dt = DateTime::from_components(
+            9999,
+            12,
+            1,
+            0,
+            0,
+            0,
+            UtcOffset::UTC,
+        )
+        .unwrap();
+        // i32::MAX months will overflow the year*12 + months calculation,
+        // exercising the `checked_*` Err arm.
+        assert!(matches!(
+            dt.add_months(i32::MAX),
+            Err(DateTimeError::InvalidDate)
+        ));
+        assert!(matches!(
+            dt.add_months(i32::MIN),
+            Err(DateTimeError::InvalidDate)
+        ));
+    }
+
+    #[test]
+    fn test_add_months_year_out_of_range_returns_err() {
+        let dt = DateTime::from_components(
+            9999,
+            12,
+            1,
+            0,
+            0,
+            0,
+            UtcOffset::UTC,
+        )
+        .unwrap();
+        // 12 months past Dec 9999 lands in year 10000, which `time::Date`
+        // refuses by default. Exercises the final `Date::from_calendar_date`
+        // Err arm in `add_months`.
+        assert!(matches!(
+            dt.add_months(12),
+            Err(DateTimeError::InvalidDate)
+        ));
+    }
+
+    #[test]
+    fn test_add_years_overflow_returns_err() {
+        let dt = DateTime::new();
+        // `i32::MAX` years overflows the `checked_add` in `add_years`.
+        assert!(matches!(
+            dt.add_years(i32::MAX),
+            Err(DateTimeError::InvalidDate)
+        ));
+    }
+
+    #[test]
+    fn test_add_years_out_of_range_returns_err() {
+        let dt = DateTime::from_components(
+            9999,
+            6,
+            15,
+            0,
+            0,
+            0,
+            UtcOffset::UTC,
+        )
+        .unwrap();
+        // year 10000 is outside `time::Date::MAX`.
+        assert!(matches!(
+            dt.add_years(1),
+            Err(DateTimeError::InvalidDate)
+        ));
+    }
+
+    #[test]
+    fn test_is_valid_time_wrong_part_count() {
+        // Two parts — exercises the `parts.len() != 3` early return.
+        assert!(!DateTime::is_valid_time("12:00"));
+        // Four parts — same path.
+        assert!(!DateTime::is_valid_time("12:00:00:00"));
+        // Empty.
+        assert!(!DateTime::is_valid_time(""));
+        // Just colons.
+        assert!(!DateTime::is_valid_time("::"));
+    }
+
+    #[test]
+    fn test_serde_round_trip() {
+        let dt = DateTime::from_components(
+            2024,
+            6,
+            15,
+            12,
+            30,
+            45,
+            UtcOffset::UTC,
+        )
+        .unwrap();
+        let json = serde_json::to_string(&dt).unwrap();
+        let parsed: DateTime = serde_json::from_str(&json).unwrap();
+        assert_eq!(dt, parsed);
+    }
+
+    #[test]
+    fn test_serde_deserialize_rejects_invalid_string() {
+        // Exercises the deserialize Err arm by feeding garbage.
+        let result: Result<DateTime, _> =
+            serde_json::from_str("\"not-a-datetime\"");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_format_time_in_timezone_invalid_tz_returns_err() {
+        let dt = DateTime::new();
+        let result =
+            dt.format_time_in_timezone("NOPE_ZONE", "[hour]:[minute]");
+        assert!(matches!(result, Err(DateTimeError::InvalidTimezone)));
+    }
+
+    #[test]
+    fn test_set_time_ok_path() {
+        let dt = DateTime::from_components(
+            2024,
+            6,
+            15,
+            0,
+            0,
+            0,
+            UtcOffset::UTC,
+        )
+        .unwrap();
+        let updated = dt.set_time(10, 30, 45).unwrap();
+        assert_eq!(updated.hour(), 10);
+        assert_eq!(updated.minute(), 30);
+        assert_eq!(updated.second(), 45);
+        // Date and offset preserved.
+        assert_eq!(updated.year(), 2024);
+        assert_eq!(updated.month(), Month::June);
+        assert_eq!(updated.day(), 15);
+        assert_eq!(updated.offset(), UtcOffset::UTC);
+    }
+
+    #[test]
+    fn test_is_valid_iso_week() {
+        assert!(DateTime::is_valid_iso_week("1"));
+        assert!(DateTime::is_valid_iso_week("52"));
+        assert!(DateTime::is_valid_iso_week("53"));
+        assert!(!DateTime::is_valid_iso_week("0"));
+        assert!(!DateTime::is_valid_iso_week("54"));
+        assert!(!DateTime::is_valid_iso_week("not-a-number"));
+    }
+
+    #[test]
+    fn test_datetime_builder_default() {
+        // Exercises `impl Default for DateTimeBuilder { fn default() }`.
+        let builder = DateTimeBuilder::default();
+        let dt = builder.build().unwrap();
+        assert_eq!(dt.year(), 1970);
+        assert_eq!(dt.month(), Month::January);
+        assert_eq!(dt.day(), 1);
+        assert_eq!(dt.offset(), UtcOffset::UTC);
+    }
+
+    #[test]
+    fn test_days_in_month_invalid_month() {
+        // Exercises the catch-all `_ => Err(...)` arm in `days_in_month`.
+        assert!(matches!(
+            days_in_month(2024, 0),
+            Err(DateTimeError::InvalidDate)
+        ));
+        assert!(matches!(
+            days_in_month(2024, 13),
+            Err(DateTimeError::InvalidDate)
+        ));
     }
 }

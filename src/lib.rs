@@ -99,7 +99,7 @@ pub mod macros;
 ///
 /// Provides a convenient way to import commonly used types with a single use statement.
 pub mod prelude {
-    pub use crate::datetime::DateTime;
+    pub use crate::datetime::{DateTime, DateTimeBuilder};
     pub use crate::error::{AppError, DateTimeError};
 }
 

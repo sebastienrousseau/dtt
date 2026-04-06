@@ -222,6 +222,44 @@ mod tests {
             Ok(())
         }
 
+        /// Round-trips every `DateTimeError` variant that supports both
+        /// directions, plus pins the documented one-way behaviour of
+        /// `ParseError` and `ComponentRange`.
+        #[test]
+        fn test_serde_all_variants(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            // Round-trippable variants.
+            for variant in [
+                DateTimeError::InvalidFormat,
+                DateTimeError::InvalidTimezone,
+                DateTimeError::InvalidDate,
+                DateTimeError::InvalidTime,
+            ] {
+                let s = serde_json::to_string(&variant)?;
+                let parsed: DateTimeError = serde_json::from_str(&s)?;
+                assert_eq!(variant, parsed);
+            }
+
+            // ComponentRange serialises to a fixed string but cannot
+            // be deserialised (intentional, since the inner type has no
+            // public constructor). Trigger a real ComponentRange from
+            // the `time` crate so we exercise the serialise branch.
+            use time::{Date, Month};
+            let cr_err =
+                Date::from_calendar_date(2024, Month::January, 32)
+                    .expect_err("day 32 must be invalid");
+            let dtt_err: DateTimeError = cr_err.into();
+            let serialized = serde_json::to_string(&dtt_err)?;
+            assert_eq!(serialized, "\"ComponentRange\"");
+
+            // The deserialise side is documented as one-way: it returns
+            // an error rather than reconstructing a synthetic value.
+            assert!(serde_json::from_str::<DateTimeError>(&serialized)
+                .is_err());
+
+            Ok(())
+        }
+
         /// Tests deserialization of `DateTimeError` from strings.
         ///
         /// This test verifies that `DateTimeError` can be deserialized from valid
