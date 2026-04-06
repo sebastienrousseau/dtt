@@ -44,7 +44,7 @@ fn bench_format_iso_8601(c: &mut Criterion) {
     let date = black_box(DateTime::new());
     let _ = c.bench_function("format ISO 8601", |b| {
         b.iter(|| {
-            if let Ok(output) = date.format_iso8601() {
+            if let Ok(output) = date.format_rfc3339() {
                 let _ = output;
             }
         });
@@ -176,7 +176,7 @@ fn bench_convert_timezone(c: &mut Criterion) {
     };
     let _ = c.bench_function("convert timezone", |b| {
         b.iter(|| {
-            if let Ok(new_date) = date.convert_to_tz("EST") {
+            if let Ok(new_date) = date.convert_to_tz("EST_USA") {
                 let _ = new_date;
             }
         });

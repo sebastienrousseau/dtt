@@ -205,27 +205,6 @@ macro_rules! dtt_min {
     }};
 }
 
-/// Creates a new vector containing the provided elements.
-///
-/// # Arguments
-///
-/// - `$($elem:expr),* $(,)?`: A comma-separated list of expressions. Each expression represents an element to be added to the vector.
-///
-/// # Example
-///
-/// ```rust
-/// use dtt::dtt_create_vec;
-///
-/// let v = dtt_create_vec![1, 2, 3];
-/// assert_eq!(v, vec![1, 2, 3]);
-/// ```
-#[macro_export]
-macro_rules! dtt_create_vec {
-    ($($elem:expr),* $(,)?) => {{
-        vec![$($elem),*]
-    }};
-}
-
 /// Returns the maximum of the given values.
 ///
 /// # Arguments
@@ -397,13 +376,14 @@ macro_rules! dtt_sub_days {
 ///
 /// # Parameters
 ///
-/// - `$dt1:expr`: The first `DateTime` instance.
-/// - `$dt2:expr`: The second `DateTime` instance.
+/// - `$dt1:expr`: The first `DateTime` instance, as a string parseable as `i64`.
+/// - `$dt2:expr`: The second `DateTime` instance, as a string parseable as `i64`.
 /// - `$unit:expr`: The unit for the difference (seconds, days, etc.).
 ///
 /// # Returns
 ///
-/// The difference in the specified unit between the two `DateTime` instances.
+/// `Some(i64)` containing the absolute difference in the specified unit, or
+/// `None` if either input cannot be parsed as `i64`.
 ///
 /// # Example
 ///
@@ -413,7 +393,7 @@ macro_rules! dtt_sub_days {
 /// let dt1 = "1609459200"; // 2021-01-01 00:00:00 UTC
 /// let dt2 = "1609459230"; // 2021-01-01 00:00:30 UTC
 /// let seconds_difference = dtt_diff!(dt1, dt2, 1);
-/// assert_eq!(seconds_difference, 30i64);
+/// assert_eq!(seconds_difference, Some(30i64));
 /// ```
 #[macro_export]
 macro_rules! dtt_diff {
@@ -422,9 +402,9 @@ macro_rules! dtt_diff {
             (Ok(dt1), Ok(dt2)) => {
                 let difference =
                     if dt1 <= dt2 { dt2 - dt1 } else { dt1 - dt2 };
-                (difference / $unit).abs()
+                Some((difference / $unit).abs())
             }
-            _ => panic!("Error: Invalid input"),
+            _ => None,
         }
     }};
 }
@@ -445,7 +425,7 @@ macro_rules! dtt_diff {
 /// let dt1 = "1609459200"; // 2021-01-01 00:00:00 UTC
 /// let dt2 = "1609459230"; // 2021-01-01 00:00:30 UTC
 /// let seconds_difference = dtt_diff_seconds!(dt1, dt2);
-/// assert_eq!(seconds_difference, 30i64);
+/// assert_eq!(seconds_difference, Some(30i64));
 /// ```
 #[macro_export]
 macro_rules! dtt_diff_seconds {
@@ -470,7 +450,7 @@ macro_rules! dtt_diff_seconds {
 /// let dt1 = "1609459200"; // 2021-01-01 00:00:00 UTC
 /// let dt2 = "1609545600"; // 2021-01-02 00:00:00 UTC
 /// let days_difference = dtt_diff_days!(dt1, dt2);
-/// assert_eq!(days_difference, 1i64);
+/// assert_eq!(days_difference, Some(1i64));
 /// ```
 #[macro_export]
 macro_rules! dtt_diff_days {

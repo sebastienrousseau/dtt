@@ -29,7 +29,7 @@
 //! let maybe_dt = DateTime::parse("2024-01-01T12:00:00Z");
 //! if let Ok(dt) = maybe_dt {
 //!     // Convert timezone
-//!     let est = dt.convert_to_tz("EST");
+//!     let est = dt.convert_to_tz("EST_USA");
 //!     if let Ok(est_dt) = est {
 //!         // ...
 //!     }
@@ -47,7 +47,7 @@
 #![warn(clippy::pedantic, clippy::nursery, clippy::cargo)]
 
 use crate::error::DateTimeError;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::{
     cmp::Ordering,
     collections::HashMap,
@@ -55,6 +55,7 @@ use std::{
     hash::{Hash, Hasher},
     ops::{Add, Sub},
     str::FromStr,
+    sync::LazyLock,
 };
 use time::{
     format_description, Date, Duration, Month, OffsetDateTime,
@@ -94,66 +95,116 @@ const MAX_ORDINAL_DAY: u16 = 366;
 /// use dtt::datetime::DateTime;
 ///
 /// let utc = DateTime::new();
-/// let maybe_est = utc.convert_to_tz("EST");
+/// let maybe_est = utc.convert_to_tz("EST_USA");
 /// if let Ok(est) = maybe_est {
 ///     // ...
 /// }
 /// ```
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug)]
 pub struct DateTime {
     /// The date and time in UTC (when offset = `UtcOffset::UTC`) or a
     /// user-chosen offset if `offset != UtcOffset::UTC`.
-    pub datetime: PrimitiveDateTime,
+    pub(crate) datetime: PrimitiveDateTime,
     /// The timezone offset from UTC.
-    pub offset: UtcOffset,
+    pub(crate) offset: UtcOffset,
 }
 
-lazy_static::lazy_static! {
-    /// Static mapping of timezone abbreviations to their `UtcOffset`.
-    ///
-    /// # Note
-    ///
-    /// This is not an exhaustive list of timezones. It is a convenient subset
-    /// for demonstration purposes. Real-world usage might integrate a
-    /// more robust timezone library or database.
-    static ref TIMEZONE_OFFSETS: HashMap<&'static str, Result<UtcOffset, DateTimeError>> = {
-        let mut m = HashMap::new();
-        let _ = m.insert("UTC", Ok(UtcOffset::UTC));
-        let _ = m.insert("GMT", Ok(UtcOffset::UTC));
-
-        // North American time zones
-        let _ = m.insert("EST", UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("EDT", UtcOffset::from_hms(-4, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("CST", UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("CDT", UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("MST", UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("MDT", UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("PST", UtcOffset::from_hms(-8, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("PDT", UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from));
-
-        // European time zones
-        let _ = m.insert("CET", UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("CEST", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("EET", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("EEST", UtcOffset::from_hms(3, 0, 0).map_err(DateTimeError::from));
-
-        // Asian time zones
-        let _ = m.insert("JST", UtcOffset::from_hms(9, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("IST", UtcOffset::from_hms(5, 30, 0).map_err(DateTimeError::from));
-        let _ = m.insert("HKT", UtcOffset::from_hms(8, 0, 0).map_err(DateTimeError::from));
-
-        // Australian time zones
-        let _ = m.insert("AEDT", UtcOffset::from_hms(11, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert("AEST", UtcOffset::from_hms(10, 0, 0).map_err(DateTimeError::from));
-        let _ = m.insert(
-            "WADT",
-            UtcOffset::from_hms(8, 45, 0)
-                .map_err(DateTimeError::from)
-        );
-
-        m
-    };
+impl Serialize for DateTime {
+    /// Serializes a `DateTime` as a canonical RFC 3339 string. Two
+    /// `DateTime` values that compare equal under `PartialEq` always
+    /// produce equal serialized strings.
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = self.format_rfc3339().map_err(serde::ser::Error::custom)?;
+        serializer.serialize_str(&s)
+    }
 }
+
+impl<'de> Deserialize<'de> for DateTime {
+    /// Deserializes a `DateTime` from an RFC 3339 string.
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = <&str>::deserialize(deserializer)?;
+        Self::parse(s).map_err(serde::de::Error::custom)
+    }
+}
+
+/// Static mapping of timezone abbreviations to their `UtcOffset`.
+///
+/// # Note
+///
+/// This is not an exhaustive list of timezones. It is a convenient subset
+/// for demonstration purposes. Real-world usage might integrate a
+/// more robust timezone library or database.
+///
+/// ## Disambiguation
+///
+/// Several common abbreviations refer to multiple zones in the real world.
+/// To avoid silent wrong-answer bugs, ambiguous bare codes (`IST`, `CST`,
+/// `EST`) are **not** accepted; callers must use an explicit suffixed form:
+///
+/// | Abbreviation | Resolves to |
+/// |--------------|-------------|
+/// | `IST_INDIA`   | +05:30 (Indian Standard Time) |
+/// | `IST_IRELAND` | +01:00 (Irish Standard Time) |
+/// | `IST_ISRAEL`  | +02:00 (Israel Standard Time) |
+/// | `CST_USA`     | -06:00 (US Central Standard Time) |
+/// | `CST_CHINA`   | +08:00 (China Standard Time) |
+/// | `EST_USA`     | -05:00 (US Eastern Standard Time) |
+/// | `EST_AUS`     | +10:00 (Australian Eastern Standard Time) |
+///
+/// `WADT` (which historically meant Western Australia DST) is not exposed
+/// because its `+08:45` offset corresponds to `ACWST` (Australian Central
+/// Western Standard Time); use `ACWST` instead.
+static TIMEZONE_OFFSETS: LazyLock<
+    HashMap<&'static str, Result<UtcOffset, DateTimeError>>,
+> = LazyLock::new(|| {
+    let mut m = HashMap::new();
+    let _ = m.insert("UTC", Ok(UtcOffset::UTC));
+    let _ = m.insert("GMT", Ok(UtcOffset::UTC));
+
+    // North American time zones (USA)
+    let _ = m.insert("EST_USA", UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("EDT", UtcOffset::from_hms(-4, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("CST_USA", UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("CDT", UtcOffset::from_hms(-5, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("MST", UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("MDT", UtcOffset::from_hms(-6, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("PST", UtcOffset::from_hms(-8, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("PDT", UtcOffset::from_hms(-7, 0, 0).map_err(DateTimeError::from));
+
+    // European time zones
+    let _ = m.insert("CET", UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("CEST", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("EET", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("EEST", UtcOffset::from_hms(3, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("IST_IRELAND", UtcOffset::from_hms(1, 0, 0).map_err(DateTimeError::from));
+
+    // Middle East time zones
+    let _ = m.insert("IST_ISRAEL", UtcOffset::from_hms(2, 0, 0).map_err(DateTimeError::from));
+
+    // Asian time zones
+    let _ = m.insert("JST", UtcOffset::from_hms(9, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("IST_INDIA", UtcOffset::from_hms(5, 30, 0).map_err(DateTimeError::from));
+    let _ = m.insert("CST_CHINA", UtcOffset::from_hms(8, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("HKT", UtcOffset::from_hms(8, 0, 0).map_err(DateTimeError::from));
+
+    // Australian time zones
+    let _ = m.insert("EST_AUS", UtcOffset::from_hms(10, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("AEDT", UtcOffset::from_hms(11, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert("AEST", UtcOffset::from_hms(10, 0, 0).map_err(DateTimeError::from));
+    let _ = m.insert(
+        "ACWST",
+        UtcOffset::from_hms(8, 45, 0)
+            .map_err(DateTimeError::from)
+    );
+
+    m
+});
 
 // -----------------------------------------------------------------------------
 // Builder Pattern
@@ -211,15 +262,7 @@ pub struct DateTimeBuilder {
 
 impl Default for DateTimeBuilder {
     fn default() -> Self {
-        Self {
-            year: 1970,
-            month: 1,
-            day: 1,
-            hour: 0,
-            minute: 0,
-            second: 0,
-            offset: UtcOffset::UTC,
-        }
+        Self::new()
     }
 }
 
@@ -339,7 +382,7 @@ impl DateTime {
     ///
     /// # Arguments
     ///
-    /// * `tz` - A timezone abbreviation (e.g., "UTC", "EST", "PST")
+    /// * `tz` - A timezone abbreviation (e.g., "UTC", "`EST_USA`", "PST")
     ///
     /// # Returns
     ///
@@ -351,7 +394,7 @@ impl DateTime {
     /// ```
     /// use dtt::datetime::DateTime;
     ///
-    /// let maybe_est_time = DateTime::new_with_tz("EST");
+    /// let maybe_est_time = DateTime::new_with_tz("EST_USA");
     /// if let Ok(est_time) = maybe_est_time {
     ///     // ...
     /// }
@@ -573,7 +616,7 @@ impl DateTime {
     ///
     /// # Arguments
     ///
-    /// * `tz` - Target timezone abbreviation (e.g., "UTC", "EST", "PST").
+    /// * `tz` - Target timezone abbreviation (e.g., "UTC", "`EST_USA`", "PST").
     /// * `format_str` - A format description (see the `time` crate documentation
     ///   for the supported syntax).
     ///
@@ -595,7 +638,7 @@ impl DateTime {
     /// use dtt::datetime::DateTime;
     ///
     /// let dt = DateTime::new();
-    /// let result = dt.format_time_in_timezone("EST", "[hour]:[minute]:[second]");
+    /// let result = dt.format_time_in_timezone("EST_USA", "[hour]:[minute]:[second]");
     /// if let Ok(formatted_str) = result {
     ///     println!("Time in EST: {}", formatted_str);
     /// }
@@ -637,8 +680,11 @@ impl DateTime {
     /// ```
     #[must_use]
     pub fn is_valid_iso_8601(input: &str) -> bool {
-        // 1. Try parsing the string as RFC 3339 (a strict subset of ISO 8601).
-        if PrimitiveDateTime::parse(
+        // Mirror the strictness of `parse` so that
+        // `is_valid_iso_8601(x) <=> parse(x).is_ok()`.
+
+        // 1. Try the strict offset-aware path (matches `parse`).
+        if OffsetDateTime::parse(
             input,
             &format_description::well_known::Rfc3339,
         )
@@ -647,17 +693,18 @@ impl DateTime {
             return true;
         }
 
-        // 2. Otherwise, try parsing as just the date portion of ISO 8601 (yyyy-mm-dd).
-        if Date::parse(
-            input,
-            &format_description::well_known::Iso8601::DATE,
-        )
-        .is_ok()
-        {
-            return true;
+        // 2. Only accept date-only inputs that don't carry a time component.
+        // `time::Date::parse` with `Iso8601::DATE` is lenient with trailing
+        // `T<…>` content; gating on the absence of `T`/space prevents the
+        // validator from accepting strings the parser would reject.
+        if !input.contains('T') && !input.contains(' ') {
+            return Date::parse(
+                input,
+                &format_description::well_known::Iso8601::DATE,
+            )
+            .is_ok();
         }
 
-        // 3. If both attempts fail, it's not a valid ISO 8601 or RFC 3339 datetime/date.
         false
     }
 
@@ -820,26 +867,32 @@ impl DateTime {
     /// Returns a `DateTimeError` if the input string is not a valid date/time.
     ///
     pub fn parse(input: &str) -> Result<Self, DateTimeError> {
-        // Try RFC 3339 format first
-        if let Ok(dt) = PrimitiveDateTime::parse(
+        // Try RFC 3339 format first (preserves the offset).
+        if let Ok(odt) = OffsetDateTime::parse(
             input,
             &format_description::well_known::Rfc3339,
         ) {
             return Ok(Self {
-                datetime: dt,
-                offset: UtcOffset::UTC,
+                datetime: PrimitiveDateTime::new(odt.date(), odt.time()),
+                offset: odt.offset(),
             });
         }
 
-        // Fall back to ISO 8601 date format
-        if let Ok(date) = Date::parse(
-            input,
-            &format_description::well_known::Iso8601::DATE,
-        ) {
-            return Ok(Self {
-                datetime: PrimitiveDateTime::new(date, Time::MIDNIGHT),
-                offset: UtcOffset::UTC,
-            });
+        // Only try date-only parsing if no time component is present.
+        // This prevents silently truncating "2024-01-01T12:34:56" to midnight.
+        if !input.contains('T') && !input.contains(' ') {
+            if let Ok(date) = Date::parse(
+                input,
+                &format_description::well_known::Iso8601::DATE,
+            ) {
+                return Ok(Self {
+                    datetime: PrimitiveDateTime::new(
+                        date,
+                        Time::MIDNIGHT,
+                    ),
+                    offset: UtcOffset::UTC,
+                });
+            }
         }
 
         Err(DateTimeError::InvalidFormat)
@@ -956,31 +1009,6 @@ impl DateTime {
             .map_err(|_| DateTimeError::InvalidFormat)
     }
 
-    /// Formats the `DateTime` as an ISO 8601 string (YYYY-MM-DDTHH:MM:SS).
-    ///
-    /// # Returns
-    ///
-    /// Returns a `Result` containing either the formatted ISO 8601 string
-    /// or a `DateTimeError` if formatting fails.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use dtt::datetime::DateTime;
-    ///
-    /// let dt = DateTime::new();
-    /// let maybe_iso8601 = dt.format_iso8601();
-    /// assert!(maybe_iso8601.is_ok());
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns a `DateTimeError` if formatting fails.
-    ///
-    pub fn format_iso8601(&self) -> Result<String, DateTimeError> {
-        self.format("[year]-[month]-[day]T[hour]:[minute]:[second]")
-    }
-
     /// Updates the `DateTime` to the current time while preserving the timezone offset.
     ///
     /// # Returns
@@ -1021,7 +1049,7 @@ impl DateTime {
     ///
     /// # Arguments
     ///
-    /// * `new_tz` - Target timezone abbreviation (e.g., "UTC", "EST", "PST")
+    /// * `new_tz` - Target timezone abbreviation (e.g., "UTC", "`EST_USA`", "PST")
     ///
     /// # Returns
     ///
@@ -1034,7 +1062,7 @@ impl DateTime {
     /// use dtt::datetime::DateTime;
     ///
     /// let utc = DateTime::new();
-    /// let maybe_est = utc.convert_to_tz("EST");
+    /// let maybe_est = utc.convert_to_tz("EST_USA");
     /// assert!(maybe_est.is_ok());
     /// ```
     ///
@@ -1198,12 +1226,17 @@ impl DateTime {
         months: i32,
     ) -> Result<Self, DateTimeError> {
         let current_date = self.datetime.date();
-        let total_months =
-            current_date.year() * 12 + current_date.month() as i32 - 1
-                + months;
+        let total_months = current_date
+            .year()
+            .checked_mul(12)
+            .and_then(|v| v.checked_add(i32::from(current_date.month() as u8)))
+            .and_then(|v| v.checked_sub(1))
+            .and_then(|v| v.checked_add(months))
+            .ok_or(DateTimeError::InvalidDate)?;
 
-        let target_year = total_months / 12;
-        let target_month = u8::try_from((total_months % 12) + 1);
+        let target_year = total_months.div_euclid(12);
+        let target_month =
+            u8::try_from(total_months.rem_euclid(12) + 1);
 
         let target_month =
             target_month.map_err(|_| DateTimeError::InvalidDate)?;
@@ -1598,9 +1631,19 @@ impl FromStr for DateTime {
 }
 
 impl Default for DateTime {
-    /// Returns the current UTC time as the default `DateTime` value.
+    /// Returns the Unix epoch (1970-01-01T00:00:00Z) as the default value.
+    ///
+    /// `Default` is intentionally deterministic; for the current wall-clock
+    /// time use [`DateTime::new`].
     fn default() -> Self {
-        Self::new()
+        // Safe by construction: 1970-01-01 is a valid calendar date and
+        // 00:00:00 is a valid time, so neither call can fail in practice.
+        let date = Date::from_calendar_date(1970, Month::January, 1)
+            .unwrap_or(Date::MIN);
+        Self {
+            datetime: PrimitiveDateTime::new(date, Time::MIDNIGHT),
+            offset: UtcOffset::UTC,
+        }
     }
 }
 
@@ -1656,6 +1699,15 @@ impl Sub<Duration> for DateTime {
     }
 }
 
+impl PartialEq for DateTime {
+    /// Compares two `DateTime` values by their absolute instant (normalized to UTC).
+    fn eq(&self, other: &Self) -> bool {
+        self.cmp(other) == Ordering::Equal
+    }
+}
+
+impl Eq for DateTime {}
+
 impl PartialOrd for DateTime {
     /// Compares two `DateTime` for ordering, returning `Some(Ordering)`.
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
@@ -1664,17 +1716,25 @@ impl PartialOrd for DateTime {
 }
 
 impl Ord for DateTime {
-    /// Compares two `DateTimes` for ordering.
+    /// Compares two `DateTime` values by their absolute instant (normalized to UTC).
     fn cmp(&self, other: &Self) -> Ordering {
-        self.datetime.cmp(&other.datetime)
+        let self_utc = self.datetime.assume_offset(self.offset);
+        let other_utc = other.datetime.assume_offset(other.offset);
+        self_utc.cmp(&other_utc)
     }
 }
 
 impl Hash for DateTime {
-    /// Computes a hash value for the `DateTime` based on its components.
+    /// Computes a hash value for the `DateTime` based on its absolute UTC instant.
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.datetime.hash(state);
-        self.offset.hash(state);
+        self.datetime
+            .assume_offset(self.offset)
+            .unix_timestamp()
+            .hash(state);
+        self.datetime
+            .assume_offset(self.offset)
+            .nanosecond()
+            .hash(state);
     }
 }
 
@@ -1751,7 +1811,7 @@ mod tests {
 
     #[test]
     fn test_new_with_tz() {
-        let est = DateTime::new_with_tz("EST");
+        let est = DateTime::new_with_tz("EST_USA");
         assert!(est.is_ok());
         if let Ok(est_dt) = est {
             assert_eq!(est_dt.offset().whole_hours(), -5);
@@ -1856,7 +1916,7 @@ mod tests {
     #[test]
     fn test_timezone_conversion() {
         let utc = DateTime::new();
-        let est = utc.convert_to_tz("EST");
+        let est = utc.convert_to_tz("EST_USA");
         assert!(est.is_ok());
         if let Ok(est_val) = est {
             assert_eq!(est_val.offset().whole_hours(), -5);

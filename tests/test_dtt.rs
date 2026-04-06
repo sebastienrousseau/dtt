@@ -168,14 +168,30 @@ mod tests {
         assert!(
             rfc3339_format.contains('T'),
             "RFC3339 format should contain 'T'"
-        ); // Use char for single character
-
-        let iso8601_format = date.format_iso8601()?;
-        assert!(
-            iso8601_format.contains('T'),
-            "ISO8601 format should contain 'T'"
-        ); // Use char for single character
+        );
 
         Ok(())
+    }
+
+    /// Regression test: `is_valid_iso_8601` and `parse` must agree.
+    ///
+    /// Pins the workaround for the upstream `time` crate's lenient
+    /// `Iso8601::DATE` parser, which accepts some inputs containing
+    /// a `T<time>` suffix as if they were date-only.
+    #[test]
+    fn test_validator_matches_parser() {
+        for input in [
+            "2024-01-01T12:00:00",  // missing offset — both should reject
+            "2024-01-01T12:00:00Z", // valid RFC 3339
+            "2024-01-01",           // valid date-only
+            "2024-13-01",           // invalid month
+            "not a date",
+        ] {
+            assert_eq!(
+                DateTime::is_valid_iso_8601(input),
+                DateTime::parse(input).is_ok(),
+                "validator/parser mismatch on {input:?}"
+            );
+        }
     }
 }

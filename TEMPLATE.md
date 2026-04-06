@@ -50,7 +50,6 @@ The `DateTime (DTT)` library offers the following features:
   - `parse_custom_format(input: &str, format: &str)`: Parses a date-time string using a custom format.
   - `format(&self, format_str: &str)`: Formats the `DateTime` object as a string using the specified format.
   - `format_rfc3339(&self)`: Formats the `DateTime` as an RFC 3339 string.
-  - `format_iso8601(&self)`: Formats the `DateTime` as an ISO 8601 string.
 
 - **Date-Time Manipulation**:
   - `convert_to_tz(&self, new_tz: &str)`: Converts the `DateTime` object to a different timezone.

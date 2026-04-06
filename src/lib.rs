@@ -1,7 +1,8 @@
+#![forbid(unsafe_code)]
 // Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-//! DateTime (DTT) is a comprehensive library for date and time manipulation.
+//! `DateTime` (DTT) is a comprehensive library for date and time manipulation.
 //!
 //! # Overview
 //!
@@ -161,25 +162,30 @@ mod tests {
 
     mod initialization {
         use super::*;
+        use serial_test::serial;
 
         #[test]
+        #[serial]
         fn test_normal_run() {
             env::remove_var(constants::TEST_MODE_ENV);
             assert!(run().is_ok());
         }
 
         #[test]
+        #[serial]
         fn test_simulated_error() {
             env::set_var(
                 constants::TEST_MODE_ENV,
                 constants::TEST_MODE_ENABLED,
             );
             assert!(matches!(run(), Err(AppError::SimulatedError)));
+            env::remove_var(constants::TEST_MODE_ENV);
         }
     }
 
     mod configuration {
         use super::*;
+        use serial_test::serial;
 
         #[test]
         #[allow(clippy::const_is_empty)]
@@ -191,6 +197,7 @@ mod tests {
         }
 
         #[test]
+        #[serial]
         fn test_is_test_mode() {
             env::remove_var(constants::TEST_MODE_ENV);
             let first_check = is_test_mode();
@@ -208,6 +215,7 @@ mod tests {
                 second_check,
                 "Should be in test mode after enabling it"
             );
+            env::remove_var(constants::TEST_MODE_ENV);
         }
     }
 }

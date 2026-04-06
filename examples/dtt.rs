@@ -140,7 +140,7 @@ fn advanced_datetime_operations() -> Result<(), AppError> {
 
     // Timezone conversion
     println!("\n🌍 Timezone Conversion:");
-    let nyc_time = utc_date.convert_to_tz("EST")?;
+    let nyc_time = utc_date.convert_to_tz("EST_USA")?;
     println!("Current time in New York: ✅ {:?}", nyc_time);
 
     // Timezone formatting
@@ -162,9 +162,6 @@ fn advanced_datetime_operations() -> Result<(), AppError> {
     println!("\n📝 Date Formatting:");
     let formatted_date = utc_date.format_rfc3339()?;
     println!("RFC3339 formatted date: ✅ {}", formatted_date);
-
-    let iso8601_date = utc_date.format_iso8601()?;
-    println!("ISO8601 formatted date: ✅ {}", iso8601_date);
 
     // Date ranges
     println!("\n📅 Date Ranges:");
@@ -326,7 +323,7 @@ fn error_handling_examples() -> Result<(), AppError> {
     let dt1 = dtt_now!();
     println!("Original dt1: {:?}", dt1);
 
-    let iso8601_string = dt1.format_iso8601()?;
+    let iso8601_string = dt1.format_rfc3339()?;
     println!("dt1 ISO 8601 string: {}", iso8601_string);
 
     match DateTime::parse(&iso8601_string) {
@@ -334,7 +331,7 @@ fn error_handling_examples() -> Result<(), AppError> {
             println!("Parsed dt2: {:?}", dt2);
             println!(
                 "Successfully parsed dt2 ISO 8601: {}",
-                dt2.format_iso8601()?
+                dt2.format_rfc3339()?
             );
             println!("dt1 and dt2 are equal: {}", dt1 == dt2);
             println!(
@@ -408,7 +405,7 @@ fn performance_examples() -> Result<(), AppError> {
     let dt = DateTime::new();
     let start = Instant::now();
     for _ in 0..10000 {
-        let _ = dt.format_iso8601()?;
+        let _ = dt.format_rfc3339()?;
     }
     let duration = start.elapsed();
     println!(
@@ -440,10 +437,9 @@ fn locale_specific_examples() -> Result<(), AppError> {
     println!("\n🦀 Locale-Specific Formatting Information 🦀");
 
     println!("Note: The current version of the DateTime library does not support locale-specific formatting.");
-    println!("For formatting dates, you can use the standard formatting methods like `format_iso8601` or `format_rfc3339`.");
+    println!("For formatting dates, use the standard `format_rfc3339` method or call `format` with a custom format description.");
 
     let dt = DateTime::new();
-    println!("Example ISO 8601 format: {}", dt.format_iso8601()?);
     println!("Example RFC 3339 format: {}", dt.format_rfc3339()?);
 
     println!("\nIf you need locale-specific formatting, consider using additional libraries or implementing custom formatting functions.");
