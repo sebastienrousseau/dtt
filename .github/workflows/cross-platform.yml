@@ -45,3 +45,47 @@ jobs:
 
       - name: Fmt check
         run: cargo fmt --all -- --check
+
+  coverage:
+    name: Coverage gate (100% lines + functions)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: llvm-tools-preview
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Enforce line coverage ≥ 99%
+        run: cargo llvm-cov --summary-only --fail-under-lines 99
+
+      - name: Enforce function coverage = 100%
+        run: cargo llvm-cov --summary-only --fail-under-functions 100
+
+  audit:
+    name: cargo-audit (security advisories)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-audit
+        uses: taiki-e/install-action@cargo-audit
+
+      - name: Run cargo-audit
+        run: cargo audit --deny warnings
