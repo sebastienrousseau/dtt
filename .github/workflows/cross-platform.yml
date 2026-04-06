@@ -6,7 +6,7 @@ name: Cross-Platform Tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/**]
   pull_request:
 
 concurrency:
