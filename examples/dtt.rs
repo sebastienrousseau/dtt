@@ -50,33 +50,32 @@ fn basic_datetime_examples() -> Result<(), AppError> {
     println!("🦀 Basic DateTime Examples 🦀");
 
     let now = dtt_now!();
-    println!("Current time (using macro): ✅ {:?}", now);
+    println!("Current time (using macro): ✅ {now:?}");
 
     let parsed_date = dtt_parse!("2023-05-20T15:30:00Z")?;
-    println!("Parsed date (using macro): ✅ {:?}", parsed_date);
+    println!("Parsed date (using macro): ✅ {parsed_date:?}");
 
     let utc_date = DateTime::new();
-    println!("UTC Date: ✅ {:?}", utc_date);
+    println!("UTC Date: ✅ {utc_date:?}");
 
     let paris_time = DateTime::new_with_tz("CET")?;
     let tokyo_time = DateTime::new_with_tz("JST")?;
-    println!("Paris time: ✅ {:?}", paris_time);
-    println!("Tokyo time: ✅ {:?}", tokyo_time);
+    println!("Paris time: ✅ {paris_time:?}");
+    println!("Tokyo time: ✅ {tokyo_time:?}");
 
     let custom_offset_time = DateTime::new_with_custom_offset(5, 30)?;
     println!(
-        "Custom offset time (UTC+5:30): ✅ {:?}",
-        custom_offset_time
+        "Custom offset time (UTC+5:30): ✅ {custom_offset_time:?}"
     );
 
     let rfc3339_date = DateTime::parse("2023-05-20T15:30:00Z")?;
-    println!("Parsed RFC3339 date: ✅ {:?}", rfc3339_date);
+    println!("Parsed RFC3339 date: ✅ {rfc3339_date:?}");
 
     let custom_format_date = DateTime::parse_custom_format(
         "20/05/2023 15:30:00",
         "[day]/[month]/[year] [hour]:[minute]:[second]",
     )?;
-    println!("Parsed custom format date: ✅ {:?}", custom_format_date);
+    println!("Parsed custom format date: ✅ {custom_format_date:?}");
 
     Ok(())
 }
@@ -96,14 +95,14 @@ fn advanced_datetime_operations() -> Result<(), AppError> {
     // Date arithmetic
     println!("\n📅 Date Arithmetic:");
     let future_date = dtt_add_days!(utc_date, 30)?;
-    println!("Date after 30 days: ✅ {:?}", future_date);
+    println!("Date after 30 days: ✅ {future_date:?}");
 
     let past_date = dtt_sub_days!(utc_date, 15)?;
-    println!("Date 15 days ago: ✅ {:?}", past_date);
+    println!("Date 15 days ago: ✅ {past_date:?}");
 
     let duration = future_date.duration_since(&utc_date);
     let days_between = duration.whole_days();
-    println!("Days between dates: ✅ {} days", days_between);
+    println!("Days between dates: ✅ {days_between} days");
 
     // Date ranges and comparisons
     println!("\n📊 Date Ranges and Comparisons:");
@@ -136,12 +135,12 @@ fn advanced_datetime_operations() -> Result<(), AppError> {
     )?;
     let is_in_range =
         check_date.is_within_range(&start_date, &end_date);
-    println!("Is 2023-06-15 within 2023? ✅ {}", is_in_range);
+    println!("Is 2023-06-15 within 2023? ✅ {is_in_range}");
 
     // Timezone conversion
     println!("\n🌍 Timezone Conversion:");
     let nyc_time = utc_date.convert_to_tz("EST_USA")?;
-    println!("Current time in New York: ✅ {:?}", nyc_time);
+    println!("Current time in New York: ✅ {nyc_time:?}");
 
     // Timezone formatting
     println!("\n🌍 Timezone Formatting:");
@@ -149,19 +148,19 @@ fn advanced_datetime_operations() -> Result<(), AppError> {
         "PST",
         "[hour repr:12]:[minute] [period]",
     )?;
-    println!("Current time in Los Angeles: ✅ {}", la_time);
+    println!("Current time in Los Angeles: ✅ {la_time}");
 
     let tokyo_time = DateTime::format_time_in_timezone(
         &DateTime::new(),
         "JST",
         "[year]-[month]-[day] [hour]:[minute]",
     )?;
-    println!("Current time in Tokyo: ✅ {}", tokyo_time);
+    println!("Current time in Tokyo: ✅ {tokyo_time}");
 
     // Formatting
     println!("\n📝 Date Formatting:");
     let formatted_date = utc_date.format_rfc3339()?;
-    println!("RFC3339 formatted date: ✅ {}", formatted_date);
+    println!("RFC3339 formatted date: ✅ {formatted_date}");
 
     // Date ranges
     println!("\n📅 Date Ranges:");
@@ -187,22 +186,22 @@ fn macro_usage_examples() {
     println!("\n🦀 Macro Usage Examples 🦀");
 
     let vec = dtt_vec![1, 2, 3, 4, 5];
-    println!("Vector created with dtt_vec!: ✅ {:?}", vec);
+    println!("Vector created with dtt_vec!: ✅ {vec:?}");
 
     let map = dtt_map! {"a" => 1, "b" => 2, "c" => 3};
-    println!("Map created with dtt_map!: ✅ {:?}", map);
+    println!("Map created with dtt_map!: ✅ {map:?}");
 
     dtt_assert!(2 + 2 == 4, "Basic arithmetic assertion");
     println!("dtt_assert! passed");
 
     let min_value = dtt_min!(5, 3, 7, 1, 9);
-    println!("Minimum value using dtt_min!: ✅ {}", min_value);
+    println!("Minimum value using dtt_min!: ✅ {min_value}");
 
     let max_value = dtt_max!(5, 3, 7, 1, 9);
-    println!("Maximum value using dtt_max!: ✅ {}", max_value);
+    println!("Maximum value using dtt_max!: ✅ {max_value}");
 
     let joined_string = dtt_join!("Hello", " ", "World", "!");
-    println!("Joined string using dtt_join!: ✅ {}", joined_string);
+    println!("Joined string using dtt_join!: ✅ {joined_string}");
 
     println!("Printing vector using dtt_print_vec!:");
     dtt_print_vec!([1, 2, 3, 4, 5]);
@@ -284,21 +283,21 @@ fn error_handling_examples() -> Result<(), AppError> {
     match DateTime::new_with_tz("InvalidTZ") {
         Ok(_) => println!("Unexpected: InvalidTZ was accepted"),
         Err(e) => {
-            println!("Expected error with invalid timezone: {}", e);
+            println!("Expected error with invalid timezone: {e}");
         }
     }
 
     // Invalid custom offset
     match DateTime::new_with_custom_offset(25, 0) {
         Ok(_) => println!("Unexpected: Invalid offset was accepted"),
-        Err(e) => println!("Expected error with invalid offset: {}", e),
+        Err(e) => println!("Expected error with invalid offset: {e}"),
     }
 
     // Invalid date parsing
     match DateTime::parse("not-a-date") {
         Ok(_) => println!("Unexpected: Invalid date string was parsed"),
         Err(e) => {
-            println!("Expected error parsing invalid date: {}", e);
+            println!("Expected error parsing invalid date: {e}");
         }
     }
 
@@ -314,21 +313,21 @@ fn error_handling_examples() -> Result<(), AppError> {
     )?;
     match dtt_add_days!(max_date, 1) {
         Ok(_) => println!("Unexpected: Date overflow was allowed"),
-        Err(e) => println!("Expected error with date overflow: {}", e),
+        Err(e) => println!("Expected error with date overflow: {e}"),
     }
 
     // ISO 8601 Parsing Example
     println!("\n🦀 ISO 8601 Self-Parsing Example 🦀");
 
     let dt1 = dtt_now!();
-    println!("Original dt1: {:?}", dt1);
+    println!("Original dt1: {dt1:?}");
 
     let iso8601_string = dt1.format_rfc3339()?;
-    println!("dt1 ISO 8601 string: {}", iso8601_string);
+    println!("dt1 ISO 8601 string: {iso8601_string}");
 
     match DateTime::parse(&iso8601_string) {
         Ok(dt2) => {
-            println!("Parsed dt2: {:?}", dt2);
+            println!("Parsed dt2: {dt2:?}");
             println!(
                 "Successfully parsed dt2 ISO 8601: {}",
                 dt2.format_rfc3339()?
@@ -340,7 +339,7 @@ fn error_handling_examples() -> Result<(), AppError> {
             );
             // Note: There might be a small difference due to microsecond precision
         }
-        Err(e) => println!("Error parsing ISO 8601 string: {}", e),
+        Err(e) => println!("Error parsing ISO 8601 string: {e}"),
     }
 
     Ok(())
@@ -360,11 +359,11 @@ fn serialization_examples() -> Result<(), AppError> {
 
     // Serialization
     let serialized = serde_json::to_string(&dt)?;
-    println!("Serialized DateTime: {}", serialized);
+    println!("Serialized DateTime: {serialized}");
 
     // Deserialization
     let deserialized: DateTime = serde_json::from_str(&serialized)?;
-    println!("Deserialized DateTime: {:?}", deserialized);
+    println!("Deserialized DateTime: {deserialized:?}");
 
     // Verify equality
     println!(
@@ -391,7 +390,7 @@ fn performance_examples() -> Result<(), AppError> {
         let _ = DateTime::new();
     }
     let duration = start.elapsed();
-    println!("Time to create 10,000 DateTime objects: {:?}", duration);
+    println!("Time to create 10,000 DateTime objects: {duration:?}");
 
     // Measure parsing performance
     let start = Instant::now();
@@ -399,7 +398,7 @@ fn performance_examples() -> Result<(), AppError> {
         let _ = DateTime::parse("2023-09-01T12:00:00Z")?;
     }
     let duration = start.elapsed();
-    println!("Time to parse 10,000 ISO8601 strings: {:?}", duration);
+    println!("Time to parse 10,000 ISO8601 strings: {duration:?}");
 
     // Measure formatting performance
     let dt = DateTime::new();
@@ -409,8 +408,7 @@ fn performance_examples() -> Result<(), AppError> {
     }
     let duration = start.elapsed();
     println!(
-        "Time to format 10,000 DateTime objects to ISO8601: {:?}",
-        duration
+        "Time to format 10,000 DateTime objects to ISO8601: {duration:?}"
     );
 
     // Measure arithmetic performance
@@ -420,7 +418,7 @@ fn performance_examples() -> Result<(), AppError> {
         let _ = dt.add_days(i)?;
     }
     let duration = start.elapsed();
-    println!("Time to perform 10,000 date additions: {:?}", duration);
+    println!("Time to perform 10,000 date additions: {duration:?}");
 
     Ok(())
 }

@@ -245,7 +245,7 @@ mod tests {
                 0,
                 UtcOffset::UTC,
             )?;
-            let display_string = format!("{}", dt);
+            let display_string = format!("{dt}");
             assert!(display_string.starts_with("2024-01-01T00:00:00"));
             Ok(())
         }
@@ -1084,11 +1084,11 @@ mod tests {
 
             let serialized =
                 serde_json::to_string(&dt).map_err(|err| {
-                    format!("Failed to serialize DateTime: {:?}", err)
+                    format!("Failed to serialize DateTime: {err:?}")
                 })?;
             let deserialized: DateTime =
                 serde_json::from_str(&serialized).map_err(|err| {
-                    format!("Failed to deserialize DateTime: {:?}", err)
+                    format!("Failed to deserialize DateTime: {err:?}")
                 })?;
 
             assert_eq!(dt, deserialized);
@@ -1166,7 +1166,7 @@ mod tests {
                 UtcOffset::UTC,
             )?;
 
-            let debug_output = format!("{:?}", dt);
+            let debug_output = format!("{dt:?}");
             assert!(debug_output.contains("DateTime"));
             assert!(debug_output.contains("datetime"));
             assert!(debug_output.contains("offset"));
@@ -1567,7 +1567,7 @@ mod tests {
                 "[hour]:[minute]:[second]",
             );
             assert!(result.is_ok());
-            println!("Formatted result: {:?}", result);
+            println!("Formatted result: {result:?}");
         }
 
         #[test]
@@ -1588,8 +1588,7 @@ mod tests {
             // Assert the formatted time matches the expected pattern
             assert!(
                 re.is_match(&result),
-                "Formatted time '{}' does not match expected pattern",
-                result
+                "Formatted time '{result}' does not match expected pattern"
             );
 
             Ok(())
@@ -1612,8 +1611,7 @@ mod tests {
             if let Err(e) = result {
                 assert!(
                     matches!(e, DateTimeError::InvalidTimezone),
-                    "Expected DateTimeError::InvalidTimezone, got {:?}",
-                    e
+                    "Expected DateTimeError::InvalidTimezone, got {e:?}"
                 );
             }
         }

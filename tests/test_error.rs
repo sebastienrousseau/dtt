@@ -84,9 +84,9 @@ mod tests {
         fn test_debug_impl() {
             let format_error = DateTimeError::InvalidFormat;
             let timezone_error = DateTimeError::InvalidTimezone;
-            assert_eq!(format!("{:?}", format_error), "InvalidFormat");
+            assert_eq!(format!("{format_error:?}"), "InvalidFormat");
             assert_eq!(
-                format!("{:?}", timezone_error),
+                format!("{timezone_error:?}"),
                 "InvalidTimezone"
             );
         }
@@ -409,19 +409,19 @@ mod tests {
         #[test]
         fn test_debug_display_impl() {
             let format_error = DateTimeError::InvalidFormat;
-            assert_eq!(format!("{:?}", format_error), "InvalidFormat");
+            assert_eq!(format!("{format_error:?}"), "InvalidFormat");
             assert_eq!(
-                format!("{}", format_error),
+                format!("{format_error}"),
                 "Invalid date format"
             );
 
             let timezone_error = DateTimeError::InvalidTimezone;
             assert_eq!(
-                format!("{:?}", timezone_error),
+                format!("{timezone_error:?}"),
                 "InvalidTimezone"
             );
             assert_eq!(
-                format!("{}", timezone_error),
+                format!("{timezone_error}"),
                 "Invalid or unsupported timezone; DST not supported"
             );
         }

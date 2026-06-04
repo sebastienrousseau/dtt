@@ -27,13 +27,13 @@ mod tests {
         test_mode: bool,
     ) -> Result<std::process::Output, Box<dyn std::error::Error>> {
         let mut cmd = Command::cargo_bin("dtt").map_err(|err| {
-            format!("Failed to find binary 'dtt': {:?}", err)
+            format!("Failed to find binary 'dtt': {err:?}")
         })?;
         if test_mode {
             let _ = cmd.env("DTT_TEST_MODE", "1");
         }
         let output = cmd.output().map_err(|err| {
-            format!("Failed to execute command: {:?}", err)
+            format!("Failed to execute command: {err:?}")
         })?;
         Ok(output)
     }
@@ -62,8 +62,7 @@ mod tests {
             let stderr =
                 String::from_utf8(output.stderr).map_err(|err| {
                     eprintln!(
-                        "Failed to parse stderr as UTF-8: {:?}",
-                        err
+                        "Failed to parse stderr as UTF-8: {err:?}"
                     );
                     err
                 })?;
