@@ -26,5 +26,19 @@ fn main() -> Result<(), AppError> {
     let diff = later.duration_since(&dt);
     println!("Days between   : {}", diff.whole_days());
 
+    // Mutation helpers (return a new DateTime; never mutate in place).
+    let noon = dt.set_time(12, 0, 0)?;
+    println!("set_time 12:00 : {noon}");
+
+    let christmas = dt.set_date(2024, 12, 25)?;
+    println!("set_date 12-25 : {christmas}");
+
+    // `sub_months` is the symmetric counterpart to `add_months`.
+    println!("- 1 month      : {}", dt.sub_months(1)?);
+
+    // `update` rebases to the current wall-clock while preserving the
+    // existing offset. Useful for "tick" loops.
+    let _refreshed = dt.update()?;
+
     Ok(())
 }
