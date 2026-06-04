@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] — 2026-06-04
+
+This release was originally prepared as `0.0.10` but is shipping as
+`0.1.0` because the `time` security upgrade pins a transitive
+dependency (`time-core = =0.1.8`) that requires Rust `1.88.0`. Per
+[`docs/msrv-policy.md`](docs/msrv-policy.md), MSRV may only move in a
+MINOR release pre-1.0.
+
 ### Security
 
 - **Bump `time` to 0.3.47** to pull in the upstream fix for
@@ -25,9 +33,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as inner `#![deny(...)]` attributes in `src/lib.rs` so they apply to
   the lib crate only — integration tests, benches, and examples keep
   their freedom to use `unwrap`/`expect`.
+- [`docs/msrv-policy.md`](docs/msrv-policy.md) committed to the
+  repository (was previously untracked).
 
 ### Changed
 
+- **MSRV bumped `1.80.0` → `1.88.0`.** Required by `time-core = =0.1.8`
+  (transitive of `time 0.3.47`), which declares `rust-version = "1.88.0"`
+  and uses Cargo's `edition2024` feature. There is no `time` release
+  containing the RUSTSEC fix with a lower MSRV; downgrading would
+  reintroduce the vulnerability.
 - **Modularised `src/datetime.rs`** (2492 → 1645 + 159 + 95 + 623 lines)
   into `src/datetime/{mod,builder,validate,tests}.rs`. Public API is
   unchanged; existing `dtt::datetime::DateTime` and
@@ -145,6 +160,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Earlier history; see git log for details.
 
-[Unreleased]: https://github.com/sebastienrousseau/dtt/compare/v0.0.10...HEAD
+[Unreleased]: https://github.com/sebastienrousseau/dtt/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/sebastienrousseau/dtt/compare/v0.0.9...v0.1.0
 [0.0.10]: https://github.com/sebastienrousseau/dtt/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/sebastienrousseau/dtt/releases/tag/v0.0.9

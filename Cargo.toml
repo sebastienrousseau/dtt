@@ -5,9 +5,9 @@
 
 [package]
 name = "dtt"
-version = "0.0.10"
+version = "0.1.0"
 edition = "2021"
-rust-version = "1.80.0"
+rust-version = "1.88.0"
 license = "MIT OR Apache-2.0"
 authors = ["The DateTime (DTT) contributors"]
 build = "build.rs"

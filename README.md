@@ -13,7 +13,7 @@
   <a href="https://crates.io/crates/dtt"><img src="https://img.shields.io/crates/v/dtt.svg?style=for-the-badge&color=fc8d62&logo=rust" alt="Crates.io" /></a>
   <a href="https://docs.rs/dtt"><img src="https://img.shields.io/badge/docs.rs-dtt-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" alt="Docs.rs" /></a>
   <a href="https://codecov.io/gh/sebastienrousseau/dtt"><img src="https://img.shields.io/codecov/c/github/sebastienrousseau/dtt?style=for-the-badge&logo=codecov" alt="Coverage" /></a>
-  <a href="https://lib.rs/crates/dtt"><img src="https://img.shields.io/badge/lib.rs-v0.0.10-orange.svg?style=for-the-badge" alt="lib.rs" /></a>
+  <a href="https://lib.rs/crates/dtt"><img src="https://img.shields.io/badge/lib.rs-v0.1.0-orange.svg?style=for-the-badge" alt="lib.rs" /></a>
 </p>
 
 ---
@@ -44,12 +44,12 @@ Or add to `Cargo.toml`:
 
 ```toml
 [dependencies]
-dtt = "0.0.10"
+dtt = "0.1.0"
 ```
 
 ### Prerequisites
 
-DTT requires **Rust 1.80.0 or later** (it uses `std::sync::LazyLock`).
+DTT requires **Rust 1.88.0 or later** (pinned by `time = 0.3.47`, which carries the upstream fix for [RUSTSEC stack-exhaustion DoS](https://rustsec.org/) in `time < 0.3.47`).
 
 | Platform | Setup |
 |----------|-------|
@@ -58,7 +58,7 @@ DTT requires **Rust 1.80.0 or later** (it uses `std::sync::LazyLock`).
 | **WSL** | Same as Linux, run inside your WSL distribution |
 | **Windows** | Download `rustup-init.exe` from [rustup.rs](https://rustup.rs/) |
 
-After install, verify with `rustc --version` (must be ≥ 1.80.0). Upgrade an existing toolchain with `rustup update stable`.
+After install, verify with `rustc --version` (must be ≥ 1.88.0). Upgrade an existing toolchain with `rustup update stable`.
 
 ---
 
@@ -277,7 +277,7 @@ the same matrix on Linux, macOS, **and** Windows on every PR via
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
-| `error[E0658]: 'std::sync::LazyLock' is unstable` | Rust < 1.80.0 | `rustup update stable` |
+| `feature 'edition2024' is required` from `time-core` | Rust < 1.88.0 | `rustup update stable` |
 | `Err(InvalidTimezone)` for `"EST"`, `"CST"`, `"IST"` | Bare ambiguous codes are rejected by design | Use a suffixed form (e.g. `EST_USA`, `IST_INDIA`) |
 | `Err(InvalidFormat)` parsing `"2024-01-01T12:00:00"` | RFC 3339 requires an offset | Append `Z` or `+HH:MM` |
 | `Err(InvalidTimezone)` from `new_with_custom_offset(5, -30)` | Mixed-sign offsets are rejected | Pass same-sign components, e.g. `(4, 30)` |
