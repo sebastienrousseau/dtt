@@ -34,7 +34,7 @@
 #![doc = include_str!("../README.md")]
 #![doc(
     html_favicon_url = "https://kura.pro/dtt/images/favicon.ico",
-    html_logo_url = "https://kura.pro/dtt/images/logos/dtt.svg",
+    html_logo_url = "https://cloudcdn.pro/dtt/v1/logos/dtt.svg",
     html_root_url = "https://docs.rs/dtt"
 )]
 // Rust-level lints live in [lints.rust] in Cargo.toml. Universal clippy

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://kura.pro/dtt/images/logos/dtt.svg" alt="DateTime (DTT) logo" width="128" />
+  <img src="https://cloudcdn.pro/dtt/v1/logos/dtt.svg" alt="DateTime (DTT) logo" width="128" />
 </p>
 
 <h1 align="center">DateTime (DTT)</h1>
