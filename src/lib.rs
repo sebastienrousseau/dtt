@@ -33,7 +33,7 @@
 
 #![doc = include_str!("../README.md")]
 #![doc(
-    html_favicon_url = "https://kura.pro/dtt/images/favicon.ico",
+    html_favicon_url = "https://cloudcdn.pro/dtt/v1/favicon.ico",
     html_logo_url = "https://cloudcdn.pro/dtt/v1/logos/dtt.svg",
     html_root_url = "https://docs.rs/dtt"
 )]
