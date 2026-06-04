@@ -59,9 +59,9 @@ use time::{
 // using `dtt::datetime::DateTimeBuilder`. The `validate` module hosts an
 // additional `impl DateTime { ... }` block and needs no re-export.
 mod builder;
-mod validate;
 #[cfg(test)]
 mod tests;
+mod validate;
 
 pub use builder::DateTimeBuilder;
 
@@ -1469,7 +1469,6 @@ impl DateTime {
     }
 }
 
-
 // -----------------------------------------------------------------------------
 // Standard Trait Implementations
 // -----------------------------------------------------------------------------
@@ -1654,4 +1653,3 @@ pub const fn days_in_month(
 pub const fn is_leap_year(year: i32) -> bool {
     (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
 }
-

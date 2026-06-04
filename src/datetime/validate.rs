@@ -44,7 +44,9 @@ impl DateTime {
     /// Validates whether a string represents a valid month.
     #[must_use]
     pub fn is_valid_month(month: &str) -> bool {
-        month.parse::<u8>().is_ok_and(|m| (1..=MAX_MONTH).contains(&m))
+        month
+            .parse::<u8>()
+            .is_ok_and(|m| (1..=MAX_MONTH).contains(&m))
     }
 
     /// Validates whether a string represents a valid year within the
@@ -54,7 +56,8 @@ impl DateTime {
     /// construct, so the validator and the builder agree.
     #[must_use]
     pub fn is_valid_year(year: &str) -> bool {
-        year.parse::<i32>().is_ok_and(|y| (-9999..=9999).contains(&y))
+        year.parse::<i32>()
+            .is_ok_and(|y| (-9999..=9999).contains(&y))
     }
 
     /// Validates whether a string represents a valid microsecond.
