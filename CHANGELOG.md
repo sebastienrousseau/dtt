@@ -15,10 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Bump `serde` 1.0.217 → 1.0.219 (absorbs dependabot PR #110).
+- Bump `serde` 1.0.217 → 1.0.228 (absorbs dependabot PRs #110, #124).
 - Bump `serde_json` 1.0.135 → 1.0.140 (absorbs dependabot PR #107).
-- Bump `thiserror` 2.0.11 → 2.0.12 (absorbs dependabot PR #106).
-- Bump `assert_cmd` (dev) 2.0.16 → 2.0.17 (absorbs dependabot PR #113).
+- Bump `thiserror` 2.0.11 → 2.0.18 (absorbs dependabot PRs #106, #126).
+- Bump `assert_cmd` (dev) 2.0.16 → 2.2.0 (absorbs dependabot PRs #113, #119).
+- Bump `criterion` (dev) 0.5.1 → 0.8.2 (absorbs dependabot PR #127); switch
+  benches from `criterion::black_box` (deprecated) to `std::hint::black_box`.
+- Bump `regex` (dev) 1.11.1 → 1.12.3 (absorbs dependabot PR #121).
+- Bump `actions/checkout` v4 → v6 in `cross-platform.yml`
+  (absorbs dependabot PR #118).
+- Bump `actions/upload-artifact` v4 → v7 in `cross-platform.yml`
+  (absorbs dependabot PR #120).
 
 [rustsec-time]: https://github.com/sebastienrousseau/dtt/security/dependabot/3
 

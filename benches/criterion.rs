@@ -7,10 +7,9 @@
 //! This module contains benchmarks for various operations provided by the DTT library,
 //! including creation, parsing, formatting, arithmetic operations, comparisons, and timezone conversions.
 
-use criterion::{
-    black_box, criterion_group, criterion_main, Criterion,
-};
+use criterion::{criterion_group, criterion_main, Criterion};
 use dtt::datetime::DateTime;
+use std::hint::black_box;
 use time::Duration;
 
 /// Benchmark the creation of a new `DateTime` instance.
