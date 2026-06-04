@@ -9,11 +9,15 @@ transitive dependency uses Cargo's `edition2024` feature.
 
 ## How the floor moves
 
-- The MSRV may be raised in any **MINOR** release.
-- The MSRV is **not** raised in a PATCH release.
-- An MSRV bump is documented under `### Changed` in `CHANGELOG.md`
+- The MSRV **may be raised in any release**, including PATCH releases,
+  if and only if the bump is required to absorb an upstream security
+  advisory. This exception exists to keep the supply chain ahead of
+  known vulnerabilities; it is invoked sparingly.
+- For non-security reasons, the MSRV is raised only in MINOR or MAJOR
+  releases.
+- Every MSRV bump is documented under `### Changed` in `CHANGELOG.md`
   with a brief justification (typically: "required by upstream
-  dependency X" or "uses stable feature Y").
+  security advisory X" or "uses stable feature Y").
 
 ## How the floor is enforced
 
@@ -44,7 +48,7 @@ timezone-offset table, which is already covered by the 1.88.0 floor.
 ```toml
 # In your project's Cargo.toml
 [dependencies]
-dtt = "0.1.0"            # already constrained to >= 1.88
+dtt = "0.0.10"           # already constrained to >= 1.88
 ```
 
 Or, to lock to the lowest verified-working toolchain:
@@ -56,10 +60,10 @@ cargo +1.88.0 build
 
 ## History of MSRV bumps
 
-| Release | MSRV | Reason |
-|---------|------|--------|
-| `0.1.0` | `1.88.0` | `time 0.3.47` security upgrade pins `time-core =0.1.8` which uses `edition2024`. |
-| `0.0.10` | `1.80.0` | `std::sync::LazyLock` stabilisation. |
+| Release | MSRV    | Reason                                                                  |
+|---------|---------|-------------------------------------------------------------------------|
+| `0.0.10` | `1.88.0` | Security: `time 0.3.47` (RUSTSEC fix) pins `time-core =0.1.8` (`edition2024`). |
+| `0.0.9` | `1.80.0` | `std::sync::LazyLock` stabilisation.                                    |
 
 ## Future direction
 
@@ -67,4 +71,5 @@ Once `dtt` reaches `1.0.0`, the policy moves to **rolling
 "stable − 6 months"**: every MINOR release floors at the stable
 toolchain that was current six months prior to the release tag. This
 matches the policy used by `tokio`, `serde`, and other ecosystem
-anchor crates.
+anchor crates. The security-driven patch-release exception above is
+retained at all version levels.

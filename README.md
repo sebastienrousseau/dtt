@@ -13,7 +13,7 @@
   <a href="https://crates.io/crates/dtt"><img src="https://img.shields.io/crates/v/dtt.svg?style=for-the-badge&color=fc8d62&logo=rust" alt="Crates.io" /></a>
   <a href="https://docs.rs/dtt"><img src="https://img.shields.io/badge/docs.rs-dtt-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" alt="Docs.rs" /></a>
   <a href="https://codecov.io/gh/sebastienrousseau/dtt"><img src="https://img.shields.io/codecov/c/github/sebastienrousseau/dtt?style=for-the-badge&logo=codecov" alt="Coverage" /></a>
-  <a href="https://lib.rs/crates/dtt"><img src="https://img.shields.io/badge/lib.rs-v0.1.0-orange.svg?style=for-the-badge" alt="lib.rs" /></a>
+  <a href="https://lib.rs/crates/dtt"><img src="https://img.shields.io/badge/lib.rs-v0.0.10-orange.svg?style=for-the-badge" alt="lib.rs" /></a>
 </p>
 
 ---
@@ -44,7 +44,7 @@ Or add to `Cargo.toml`:
 
 ```toml
 [dependencies]
-dtt = "0.1.0"
+dtt = "0.0.10"
 ```
 
 ### Prerequisites
