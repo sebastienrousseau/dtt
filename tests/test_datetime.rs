@@ -1068,6 +1068,7 @@ mod tests {
             Ok(())
         }
 
+        #[cfg(feature = "serde")]
         #[test]
         fn test_datetime_serialization(
         ) -> Result<(), Box<dyn std::error::Error>> {

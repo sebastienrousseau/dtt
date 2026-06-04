@@ -37,17 +37,21 @@
     html_logo_url = "https://kura.pro/dtt/images/logos/dtt.svg",
     html_root_url = "https://docs.rs/dtt"
 )]
-// Linting configuration
+// Rust-level lints live in [lints.rust] in Cargo.toml. Universal clippy
+// allowances live in [lints.clippy]. The strict deny-list below applies
+// to the *library crate only* — integration tests, benches, and examples
+// are separate crates and remain free to use `unwrap`, `expect`, etc.
 #![deny(
-    clippy::all,
-    clippy::pedantic,
-    clippy::cargo,
-    clippy::nursery,
     rustdoc::broken_intra_doc_links,
-    missing_docs,
-    unsafe_code
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::cargo,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::result_unit_err,
+    clippy::clone_on_ref_ptr
 )]
-#![allow(clippy::module_name_repetitions)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 // Standard library imports
@@ -143,8 +147,7 @@ pub fn run() -> Result<(), AppError> {
 /// should operate in test mode.
 fn is_test_mode() -> bool {
     env::var(constants::TEST_MODE_ENV)
-        .map(|val| val == constants::TEST_MODE_ENABLED)
-        .unwrap_or(false)
+        .is_ok_and(|val| val == constants::TEST_MODE_ENABLED)
 }
 
 /// Displays the welcome message with library information.

@@ -133,6 +133,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "serde")]
     mod serialization_tests {
         use dtt::error::DateTimeError;
         use time::error::{Parse, TryFromParsed};
@@ -141,6 +142,7 @@ mod tests {
         ///
         /// This test ensures that the `DateTimeError` enum can be correctly
         /// serialized to and deserialized from JSON using the `serde` crate.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_serialization() -> Result<(), Box<dyn std::error::Error>>
         {
@@ -164,6 +166,7 @@ mod tests {
         }
 
         /// Tests the deserialization of `DateTimeError`.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_deserialization(
         ) -> Result<(), Box<dyn std::error::Error>> {
@@ -193,6 +196,7 @@ mod tests {
         ///
         /// This test ensures that the custom serialization and deserialization
         /// implementations for `DateTimeError` work correctly.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_custom_serde_impl(
         ) -> Result<(), Box<dyn std::error::Error>> {
@@ -225,6 +229,7 @@ mod tests {
         /// Round-trips every `DateTimeError` variant that supports both
         /// directions, plus pins the documented one-way behaviour of
         /// `ParseError` and `ComponentRange`.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_serde_all_variants(
         ) -> Result<(), Box<dyn std::error::Error>> {
@@ -264,6 +269,7 @@ mod tests {
         ///
         /// This test verifies that `DateTimeError` can be deserialized from valid
         /// JSON strings and that invalid strings result in errors.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_from_str() -> Result<(), Box<dyn std::error::Error>> {
             let error_str = r#""InvalidFormat""#;
@@ -287,6 +293,7 @@ mod tests {
         ///
         /// This test ensures that attempting to deserialize `DateTimeError` from
         /// invalid JSON strings results in an appropriate error.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_invalid_json_deserialization() {
             let invalid_json_str = r#"{ "invalid": "data" }"#;
@@ -379,6 +386,7 @@ mod tests {
         ///
         /// This test ensures that the `unwrap` function, or any similar operation,
         /// does not panic when deserializing valid data or when handling valid error variants.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_no_unexpected_panics() -> Result<(), Box<dyn Error>> {
             let valid_json_format = r#""InvalidFormat""#;
@@ -498,6 +506,7 @@ mod tests {
             assert!(!format!("{err}").is_empty());
         }
 
+        #[cfg(feature = "serde")]
         #[test]
         fn test_error_serialization(
         ) -> Result<(), Box<dyn std::error::Error>> {
@@ -507,6 +516,7 @@ mod tests {
             Ok(())
         }
 
+        #[cfg(feature = "serde")]
         #[test]
         fn test_error_deserialization(
         ) -> Result<(), Box<dyn std::error::Error>> {

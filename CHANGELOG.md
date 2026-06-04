@@ -13,8 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [RUSTSEC: time vulnerable to stack exhaustion DoS][rustsec-time]
   (medium severity, affects `>= 0.3.6, < 0.3.47`).
 
+### Added
+
+- **Optional `serde` feature** (on by default). Disabling it via
+  `default-features = false` drops `serde`, `serde_json`, and `time/serde`
+  from the dependency graph (~6 fewer transitive crates).
+- `[lints.clippy]` and `[lints.rust]` in `Cargo.toml` as the canonical
+  source of truth for universal clippy/rust allowances. Library-only
+  strict lints (`pedantic`, `nursery`, `cargo`, `unwrap_used`,
+  `expect_used`, `panic`, `result_unit_err`, `clone_on_ref_ptr`) remain
+  as inner `#![deny(...)]` attributes in `src/lib.rs` so they apply to
+  the lib crate only — integration tests, benches, and examples keep
+  their freedom to use `unwrap`/`expect`.
+
 ### Changed
 
+- **Modularised `src/datetime.rs`** (2492 → 1645 + 159 + 95 + 623 lines)
+  into `src/datetime/{mod,builder,validate,tests}.rs`. Public API is
+  unchanged; existing `dtt::datetime::DateTime` and
+  `dtt::datetime::DateTimeBuilder` paths still resolve.
+- Removed the unused `[package.metadata.clippy]` block (the canonical
+  enforcement is `[lints.clippy]` + the inner attrs in `src/lib.rs`).
 - Bump `serde` 1.0.217 → 1.0.228 (absorbs dependabot PRs #110, #124).
 - Bump `serde_json` 1.0.135 → 1.0.140 (absorbs dependabot PR #107).
 - Bump `thiserror` 2.0.11 → 2.0.18 (absorbs dependabot PRs #106, #126).
@@ -26,6 +45,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (absorbs dependabot PR #118).
 - Bump `actions/upload-artifact` v4 → v7 in `cross-platform.yml`
   (absorbs dependabot PR #120).
+
+### Fixed
+
+- Satisfy clippy 1.96 `map_unwrap_or` lint: 10 `Result.map(...).unwrap_or(false)`
+  sites rewritten to `Result.is_ok_and(...)` in `src/datetime/validate.rs` and
+  `src/lib.rs`.
+- SBOM job: `cargo-cyclonedx 0.5.x` writes `dtt-sbom.json`; both
+  `cross-platform.yml` and `make sbom` now `mv` it to the conventional
+  `dtt-sbom.cdx.json` so the `upload-artifact` step finds it.
+- `build.rs`: inline format args (clippy::uninlined_format_args).
 
 [rustsec-time]: https://github.com/sebastienrousseau/dtt/security/dependabot/3
 

@@ -110,7 +110,11 @@ jobs:
           tool: cargo-cyclonedx
 
       - name: Generate CycloneDX SBOM
-        run: cargo cyclonedx --format json --override-filename dtt-sbom
+        # cargo-cyclonedx 0.5.x writes `<name>.json`; rename to follow
+        # the CycloneDX `.cdx.json` convention.
+        run: |
+          cargo cyclonedx --format json --override-filename dtt-sbom
+          mv dtt-sbom.json dtt-sbom.cdx.json
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v7

@@ -74,6 +74,7 @@ sbom:
 	    cargo install cargo-cyclonedx; \
 	}
 	cargo cyclonedx --format json --override-filename dtt-sbom
+	@mv -f dtt-sbom.json dtt-sbom.cdx.json
 	@echo "✅ SBOM written to dtt-sbom.cdx.json"
 
 check-deps:
