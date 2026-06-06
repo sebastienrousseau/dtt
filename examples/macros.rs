@@ -78,12 +78,12 @@ fn main() -> Result<(), AppError> {
     // 2021-01-01T00:00:00Z and 2021-01-01T00:00:30Z
     let secs: Option<i64> =
         dtt_diff_seconds!("1609459200", "1609459230");
-    println!("Seconds diff   : {:?}", secs);
+    println!("Seconds diff   : {secs:?}");
     assert_eq!(secs, Some(30));
 
     // 2021-01-01 vs 2021-01-08 — exactly 7 days.
     let days: Option<i64> = dtt_diff_days!("1609459200", "1610064000");
-    println!("Days diff      : {:?}", days);
+    println!("Days diff      : {days:?}");
     assert_eq!(days, Some(7));
 
     // Invalid input → None (no panic).
