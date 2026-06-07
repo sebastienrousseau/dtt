@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 # Set the path to Cargo.toml relative to the script's location
 cargo_toml="$(dirname "$0")/../Cargo.toml"

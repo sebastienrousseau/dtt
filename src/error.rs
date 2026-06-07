@@ -3,8 +3,8 @@
 // Copyright © 2025 DateTime (DTT) library. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use serde_json;
 use std::{
     env,
     hash::{Hash, Hasher},
@@ -23,6 +23,7 @@ pub enum AppError {
     DateTimeError(#[from] DateTimeError),
 
     /// Error that occurs during serialization.
+    #[cfg(feature = "serde")]
     #[error("Serialization error: {0}")]
     SerializationError(#[from] serde_json::Error),
 
@@ -84,6 +85,7 @@ impl Hash for DateTimeError {
     }
 }
 
+#[cfg(feature = "serde")]
 impl Serialize for DateTimeError {
     /// Serializes the `DateTimeError` into a string representation.
     ///
@@ -121,6 +123,7 @@ impl Serialize for DateTimeError {
     }
 }
 
+#[cfg(feature = "serde")]
 impl<'de> Deserialize<'de> for DateTimeError {
     /// Deserializes a string into a `DateTimeError`.
     ///

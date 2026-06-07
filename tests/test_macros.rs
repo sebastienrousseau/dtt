@@ -11,8 +11,7 @@
 #[cfg(test)]
 mod tests {
     use dtt::*;
-    use paste::paste;
-    use std::{collections::HashMap, panic};
+    use std::collections::HashMap;
     use time::Month;
 
     #[test]
@@ -127,7 +126,7 @@ mod tests {
         let dt1 = "1609459200"; // 2021-01-01 00:00:00 UTC
         let dt2 = "1609459230"; // 2021-01-01 00:00:30 UTC
         let seconds_difference = dtt_diff_seconds!(dt1, dt2);
-        assert_eq!(seconds_difference, 30i64);
+        assert_eq!(seconds_difference, Some(30i64));
     }
 
     #[test]
@@ -135,7 +134,7 @@ mod tests {
         let dt1 = "1609459200"; // 2021-01-01 00:00:00 UTC
         let dt2 = "1609545600"; // 2021-01-02 00:00:00 UTC
         let days_difference = dtt_diff_days!(dt1, dt2);
-        assert_eq!(days_difference, 1i64);
+        assert_eq!(days_difference, Some(1i64));
     }
 
     #[test]
@@ -152,20 +151,18 @@ mod tests {
     }
 
     #[test]
-    fn test_dtt_create_vec() {
-        let v = dtt_create_vec![1, 2, 3];
-        assert_eq!(v, vec![1, 2, 3]);
-    }
-
-    #[test]
     fn test_dtt_is_valid_function() {
         dtt_is_valid_function!(day, u8);
         assert!(is_valid_day("15"));
         assert!(!is_valid_day("32"));
+        // Non-numeric input — exercises the macro's parse-fail branch.
+        assert!(!is_valid_day("abc"));
+        assert!(!is_valid_day(""));
 
         dtt_is_valid_function!(month, u8);
         assert!(is_valid_month("12"));
         assert!(!is_valid_month("13"));
+        assert!(!is_valid_month("not-a-number"));
     }
 
     #[test]
@@ -183,8 +180,8 @@ mod tests {
     fn test_dtt_clone() {
         let dt = dtt_parse!("2023-01-01T12:00:00+00:00").unwrap();
         let cloned = dtt_clone!(dt);
-        assert_eq!(dt.datetime, cloned.datetime);
-        assert_eq!(dt.offset, cloned.offset);
+        assert_eq!(dt, cloned);
+        assert_eq!(dt.offset(), cloned.offset());
 
         // We can still test the individual components
         assert_eq!(dt.year(), cloned.year());
@@ -196,11 +193,11 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Error: Invalid input")]
     fn test_dtt_diff_days_error() {
         let dt1 = "invalid";
         let dt2 = "1641081600";
-        let _ = dtt_diff_days!(dt1, dt2);
+        let result = dtt_diff_days!(dt1, dt2);
+        assert_eq!(result, None);
     }
 
     #[test]

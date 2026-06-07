@@ -1,240 +1,324 @@
-<!-- markdownlint-disable MD033 MD041 -->
-<img src="https://kura.pro/dtt/images/logos/dtt.svg"
-alt="DateTime (DTT) logo" height="66" align="right" />
-<!-- markdownlint-enable MD033 MD041 -->
+<p align="center">
+  <img src="https://cloudcdn.pro/dtt/v1/logos/dtt.svg" alt="DateTime (DTT) logo" width="128" />
+</p>
 
-# `DateTime` (DTT)
+<h1 align="center">DateTime (DTT)</h1>
 
-A Rust library for parsing, validating, manipulating, and formatting dates and times.
+<p align="center">
+  <strong>An ergonomic Rust library for parsing, validating, manipulating, and formatting dates, times, and timezones — with guaranteed round-trip safety and unambiguous timezone codes.</strong>
+</p>
 
-[![Made With Love][made-with-rust]][14] [![Crates.io][crates-badge]][08] [![lib.rs][libs-badge]][10] [![Docs.rs][docs-badge]][09] [![Codecov][codecov-badge]][15] [![Build Status][build-badge]][16] [![Codecov][github-badge]][07]
+<p align="center">
+  <a href="https://github.com/sebastienrousseau/dtt/actions"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/dtt/ci.yml?style=for-the-badge&logo=github" alt="Build" /></a>
+  <a href="https://crates.io/crates/dtt"><img src="https://img.shields.io/crates/v/dtt.svg?style=for-the-badge&color=fc8d62&logo=rust" alt="Crates.io" /></a>
+  <a href="https://docs.rs/dtt"><img src="https://img.shields.io/badge/docs.rs-dtt-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" alt="Docs.rs" /></a>
+  <a href="https://codecov.io/gh/sebastienrousseau/dtt"><img src="https://img.shields.io/codecov/c/github/sebastienrousseau/dtt?style=for-the-badge&logo=codecov" alt="Coverage" /></a>
+  <a href="https://lib.rs/crates/dtt"><img src="https://img.shields.io/badge/lib.rs-v0.0.10-orange.svg?style=for-the-badge" alt="lib.rs" /></a>
+</p>
 
-<!-- markdownlint-disable MD033 MD041 -->
-<center>
-<!-- markdownlint-enable MD033 MD041 -->
+---
 
-• [Website][01] • [Documentation][09] • [Report Bug][04] • [Request Feature][04] • [Contributing Guidelines][05]
+## Table of Contents
 
-<!-- markdownlint-disable MD033 MD041 -->
-</center>
-<!-- markdownlint-enable MD033 MD041 -->
+- [Install](#install)
+- [Quick Start](#quick-start)
+- [Why DTT?](#why-dtt)
+- [Features](#features)
+- [Supported Timezone Abbreviations](#supported-timezone-abbreviations)
+- [API Highlights](#api-highlights)
+- [Development](#development)
+- [Troubleshooting](#troubleshooting)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Overview
+---
 
-The **`DateTime` (DTT)** library is a comprehensive, flexible toolkit for managing dates and times in Rust. It includes functions, macros, and data structures that enable you to create, parse, validate, and format date-time objects with minimal effort.
+## Install
 
-You can construct `DateTime` objects in UTC or in a fixed offset timezone, ensuring accurate date and time information for varied use cases. The library also offers validation methods, which help maintain precision and correctness in time-critical operations.
+```bash
+cargo add dtt
+```
 
-## Features
-
-The `DateTime` (DTT) library provides:
-
-- **Core Fields**  
-  - `datetime`: Internal `PrimitiveDateTime` (UTC by default)
-  - `offset`: A `UtcOffset` representing the timezone offset from UTC
-
-- **Core Methods**  
-  - `new()`: Create a `DateTime` with the current UTC time  
-  - `new_with_tz(tz: &str)`: Construct a `DateTime` in a specified timezone  
-  - `new_with_custom_offset(hours: i8, minutes: i8)`: Create a `DateTime` with a custom offset  
-  - `from_components(...)`: Build a `DateTime` from year, month, day, hour, minute, second, and offset  
-  - `update(&self)`: Refresh the `DateTime` to the current instant (preserving offset)  
-  - `now()`: Return the current `DateTime` (an alias for `new()`)  
-  - `from_str(...)`: Parse a `DateTime` from a string (implements `FromStr`)  
-  - `default()`: Provide the current UTC time by default
-
-- **Parsing and Formatting**  
-  - `parse(...)`: Parse a date-time string into a `DateTime`  
-  - `parse_custom_format(...)`: Use a custom format pattern for parsing  
-  - `format(...)`: Format a `DateTime` with a user-defined pattern  
-  - `format_rfc3339(&self)`: Output RFC 3339 text  
-  - `format_iso8601(&self)`: Output ISO 8601 text
-
-- **Date-Time Manipulation**  
-  - `convert_to_tz(...)`: Switch to a different timezone  
-  - `unix_timestamp(&self)`: Retrieve the Unix timestamp  
-  - `add_days(...)`, `add_months(...)`, `add_years(...)`: Advance the date by days, months, or years  
-  - `sub_months(...)`, `sub_years(...)`: Move the date backwards by months or years  
-  - `next_day()`, `previous_day()`: Obtain the following or preceding day  
-  - `start_of_week()`, `end_of_week()`: Jump to the beginning or end of the week  
-  - `start_of_month()`, `end_of_month()`: Jump to the beginning or end of the month  
-  - `start_of_year()`, `end_of_year()`: Jump to the beginning or end of the year  
-  - `is_within_range(&self, start: &Self, end: &Self)`: Check if a date-time is in a specific range  
-  - `duration_since(&self, other: &Self)`: Calculate duration between two `DateTime`s
-
-- **Getters**  
-  - `year(...)`, `month(...)`, `day(...)`, `hour(...)`, `minute(...)`, `second(...)`, `microsecond(...)`
-  - `weekday(...)`, `ordinal(...)`, `iso_week(...)`, `offset(...)`
-
-- **Setters**  
-  - `set_date(...)`: Update the year, month, and day  
-  - `set_time(...)`: Update the hour, minute, and second  
-
-- **Validation**  
-  - `is_valid_day(...)`, `is_valid_hour(...)`, `is_valid_minute(...)`, `is_valid_second(...)`
-  - `is_valid_month(...)`, `is_valid_year(...)`, `is_valid_microsecond(...)`
-  - `is_valid_ordinal(...)`, `is_valid_iso_week(...)`, `is_valid_time(...)`
-  - `is_valid_iso_8601(date: &str)`: Check if an input is valid ISO 8601
-
-- **Utility Functions**  
-  - `format_time_in_timezone(...)`: Format a date-time for a specified timezone
-
-- **Arithmetic Operations**  
-  - `Add<Duration>` and `Sub<Duration>` traits for adding or subtracting durations
-
-- **Comparison Operations**  
-  - `PartialOrd` and `Ord` for ordering comparisons
-
-- **Hashing**  
-  - `Hash` implementation for use with hash-based collections
-
-- **Macros**  
-  - Examples include `dtt_now!()`, `dtt_parse!()`, `dtt_add_days!()`, and many more, simplifying routine tasks like date parsing or arithmetic
-
-- **Helper Functions**  
-  - `days_in_month(year, month)`: Returns the number of days in a specific month and year  
-  - `is_leap_year(year)`: Checks if a year is a leap year
-
-- **Error Handling**  
-  - `DateTimeError`: Comprehensive error handling for invalid dates, times, or offsets
-
-- **Timezone Support**  
-  - Create or convert `DateTime` objects across multiple named timezones or custom offsets
-
-- **Serialisation and Deserialisation**  
-  - `serde`-enabled for easy reading and writing of `DateTime` objects
-
-## Installation
-
-Add this to your `Cargo.toml`:
+Or add to `Cargo.toml`:
 
 ```toml
 [dependencies]
-dtt = "0.0.9"
+dtt = "0.0.10"
 ```
 
-Then in your `main.rs` or lib crate:
+### Prerequisites
+
+DTT requires **Rust 1.88.0 or later** (pinned by `time = 0.3.47`, which carries the upstream fix for [RUSTSEC stack-exhaustion DoS](https://rustsec.org/) in `time < 0.3.47`).
+
+| Platform | Setup |
+|----------|-------|
+| **macOS** | `brew install rustup-init && rustup-init -y` |
+| **Linux** | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh -s -- -y` |
+| **WSL** | Same as Linux, run inside your WSL distribution |
+| **Windows** | Download `rustup-init.exe` from [rustup.rs](https://rustup.rs/) |
+
+After install, verify with `rustc --version` (must be ≥ 1.88.0). Upgrade an existing toolchain with `rustup update stable`.
+
+---
+
+## Quick Start
 
 ```rust
-extern crate dtt;
-use dtt::*;
-```
+use dtt::prelude::*;
 
-## Usage
+fn main() -> Result<(), AppError> {
+    // Current UTC time
+    let now = DateTime::new();
+    println!("Current time: {}", now);
 
-Below are some quick examples showing how to use the core features of the `DateTime (DTT)` library.
+    // Parse — strict, offset-required for time-bearing inputs
+    let parsed = DateTime::parse("2024-01-15T10:30:00Z")?;
+    println!("Parsed: {}", parsed);
 
-### Basic Usage
+    // Round-trip is guaranteed: parse(format(x)) == x
+    let s = parsed.format_rfc3339()?;
+    assert_eq!(parsed, DateTime::parse(&s)?);
 
-```rust
-use dtt::datetime::DateTime;
-use dtt::dtt_print;
+    // Arithmetic
+    let next_week = parsed.add_days(7)?;
+    let next_year = parsed.add_years(1)?;
+    println!("Next week: {next_week}, next year: {next_year}");
 
-// Create a new DateTime in UTC
-let now = DateTime::new();
-dtt_print!(now);
+    // Timezone conversion (note the explicit USA suffix)
+    let est = parsed.convert_to_tz("EST_USA")?;
+    println!("In US Eastern: {est}");
 
-// Create a DateTime in a specified timezone
-let ny_time = DateTime::new_with_tz("EST").expect("Valid timezone");
-println!("Current time in New York: {}", ny_time);
-
-// Parse a date-time string
-let date = DateTime::parse("2023-05-20T15:30:00Z").expect("Valid date and time");
-println!("Parsed date: {}", date);
-
-// Add days to a date-time
-let future_date = date.add_days(7).expect("Should be valid");
-println!("Date after 7 days: {}", future_date);
-```
-
-### Macro Usage
-
-The library includes macros that streamline common operations:
-
-```rust
-use dtt::{dtt_now, dtt_parse, dtt_add_days};
-
-let now = dtt_now!();
-let parsed_date = dtt_parse!("2023-05-20T15:30:00Z").expect("Valid date");
-let future_date = dtt_add_days!(parsed_date, 7).expect("Should be valid");
-
-```
-
-### Error Handling
-
-The `DateTimeError` enum is used to handle invalid or out-of-range dates and times:
-
-```rust
-use dtt::datetime::DateTime;
-use dtt::error::DateTimeError;
-
-fn example_with_error_handling() -> Result<(), DateTimeError> {
-    let date = DateTime::parse("2023-05-20T15:30:00Z")?;
-    println!("Parsed date: {}", date);
-
-    // Attempt to parse an invalid date string
-    let result = DateTime::parse("2023-13-20T15:30:00Z");
-    match result {
-        Ok(_) => println!("Unexpected success."),
-        Err(e) => println!("Failed to parse date-time: {}", e),
-    }
+    // Validation
+    assert!(DateTime::is_valid_iso_8601("2024-01-15T10:30:00Z"));
+    assert!(!DateTime::is_valid_year("10000")); // outside time crate range
 
     Ok(())
 }
 ```
 
+Run the full demo:
+
+```bash
+cargo run --example dtt
+```
+
+---
+
+## Why DTT?
+
+Most datetime libraries silently produce wrong answers in surprising places. DTT is designed to **fail loudly** rather than guess:
+
+- **Round-trip safety:** `DateTime::parse(&dt.format_rfc3339()?)? == dt` always holds. No silent date-only truncation.
+- **Unambiguous timezones:** `IST` could mean Indian (+05:30), Irish (+01:00), or Israel (+02:00). DTT requires explicit suffixes (`IST_INDIA`, `IST_IRELAND`, `IST_ISRAEL`) so you cannot accidentally use the wrong one.
+- **Mixed-sign offsets rejected:** `new_with_custom_offset(5, -30)` returns an error instead of silently producing `+05:30`.
+- **Deterministic `Default`:** `DateTime::default()` returns the Unix epoch, not wall-clock time, so tests are reproducible.
+- **UTC-normalised equality:** Two `DateTime` values that represent the same instant compare equal regardless of which offset they were stored in.
+- **Strict validation:** `is_valid_year` is bounded to the actual `time::Date` range (`-9999..=9999`), so the validator and the builder always agree.
+
+---
+
+## Features
+
+| | |
+| :--- | :--- |
+| **Parsing** | RFC 3339 with offset, ISO 8601 date-only, custom format strings |
+| **Formatting** | RFC 3339, custom format descriptors |
+| **Validation** | Components, ranges, leap years, ISO 8601, time strings |
+| **Arithmetic** | `add_days`, `add_months`, `add_years` (overflow-checked) |
+| **Comparisons** | `Eq`, `Ord`, `Hash` — all UTC-normalised |
+| **Calendar helpers** | `start_of_week`, `end_of_month`, `iso_week`, `iso_year` |
+| **Timezone support** | 22 disambiguated abbreviations + custom offsets |
+| **Serialization** | `serde` round-trip via canonical RFC 3339 strings |
+| **Cross-platform** | macOS, Linux, WSL, Windows |
+
+---
+
+## Supported Timezone Abbreviations
+
+Common abbreviations are intentionally **disambiguated**. Bare codes like `EST`, `CST`, `IST`, and `WADT` are **not accepted** because they refer to multiple zones in the real world.
+
+| Code | Offset | Region |
+|------|-------:|--------|
+| `UTC`, `GMT` | +00:00 | Coordinated Universal Time |
+| `EST_USA` | −05:00 | US Eastern Standard Time |
+| `EDT` | −04:00 | US Eastern Daylight Time |
+| `CST_USA` | −06:00 | US Central Standard Time |
+| `CDT` | −05:00 | US Central Daylight Time |
+| `MST` / `MDT` | −07/−06 | US Mountain |
+| `PST` / `PDT` | −08/−07 | US Pacific |
+| `CET` / `CEST` | +01/+02 | Central Europe |
+| `EET` / `EEST` | +02/+03 | Eastern Europe |
+| `IST_IRELAND` | +01:00 | Irish Standard Time |
+| `IST_ISRAEL` | +02:00 | Israel Standard Time |
+| `IST_INDIA` | +05:30 | Indian Standard Time |
+| `JST` | +09:00 | Japan |
+| `HKT` | +08:00 | Hong Kong |
+| `CST_CHINA` | +08:00 | China Standard Time |
+| `EST_AUS` / `AEST` | +10:00 | Australian Eastern |
+| `AEDT` | +11:00 | Australian Eastern Daylight |
+| `ACWST` | +08:45 | Australian Central Western |
+
+For any other zone, use [`DateTime::new_with_custom_offset(hours, minutes)`](https://docs.rs/dtt/latest/dtt/datetime/struct.DateTime.html#method.new_with_custom_offset).
+
+> **Note:** DST is not handled automatically. Pick the appropriate code (e.g. `EDT` vs `EST_USA`) for the date range you care about.
+
+---
+
+## API Highlights
+
+### Construction
+
+```rust
+use dtt::prelude::*;
+use time::UtcOffset;
+
+let now    = DateTime::new();                              // current UTC
+let utc    = DateTime::new_with_tz("UTC")?;                // explicit
+let mumbai = DateTime::new_with_tz("IST_INDIA")?;          // disambiguated
+let custom = DateTime::new_with_custom_offset(5, 30)?;     // +05:30
+let exact  = DateTime::from_components(2024, 1, 15, 10, 30, 0, UtcOffset::UTC)?;
+let epoch  = DateTime::default();                          // 1970-01-01T00:00:00Z
+
+// Builder pattern
+let dt = DateTimeBuilder::new()
+    .year(2024).month(1).day(15)
+    .hour(10).minute(30).second(0)
+    .offset(UtcOffset::UTC)
+    .build()?;
+# Ok::<(), AppError>(())
+```
+
+### Parsing & Formatting
+
+```rust
+# use dtt::prelude::*;
+let dt1 = DateTime::parse("2024-01-15T10:30:00Z")?;
+let dt2 = DateTime::parse("2024-01-15T10:30:00+05:30")?;
+let dt3 = DateTime::parse("2024-01-15")?;                  // date-only OK
+
+let custom = DateTime::parse_custom_format(
+    "15/01/2024 10:30",
+    "[day]/[month]/[year] [hour]:[minute]",
+)?;
+
+let s: String = dt1.format_rfc3339()?;
+let pretty   = dt1.format("[year]-[month]-[day]")?;
+# Ok::<(), AppError>(())
+```
+
+### Arithmetic & Calendar Math
+
+```rust
+# use dtt::prelude::*;
+let dt = DateTime::parse("2024-01-31T00:00:00Z")?;
+
+let next_day  = dt.next_day()?;
+let prev_day  = dt.previous_day()?;
+let next_week = dt.add_days(7)?;
+let next_feb  = dt.add_months(1)?;     // → 2024-02-29 (leap year aware)
+let next_year = dt.add_years(1)?;
+
+let monday    = dt.start_of_week()?;
+let sunday    = dt.end_of_week()?;
+let last_day  = dt.end_of_month()?;
+# Ok::<(), AppError>(())
+```
+
+### Macros
+
+```rust
+use dtt::prelude::*;
+use dtt::{dtt_now, dtt_parse, dtt_add_days, dtt_diff, dtt_diff_seconds};
+
+let now = dtt_now!();
+let dt  = dtt_parse!("2024-01-15T10:30:00Z")?;
+let later = dtt_add_days!(dt, 7)?;
+
+let secs: Option<i64> = dtt_diff_seconds!("1609459200", "1609459230");
+assert_eq!(secs, Some(30));
+# Ok::<(), AppError>(())
+```
+
+---
+
+## Development
+
+Clone, build, and verify in under a minute on any platform:
+
+```bash
+git clone https://github.com/sebastienrousseau/dtt.git
+cd dtt
+
+make verify     # fmt-check + lint + test in one command
+make help       # full task list
+```
+
+The `Makefile` is a thin wrapper around the underlying Cargo commands,
+so the equivalent direct invocations also work:
+
+```bash
+cargo build                                # build the library and binary
+cargo test                                 # run all 240+ tests
+cargo clippy --all-targets -- -D warnings  # lint with strict warnings
+cargo fmt --check                          # verify formatting
+cargo doc --no-deps --open                 # open API docs in your browser
+cargo run --example dtt                    # run the end-to-end demo
+cargo bench                                # run criterion benchmarks
+```
+
+All commands work identically on macOS, Linux, and WSL. CI exercises
+the same matrix on Linux, macOS, **and** Windows on every PR via
+[`.github/workflows/cross-platform.yml`](.github/workflows/cross-platform.yml).
+
+---
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---------|--------------|-----|
+| `feature 'edition2024' is required` from `time-core` | Rust < 1.88.0 | `rustup update stable` |
+| `Err(InvalidTimezone)` for `"EST"`, `"CST"`, `"IST"` | Bare ambiguous codes are rejected by design | Use a suffixed form (e.g. `EST_USA`, `IST_INDIA`) |
+| `Err(InvalidFormat)` parsing `"2024-01-01T12:00:00"` | RFC 3339 requires an offset | Append `Z` or `+HH:MM` |
+| `Err(InvalidTimezone)` from `new_with_custom_offset(5, -30)` | Mixed-sign offsets are rejected | Pass same-sign components, e.g. `(4, 30)` |
+| `Err(InvalidDate)` from `from_components(10000, ...)` | `time::Date` only supports `-9999..=9999` | Use a year inside that range |
+| Tests fail with environment-variable race | `cargo test` runs tests in parallel | Already mitigated via `serial_test`; use `cargo test -- --test-threads=1` if you have a custom env-var test |
+
+---
+
 ## Documentation
 
-Comprehensive API documentation is available at:
+- **API reference:** <https://docs.rs/dtt>
+- **End-to-end example:** [`examples/dtt.rs`](examples/dtt.rs)
+- **Benchmarks:** [`benches/criterion.rs`](benches/criterion.rs) — run with `cargo bench`
+- **Changelog:** [`CHANGELOG.md`](CHANGELOG.md)
+- **Security policy:** [`.github/SECURITY.md`](.github/SECURITY.md)
+- **Code of conduct:** [`.github/CODE-OF-CONDUCT.md`](.github/CODE-OF-CONDUCT.md)
 
-- [Website][01]  
-- [Docs.rs][09]  
-- [https://doc.dttlib.com/][17]
-
-## Rust Version Compatibility
-
-Requires **rustc 1.56.0** or above.  
+---
 
 ## Contributing
 
-All contributions are appreciated! Please follow our [contributing instructions][05] for details on reporting issues, requesting features, or submitting pull requests. Contributions are subject to [Rust's Code of Conduct][12].
+Contributions are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) — in particular, **all commits must be cryptographically signed** (`git commit -S`).
 
-By submitting any contribution, you agree to license your contribution under the same dual licence chosen by this project.
+Quick checklist before opening a PR:
+
+```bash
+cargo fmt
+cargo clippy --all-targets -- -D warnings
+cargo test
+git commit -S -m "feat(dtt): your conventional commit message"
+```
+
+---
+
+**THE ARCHITECT** ᴬ [Sebastien Rousseau](https://sebastienrousseau.com)
+**THE ENGINE** ᵞ [EUXIS](https://euxis.co) ᴬ Enterprise Unified Execution Intelligence System
+
+---
 
 ## License
 
-Licensed under either of these:
+Dual-licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) or [MIT](https://opensource.org/licenses/MIT), at your option.
 
-- [Apache License, Version 2.0][02]
-- [MIT license][03]
-
-You may select either licence as needed.
-
-## Credits and Acknowledgements
-
-Many thanks to all the contributors of the [DateTime (DTT) Library][06]. We also extend our gratitude to the [Rust Reddit][13] community for their helpful suggestions and feedback.
-
-[01]: https://dttlib.com "DateTime (DTT) Library Website"
-[02]: https://opensource.org/license/apache-2-0/ "Apache License, Version 2.0"
-[03]: https://opensource.org/licenses/MIT "MIT license"
-[04]: https://github.com/sebastienrousseau/dtt/issues "Issues"
-[05]: https://github.com/sebastienrousseau/dtt/blob/main/CONTRIBUTING.md "Contributing Instructions"
-[06]: https://github.com/sebastienrousseau/dtt/graphs/contributors "Contributors"
-[07]: https://github.com/sebastienrousseau/dtt "DateTime (DTT) Library"
-[08]: https://crates.io/crates/dtt "Crates.io"
-[09]: https://docs.rs/dtt "Docs.rs"
-[10]: https://lib.rs/crates/dtt "Lib.rs"
-[12]: https://www.rust-lang.org/policies/code-of-conduct "Rust's Code of Conduct"
-[13]: https://reddit.com/r/rust "Rust Reddit"
-[14]: https://www.rust-lang.org "The Rust Programming Language"
-[15]: https://codecov.io/gh/sebastienrousseau/dtt "Codecov"
-[16]: https://github.com/sebastienrousseau/dtt/actions?query=branch%3Amain "Build Status"
-[17]: https://doc.dttlib.com/ "DateTime (DTT) Library Documentation"
-
-[build-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/dtt/release.yml?branch=main&style=for-the-badge&logo=github "Build Status"
-[github-badge]: https://img.shields.io/badge/github-sebastienrousseau/main-8da0cb?style=for-the-badge&labelColor=555555&logo=github "GitHub"
-[codecov-badge]: https://img.shields.io/codecov/c/github/sebastienrousseau/dtt?style=for-the-badge&token=X3ZP0K1SGI 'Codecov'
-[crates-badge]: https://img.shields.io/crates/v/dtt.svg?style=for-the-badge 'Crates.io badge'
-[docs-badge]: https://img.shields.io/docsrs/dtt.svg?style=for-the-badge 'Docs.rs badge'
-[libs-badge]: https://img.shields.io/badge/lib.rs-v0.0.9-orange.svg?style=for-the-badge 'Lib.rs badge'
-[made-with-rust]: https://img.shields.io/badge/rust-f04041?style=for-the-badge&labelColor=c0282d&logo=rust 'Made With Rust badge'
+<p align="right"><a href="#datetime-dtt">Back to Top</a></p>

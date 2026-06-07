@@ -84,9 +84,9 @@ mod tests {
         fn test_debug_impl() {
             let format_error = DateTimeError::InvalidFormat;
             let timezone_error = DateTimeError::InvalidTimezone;
-            assert_eq!(format!("{:?}", format_error), "InvalidFormat");
+            assert_eq!(format!("{format_error:?}"), "InvalidFormat");
             assert_eq!(
-                format!("{:?}", timezone_error),
+                format!("{timezone_error:?}"),
                 "InvalidTimezone"
             );
         }
@@ -133,6 +133,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "serde")]
     mod serialization_tests {
         use dtt::error::DateTimeError;
         use time::error::{Parse, TryFromParsed};
@@ -141,6 +142,7 @@ mod tests {
         ///
         /// This test ensures that the `DateTimeError` enum can be correctly
         /// serialized to and deserialized from JSON using the `serde` crate.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_serialization() -> Result<(), Box<dyn std::error::Error>>
         {
@@ -164,6 +166,7 @@ mod tests {
         }
 
         /// Tests the deserialization of `DateTimeError`.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_deserialization(
         ) -> Result<(), Box<dyn std::error::Error>> {
@@ -193,6 +196,7 @@ mod tests {
         ///
         /// This test ensures that the custom serialization and deserialization
         /// implementations for `DateTimeError` work correctly.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_custom_serde_impl(
         ) -> Result<(), Box<dyn std::error::Error>> {
@@ -222,10 +226,50 @@ mod tests {
             Ok(())
         }
 
+        /// Round-trips every `DateTimeError` variant that supports both
+        /// directions, plus pins the documented one-way behaviour of
+        /// `ParseError` and `ComponentRange`.
+        #[cfg(feature = "serde")]
+        #[test]
+        fn test_serde_all_variants(
+        ) -> Result<(), Box<dyn std::error::Error>> {
+            // Round-trippable variants.
+            for variant in [
+                DateTimeError::InvalidFormat,
+                DateTimeError::InvalidTimezone,
+                DateTimeError::InvalidDate,
+                DateTimeError::InvalidTime,
+            ] {
+                let s = serde_json::to_string(&variant)?;
+                let parsed: DateTimeError = serde_json::from_str(&s)?;
+                assert_eq!(variant, parsed);
+            }
+
+            // ComponentRange serialises to a fixed string but cannot
+            // be deserialised (intentional, since the inner type has no
+            // public constructor). Trigger a real ComponentRange from
+            // the `time` crate so we exercise the serialise branch.
+            use time::{Date, Month};
+            let cr_err =
+                Date::from_calendar_date(2024, Month::January, 32)
+                    .expect_err("day 32 must be invalid");
+            let dtt_err: DateTimeError = cr_err.into();
+            let serialized = serde_json::to_string(&dtt_err)?;
+            assert_eq!(serialized, "\"ComponentRange\"");
+
+            // The deserialise side is documented as one-way: it returns
+            // an error rather than reconstructing a synthetic value.
+            assert!(serde_json::from_str::<DateTimeError>(&serialized)
+                .is_err());
+
+            Ok(())
+        }
+
         /// Tests deserialization of `DateTimeError` from strings.
         ///
         /// This test verifies that `DateTimeError` can be deserialized from valid
         /// JSON strings and that invalid strings result in errors.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_from_str() -> Result<(), Box<dyn std::error::Error>> {
             let error_str = r#""InvalidFormat""#;
@@ -249,6 +293,7 @@ mod tests {
         ///
         /// This test ensures that attempting to deserialize `DateTimeError` from
         /// invalid JSON strings results in an appropriate error.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_invalid_json_deserialization() {
             let invalid_json_str = r#"{ "invalid": "data" }"#;
@@ -341,6 +386,7 @@ mod tests {
         ///
         /// This test ensures that the `unwrap` function, or any similar operation,
         /// does not panic when deserializing valid data or when handling valid error variants.
+        #[cfg(feature = "serde")]
         #[test]
         fn test_no_unexpected_panics() -> Result<(), Box<dyn Error>> {
             let valid_json_format = r#""InvalidFormat""#;
@@ -363,19 +409,19 @@ mod tests {
         #[test]
         fn test_debug_display_impl() {
             let format_error = DateTimeError::InvalidFormat;
-            assert_eq!(format!("{:?}", format_error), "InvalidFormat");
+            assert_eq!(format!("{format_error:?}"), "InvalidFormat");
             assert_eq!(
-                format!("{}", format_error),
+                format!("{format_error}"),
                 "Invalid date format"
             );
 
             let timezone_error = DateTimeError::InvalidTimezone;
             assert_eq!(
-                format!("{:?}", timezone_error),
+                format!("{timezone_error:?}"),
                 "InvalidTimezone"
             );
             assert_eq!(
-                format!("{}", timezone_error),
+                format!("{timezone_error}"),
                 "Invalid or unsupported timezone; DST not supported"
             );
         }
@@ -445,15 +491,22 @@ mod tests {
         use dtt::error::DateTimeError;
         use std::mem::size_of;
 
-        /// Tests the memory layout of `DateTimeError`.
+        /// Smoke test that `DateTimeError` is well-formed.
         ///
-        /// This test ensures that the size and alignment of `DateTimeError` are as expected
-        /// and do not change unexpectedly. This is important for ensuring ABI compatibility.
+        /// We intentionally avoid asserting an exact byte size, since the
+        /// enum embeds third-party types from the `time` crate whose layout
+        /// can change in patch releases.
         #[test]
-        fn test_memory_layout() {
-            assert_eq!(size_of::<DateTimeError>(), 56);
+        fn test_datetime_error_is_well_formed() {
+            use std::error::Error;
+            let err = DateTimeError::InvalidFormat;
+            let _: &dyn Error = &err;
+            assert!(size_of::<DateTimeError>() > 0);
+            assert!(!format!("{err:?}").is_empty());
+            assert!(!format!("{err}").is_empty());
         }
 
+        #[cfg(feature = "serde")]
         #[test]
         fn test_error_serialization(
         ) -> Result<(), Box<dyn std::error::Error>> {
@@ -463,6 +516,7 @@ mod tests {
             Ok(())
         }
 
+        #[cfg(feature = "serde")]
         #[test]
         fn test_error_deserialization(
         ) -> Result<(), Box<dyn std::error::Error>> {

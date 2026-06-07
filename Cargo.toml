@@ -5,9 +5,9 @@
 
 [package]
 name = "dtt"
-version = "0.0.9"
+version = "0.0.10"
 edition = "2021"
-rust-version = "1.56.0"
+rust-version = "1.88.0"
 license = "MIT OR Apache-2.0"
 authors = ["The DateTime (DTT) contributors"]
 build = "build.rs"
@@ -57,6 +57,16 @@ name = "benchmark"
 path = "benches/criterion.rs"
 harness = false
 
+# -----------------------------------------------------------------------------
+# Examples
+# -----------------------------------------------------------------------------
+# The `dtt` example exercises serde round-tripping; it can only build when
+# the `serde` feature is enabled. The other examples are feature-free.
+[[example]]
+name = "dtt"
+path = "examples/dtt.rs"
+required-features = ["serde"]
+
 [profile.bench]
 debug = true
 
@@ -64,22 +74,28 @@ debug = true
 # Dependencies
 # -----------------------------------------------------------------------------
 [dependencies]
-lazy_static = "1.5.0"
-paste = "1.0.15"
-regex = "1.11.1"
-serde = { version = "1.0.217", features = ["derive"] }
-# serde_derive = "1.0.217"
-serde_json = "1.0.135"
-time = { version = "0.3.37", features = ["serde", "formatting", "parsing", "macros"] }
-thiserror = "2.0.11"
+# `pastey` is the maintained fork of the now-unmaintained `paste` crate
+# (RUSTSEC-2024-0436). Drop-in compatible.
+pastey = "0.2.1"
+# serde is opt-in via the `serde` feature (enabled by default). Disable
+# default-features to drop ~6 transitive dependencies.
+serde = { version = "1.0.228", features = ["derive"], optional = true }
+serde_json = { version = "1.0.143", optional = true }
+# 0.3.47 fixes RUSTSEC time stack-exhaustion DoS (medium severity).
+# `time`'s `serde` feature is only needed when our `serde` feature is on.
+time = { version = "0.3.47", default-features = false, features = ["formatting", "parsing"] }
+thiserror = "2.0.18"
 
 # -----------------------------------------------------------------------------
 # Dev-Dependencies
 # -----------------------------------------------------------------------------
 [dev-dependencies]
-assert_cmd = "2.0.16"
-criterion = "0.5.1"
-serde_json = "1.0.135"
+assert_cmd = "2.2.2"
+criterion = "0.8.2"
+proptest = "1.5.0"
+regex = "1.12.3"
+serde_json = "1.0.143"
+serial_test = "3.2.0"
 
 # -----------------------------------------------------------------------------
 # Build Dependencies
@@ -91,7 +107,10 @@ version_check = "0.9.5"
 # Features
 # -----------------------------------------------------------------------------
 [features]
-default = []
+# Default keeps the v0.0.9 behaviour (serde on, RFC 3339 round-trip).
+default = ["serde"]
+# Optional `serde`/`serde_json` support. Drops ~6 transitive crates when off.
+serde = ["dep:serde", "dep:serde_json", "time/serde"]
 bench = []
 
 # -----------------------------------------------------------------------------
@@ -119,7 +138,7 @@ elided_lifetimes_in_paths = "allow"
 non_camel_case_types = "allow"
 non_upper_case_globals = "allow"
 trivial_bounds = "allow"
-unsafe_code = "allow"
+unsafe_code = "forbid"
 
 missing_debug_implementations = "forbid"
 non_ascii_idents = "forbid"
@@ -133,7 +152,6 @@ future_incompatible = { level = "deny", priority = -1 }
 keyword_idents = { level = "deny", priority = -1 }
 macro_use_extern_crate = "deny"
 meta_variable_misuse = "deny"
-missing_fragment_specifier = "deny"
 noop_method_call = "deny"
 rust_2018_idioms = { level = "deny", priority = -1 }
 rust_2021_compatibility = { level = "deny", priority = -1 }
@@ -149,13 +167,16 @@ unused_macro_rules = "deny"
 unused_qualifications = "deny"
 variant_size_differences = "deny"
 
-[package.metadata.clippy]
-warn-lints = [
-    "clippy::all",
-    "clippy::pedantic",
-    "clippy::cargo",
-    "clippy::nursery",
-]
+# Cargo-managed clippy enforcement applies to ALL targets in the package
+# (lib, bin, tests, benches, examples). Keep only universal allowances
+# here; library-only strict lints (`pedantic`, `nursery`, `cargo`,
+# `unwrap_used`, etc.) live as inner `#![deny(...)]` attributes in
+# `src/lib.rs` so they don't fire on tests that legitimately use unwrap.
+[lints.clippy]
+module_name_repetitions = "allow"
+# `multiple_crate_versions` fires on dev-deps the user can't control
+# (criterion brings in older itertools etc.).
+multiple_crate_versions = "allow"
 
 [profile.dev]
 codegen-units = 256
@@ -175,7 +196,7 @@ debug = false
 debug-assertions = false
 incremental = false
 lto = true
-opt-level = "s"
+opt-level = 3
 overflow-checks = false
 panic = "abort"
 rpath = false

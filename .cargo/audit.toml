@@ -1,0 +1,14 @@
+# cargo-audit policy for DTT.
+#
+# Documents any intentionally-ignored RustSec advisories so CI can
+# distinguish "accepted risk" from "unreviewed warning". Keep this
+# list as short as possible — prefer fixing or upgrading over
+# ignoring.
+
+[advisories]
+# Currently: no ignored advisories. All warnings surface as CI failures.
+ignore = []
+
+# Treat unmaintained crates as hard errors in CI (set by the gate
+# that runs `cargo audit --deny warnings`).
+informational_warnings = ["unmaintained", "unsound", "notice"]

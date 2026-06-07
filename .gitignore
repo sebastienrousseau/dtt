@@ -1,5 +1,6 @@
 *.DS_Store
 *.profraw
+*.cdx.json
 /.vscode/
 /output/
 /public/
@@ -8,4 +9,3 @@ build
 Icon?
 src/.DS_Store
 tarpaulin-report.html
-Cargo.lock

@@ -1,0 +1,24 @@
+# Default to LF line endings on checkout for all text files.
+# This prevents WSL/Windows users from accidentally committing CRLF.
+* text=auto eol=lf
+
+# Shell scripts MUST be LF (CRLF breaks /bin/bash and /usr/bin/env shebangs).
+*.sh        text eol=lf
+Makefile    text eol=lf
+
+# Rust source and config files — LF for cross-platform consistency.
+*.rs        text eol=lf
+*.toml      text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.md        text eol=lf
+*.lock      text eol=lf
+
+# Mark common binary file types so git does not try to diff them.
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.svg       binary
+*.ico       binary
+*.profraw   binary

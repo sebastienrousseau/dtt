@@ -15,11 +15,13 @@
 #[cfg(test)]
 mod tests {
     use dtt::run;
+    use serial_test::serial;
 
     /// Tests the main `run` function of the library.
     ///
     /// This test ensures that the `run` function executes correctly when not in test mode.
     #[test]
+    #[serial]
     fn test_run_success() {
         std::env::set_var("DTT_TEST_MODE", "0");
         let result = run();
@@ -30,6 +32,7 @@ mod tests {
     ///
     /// This test ensures that the `run` function returns an error when in test mode.
     #[test]
+    #[serial]
     fn test_run_test_mode_error() {
         std::env::set_var("DTT_TEST_MODE", "1");
         let result = run();
@@ -41,6 +44,7 @@ mod tests {
         if let Err(err) = result {
             assert_eq!(err.to_string(), "Simulated error");
         }
+        std::env::remove_var("DTT_TEST_MODE");
     }
 
     /// Tests the `datetime` module's functionality.
@@ -80,6 +84,7 @@ mod tests {
     ///
     /// This test ensures that the environment variable `DTT_TEST_MODE` is correctly read and used by the `run` function.
     #[test]
+    #[serial]
     fn test_env_var_handling() {
         std::env::set_var("DTT_TEST_MODE", "0");
         let result = run();
@@ -95,7 +100,7 @@ mod tests {
         assert_eq!(crate_name, "dtt");
 
         let version = env!("CARGO_PKG_VERSION");
-        assert_eq!(version, "0.0.9");
+        assert_eq!(version, "0.0.10");
 
         let homepage = env!("CARGO_PKG_HOMEPAGE");
         assert_eq!(homepage, "https://dttlib.com/");
