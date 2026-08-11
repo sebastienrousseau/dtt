@@ -880,8 +880,9 @@ impl DateTime {
         input: &str,
         format: &str,
     ) -> Result<Self, DateTimeError> {
-        let format_desc = format_description::parse(format)
-            .map_err(|_| DateTimeError::InvalidFormat)?;
+        let format_desc =
+            format_description::parse_borrowed::<1>(format)
+                .map_err(|_| DateTimeError::InvalidFormat)?;
         let datetime = PrimitiveDateTime::parse(input, &format_desc)
             .map_err(|_| DateTimeError::InvalidFormat)?;
 
@@ -924,8 +925,9 @@ impl DateTime {
         &self,
         format_str: &str,
     ) -> Result<String, DateTimeError> {
-        let format_desc = format_description::parse(format_str)
-            .map_err(|_| DateTimeError::InvalidFormat)?;
+        let format_desc =
+            format_description::parse_borrowed::<1>(format_str)
+                .map_err(|_| DateTimeError::InvalidFormat)?;
         self.datetime
             .format(&format_desc)
             .map_err(|_| DateTimeError::InvalidFormat)
