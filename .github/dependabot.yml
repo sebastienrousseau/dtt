@@ -8,6 +8,16 @@ updates:
       time: "09:00"
       timezone: "UTC"
     open-pull-requests-limit: 10
+    ignore:
+      # serial_test 4.x requires rustc 1.93.1; this crate declares
+      # rust-version 1.88.0. serial_test is a dev-dependency used only
+      # inside #[cfg(test)] blocks, so taking the major would raise the
+      # crate's MSRV by five minor versions for a test-only helper —
+      # a cost carried by every consumer, for no runtime benefit.
+      #
+      # Re-evaluate when the MSRV moves on its own merits.
+      - dependency-name: "serial_test"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: [minor, patch]
