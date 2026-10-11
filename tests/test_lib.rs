@@ -100,7 +100,7 @@ mod tests {
         assert_eq!(crate_name, "dtt");
 
         let version = env!("CARGO_PKG_VERSION");
-        assert_eq!(version, "0.0.12");
+        assert_eq!(version, "0.0.13");
 
         let homepage = env!("CARGO_PKG_HOMEPAGE");
         assert_eq!(homepage, "https://dttlib.com/");
