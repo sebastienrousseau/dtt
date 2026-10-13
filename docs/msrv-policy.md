@@ -3,9 +3,10 @@
 ## The rule
 
 `dtt` supports the **stable Rust release that was current six months
-ago**. Pre-1.0, the floor is exactly **`1.88.0`** — pinned by the
-`time = 0.3.47` security upgrade, whose `time-core = =0.1.8`
-transitive dependency uses Cargo's `edition2024` feature.
+ago**. Pre-1.0, the floor is exactly **`1.89.0`**, the floor shared by
+the maintainer's Rust crates. The dependency graph alone needs `1.88.0`:
+the `time = 0.3.47` security upgrade pins `time-core = =0.1.8`, which
+uses Cargo's `edition2024` feature.
 
 ## How the floor moves
 
@@ -23,8 +24,8 @@ transitive dependency uses Cargo's `edition2024` feature.
 
 | Layer | Mechanism |
 |-------|-----------|
-| `Cargo.toml` | `rust-version = "1.88.0"` field. Cargo refuses to compile on older toolchains. |
-| `build.rs` | `version_check::is_min_version("1.88")` produces a clear error message. |
+| `Cargo.toml` | `rust-version = "1.89.0"` field. Cargo refuses to compile on older toolchains. |
+| `build.rs` | `version_check::is_min_version("1.89")` produces a clear error message. |
 | CI matrix | Every PR runs the full test suite on the declared MSRV in addition to `stable`. See [`.github/workflows/cross-platform.yml`](../.github/workflows/cross-platform.yml). |
 | CHANGELOG | Every MSRV bump is recorded under `### Changed`. |
 
@@ -41,27 +42,28 @@ dependency**, currently `time`:
   would reintroduce the vulnerability.
 
 `dtt` also relies on `std::sync::LazyLock` (stable since 1.80.0) for the
-timezone-offset table, which is already covered by the 1.88.0 floor.
+timezone-offset table, which is already covered by the 1.89.0 floor.
 
 ## How a downstream user pins to a known-good MSRV
 
 ```toml
 # In your project's Cargo.toml
 [dependencies]
-dtt = "0.0.10"           # already constrained to >= 1.88
+dtt = "0.0.14"           # constrained to >= 1.89
 ```
 
 Or, to lock to the lowest verified-working toolchain:
 
 ```bash
-rustup install 1.88.0
-cargo +1.88.0 build
+rustup install 1.89.0
+cargo +1.89.0 build
 ```
 
 ## History of MSRV bumps
 
 | Release | MSRV    | Reason                                                                  |
 |---------|---------|-------------------------------------------------------------------------|
+| `0.0.14` | `1.89.0` | Alignment: one floor across the maintainer's Rust crates.               |
 | `0.0.10` | `1.88.0` | Security: `time 0.3.47` (RUSTSEC fix) pins `time-core =0.1.8` (`edition2024`). |
 | `0.0.9` | `1.80.0` | `std::sync::LazyLock` stabilisation.                                    |
 
