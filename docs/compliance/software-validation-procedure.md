@@ -15,7 +15,7 @@ that produces evidence suitable for regulated medical-device audits.
 | Versioning | Semantic Versioning 2.0.0 |
 | Primary source | <https://github.com/sebastienrousseau/dtt> |
 | Build system | Cargo |
-| Minimum Supported Rust Version | 1.80.0 |
+| Minimum Supported Rust Version | 1.89.0 |
 | Licence | Apache-2.0 OR MIT |
 | Cryptographic signing | SSH/Ed25519 or GPG per commit (`git commit -S`) |
 
@@ -76,7 +76,7 @@ Every push to `feat/**` and every PR to `main` triggers
 `.github/workflows/cross-platform.yml`, which executes:
 
 - **Test matrix:** `ubuntu-latest`, `macos-latest`, `windows-latest`
-  × Rust `stable` + `1.80.0` MSRV (6 combinations).
+  × Rust `stable` + `1.89.0` MSRV (6 combinations).
 - **Coverage gate:** `cargo llvm-cov` with `--fail-under-lines 99
   --fail-under-functions 100`.
 - **Security gate:** `cargo audit --deny warnings` against the
