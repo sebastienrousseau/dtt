@@ -15,6 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   cross-platform matrix, the README, CONTRIBUTING.md and
   `docs/msrv-policy.md` move together.
 
+### Fixed
+
+- **doc.dttlib.com indexing.** `tools/docs-site.sh` (`make docs-site`)
+  builds the API docs with `--no-deps` and adds a `robots.txt` that
+  keeps crawlers out of `/src/` and `?search=` URLs, a `sitemap.xml` of
+  the current item pages, and a canonical link on every page. A
+  re-exported item (`dtt::DateTime`, `dtt::AppError`) rendered twice
+  now names one canonical URL. A 2024 build that documented every
+  dependency left Google requesting pages such as
+  `/src/syn/op.rs.html`, which now return 404.
+- `.github/workflows/pages.yml` builds and checks the site on every
+  pull request and deploys it from `main`. It replaces the shared docs
+  job in `ci.yml`, and no longer uploads the stale `gh-pages` branch.
+
 ## [0.0.13] - 2026-10-11
 
 ### Changed
