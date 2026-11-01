@@ -3,7 +3,7 @@
 # Works identically on macOS, Linux, and WSL with any POSIX-compliant `make`.
 # Run `make help` for the command list.
 
-.PHONY: help all build test lint fmt fmt-check doc bench example verify coverage audit sbom clean install-hooks check-deps
+.PHONY: help all build test lint fmt fmt-check doc bench example verify coverage audit docs-site sbom clean install-hooks check-deps
 
 help:
 	@echo "DTT — common tasks (works on macOS, Linux, WSL)"
@@ -14,6 +14,7 @@ help:
 	@echo "  make fmt           cargo fmt"
 	@echo "  make fmt-check     cargo fmt --check"
 	@echo "  make doc           cargo doc --no-deps --open"
+	@echo "  make docs-site     Build doc.dttlib.com (robots, sitemap, canonical)"
 	@echo "  make bench         cargo bench"
 	@echo "  make example       cargo run --example dtt"
 	@echo "  make verify        fmt-check + lint + test (PR-ready gate)"
@@ -43,6 +44,9 @@ fmt-check:
 
 doc:
 	cargo doc --no-deps --open
+
+docs-site:
+	./tools/docs-site.sh
 
 bench:
 	cargo bench

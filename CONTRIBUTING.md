@@ -22,7 +22,7 @@ conventions, and submit a pull request that lands cleanly.
 git clone https://github.com/sebastienrousseau/dtt.git
 cd dtt
 
-# Install Rust 1.80+ (skip if already installed)
+# Install Rust 1.89+ (skip if already installed)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 # Verify everything builds and tests cleanly (one command, all 3 OSes)

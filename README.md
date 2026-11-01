@@ -49,7 +49,7 @@ dtt = "0.0.13"
 
 ### Prerequisites
 
-DTT requires **Rust 1.88.0 or later** (pinned by `time = 0.3.47`, which carries the upstream fix for [RUSTSEC stack-exhaustion DoS](https://rustsec.org/) in `time < 0.3.47`).
+DTT requires **Rust 1.89.0 or later**, the floor shared by the maintainer's Rust crates. The dependency graph alone needs 1.88.0 (`time = 0.3.47`, which carries the upstream fix for [RUSTSEC stack-exhaustion DoS](https://rustsec.org/) in `time < 0.3.47`).
 
 | Platform | Setup |
 |----------|-------|
@@ -58,7 +58,7 @@ DTT requires **Rust 1.88.0 or later** (pinned by `time = 0.3.47`, which carries 
 | **WSL** | Same as Linux, run inside your WSL distribution |
 | **Windows** | Download `rustup-init.exe` from [rustup.rs](https://rustup.rs/) |
 
-After install, verify with `rustc --version` (must be ≥ 1.88.0). Upgrade an existing toolchain with `rustup update stable`.
+After install, verify with `rustc --version` (must be ≥ 1.89.0). Upgrade an existing toolchain with `rustup update stable`.
 
 ---
 
