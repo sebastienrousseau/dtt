@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.15] - Unreleased
+
+### Fixed
+
+- `dtt_is_valid_function!` failed to compile in any crate that did not
+  itself depend on `pastey` (`cannot find pastey in the list of
+  imported crates`): the macro named `::pastey`, which resolves in the
+  caller's crate. It now reaches `pastey` through a hidden `$crate`
+  re-export. This also clears cargo's `unused dependency` warning for
+  `pastey`.
+
+### Dependencies
+
+- `rustix` 1.1.4 -> 1.1.6 (dev-only, through `tempfile`) for
+  `RUSTSEC-2026-0486`.
+- `taiki-e/install-action` 2.88.1 -> 2.90.2 in CI (Dependabot #158).
+
 ## [0.0.14] - 2026-11-01
 
 ### Changed
