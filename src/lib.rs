@@ -81,6 +81,12 @@ pub use crate::datetime::DateTime;
 #[doc(inline)]
 pub use crate::error::AppError;
 
+// Used by `dtt_is_valid_function!`, which expands in the caller's crate:
+// the macro reaches `pastey` through `$crate` so callers need not depend
+// on it themselves. Not part of the public API.
+#[doc(hidden)]
+pub use pastey as __pastey;
+
 /// Core datetime functionality and operations.
 ///
 /// This module contains the primary `DateTime` type and associated functionality
