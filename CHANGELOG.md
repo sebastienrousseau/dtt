@@ -20,7 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `rustix` 1.1.4 -> 1.1.6 (dev-only, through `tempfile`) for
   `RUSTSEC-2026-0486`.
-- `taiki-e/install-action` 2.88.1 -> 2.90.2 in CI (Dependabot #158).
+- `taiki-e/install-action` 2.88.1 -> 2.90.6 in CI (Dependabot #158,
+  #160).
+- `regex` 1.13.1 -> 1.13.2 (Dependabot #161).
 
 ## [0.0.14] - 2026-11-01
 
